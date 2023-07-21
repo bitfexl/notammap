@@ -1,8 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MapTest } from "./lib/map/MapTest";
+import { fetchCountries, fetchNotams } from "./lib/notams/NotamFetch";
 
 function App() {
     const [count, setCount] = useState(0);
+
+    useEffect(() => {
+        (async () => {
+            const countries = await fetchCountries();
+            for (const country of countries) {
+                console.log(country + ":");
+                const notams = await fetchNotams(country);
+                console.log(notams);
+            }
+        })();
+    }, []);
 
     return (
         <>
