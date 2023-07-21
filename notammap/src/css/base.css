@@ -1,5 +1,46 @@
 @layer base {
+    * {
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        @apply font-medium;
+    }
+
+    h1 {
+        @apply text-3xl;
+    }
+
+    h2 {
+        @apply text-2xl;
+    }
+
+    h3 {
+        @apply text-xl;
+    }
+
+    h4 {
+        @apply text-lg;
+    }
+
+    h5 {
+        @apply text-base;
+    }
+
+    h6 {
+        @apply text-sm;
+    }
+
     button {
-        @apply text-red-500;
+        @apply p-1 bg-gray-100 border border-gray-200;
+    }
+
+    button:hover {
+        @apply bg-gray-200 border-gray-300;
     }
 }

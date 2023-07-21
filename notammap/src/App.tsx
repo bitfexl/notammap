@@ -6,6 +6,13 @@ function App() {
     return (
         <>
             <h1>Notam Map</h1>
+            <h1>Heading 1</h1>
+            <h2>Heading 2</h2>
+            <h3>Heading 3</h3>
+            <h4>Heading 4</h4>
+            <hr />
+            <h5>Heading 5</h5>
+            <h6>Heading 6</h6>
             <div className="card">
                 <button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
                 <p>{import.meta.env.VITE_MY_VAR}</p>
