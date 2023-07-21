@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { MapTest } from "./lib/map/MapTest";
 
 function App() {
     const [count, setCount] = useState(0);
@@ -20,6 +21,7 @@ function App() {
                 <br />
                 <div className="inline-block w-40 h-20 bg-green-500"></div>
             </div>
+            <MapTest></MapTest>
         </>
     );
 }
