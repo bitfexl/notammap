@@ -1,26 +1,27 @@
-import { useCallback, useEffect, useRef } from "react";
-import { LeafletMap } from "./LeafletMap";
+import { memo, useCallback, useEffect, useRef } from "react";
+import { LeafletMap } from "../LeafletMap";
 import * as L from "leaflet";
-import { Notam } from "../notams/notamextractor";
-
-/**
- * One nautical mile in meters.
- */
-const NM_TO_M = 1852;
+import { Notam } from "../../notams/notamextractor";
+import { NotamFilter, NotamMarkerProducer } from "./NotamDisplayHelpers";
 
 export interface NotamMapProps {
     notams: Notam[];
+    filter: NotamFilter;
+    markerProducer: NotamMarkerProducer;
 }
 
-export function NotamMap({ notams }: NotamMapProps) {
+export const NotamMap = memo(function NotamMap({ notams, filter, markerProducer }: NotamMapProps) {
     const mapRef = useRef<L.Map>(null);
     const displayedNotams = useRef(new Map<Notam, L.Layer>());
 
-    const initMap = useCallback((map: L.Map) => initAeronauticalMap(map, [52.351603163346255, 13.494656170576595], 9), []);
+    const initMap = useCallback((map: L.Map) => {
+        displayedNotams.current.clear();
+        initAeronauticalMap(map, [52.351603163346255, 13.494656170576595], 9);
+    }, []);
 
     useEffect(() => {
         if (mapRef.current != null) {
-            updateNotams(mapRef.current, notams, displayedNotams.current);
+            updateNotams(mapRef.current, notams, displayedNotams.current, filter, markerProducer);
         } else {
             displayedNotams.current.clear();
         }
@@ -31,14 +32,20 @@ export function NotamMap({ notams }: NotamMapProps) {
             <LeafletMap ref={mapRef} init={initMap}></LeafletMap>
         </div>
     );
-}
+});
 
-function updateNotams(map: L.Map, notams: Notam[], displayedNotams: Map<Notam, L.Layer>) {
+function updateNotams(
+    map: L.Map,
+    notams: Notam[],
+    displayedNotams: Map<Notam, L.Layer>,
+    filter: NotamFilter,
+    markerProducer: NotamMarkerProducer
+) {
     console.log("Updating " + notams.length + " notams...");
     let removedCount = 0;
 
     for (const oldNotam of displayedNotams.keys()) {
-        if (!notams.includes(oldNotam)) {
+        if (!notams.includes(oldNotam) || !filter(oldNotam)) {
             map.removeLayer(displayedNotams.get(oldNotam) as L.Layer);
             displayedNotams.delete(oldNotam);
             removedCount++;
@@ -48,9 +55,10 @@ function updateNotams(map: L.Map, notams: Notam[], displayedNotams: Map<Notam, L
     console.log("Removed " + removedCount + " notams.");
     let addedCount = 0;
 
-    for (const notam of notams) {
+    for (const notam of notams.filter(filter)) {
         if (!displayedNotams.has(notam)) {
-            displayedNotams.set(notam, createMarker(map, notam));
+            // TODO: group
+            displayedNotams.set(notam, createMarker(map, notam, markerProducer));
             addedCount++;
         }
     }
@@ -58,33 +66,8 @@ function updateNotams(map: L.Map, notams: Notam[], displayedNotams: Map<Notam, L
     console.log("Added " + addedCount + " notams.");
 }
 
-function createMarker(map: L.Map, notam: Notam): L.Layer {
-    const latlng: L.LatLngTuple = [notam.latitude, notam.longitude];
-    const radius = notam.radius * NM_TO_M;
-
-    const marker = L.marker(latlng);
-    const circle = L.circle(latlng, { radius });
-
-    const openPoupu = () => {
-        const content = document.createElement("p");
-        content.innerText = notam.notamText;
-        L.popup().setLatLng(latlng).setContent(content).openOn(map);
-    };
-
-    marker.on("click", openPoupu);
-    circle.on("click", openPoupu);
-
-    const finalLayer = L.layerGroup();
-    finalLayer.addLayer(marker);
-
-    // do not show radius for notams with radius > 10km
-    // TODO: more filter options
-    if (radius < 10000) {
-        finalLayer.addLayer(circle);
-    }
-
-    finalLayer.addTo(map);
-    return finalLayer;
+function createMarker(map: L.Map, notam: Notam, markerProducer: NotamMarkerProducer): L.Layer {
+    return markerProducer([notam], map);
 }
 
 function initAeronauticalMap(map: L.Map, center: L.LatLngTuple, zoom: number) {

@@ -1,11 +1,23 @@
-import { useState, useEffect } from "react";
-import { NotamMap } from "./lib/map/NotamMap";
+import { useState, useEffect, useCallback } from "react";
+import { NotamMap } from "./lib/map/notammap/NotamMap";
 import { fetchCountries, fetchNotams } from "./lib/notams/NotamFetch";
 import { Notam } from "./lib/notams/notamextractor";
+import { defaultFilter, defaultMarkerProducer } from "./lib/map/notammap/NotamDisplayHelpers";
 
 function App() {
     const [count, setCount] = useState(0);
     const [notams, setNotmas] = useState<Notam[]>([]);
+    const [showOnlyRestrictions, setShowOnlyRestrictions] = useState(false);
+
+    const filter = useCallback(
+        (notam: Notam) => {
+            if (showOnlyRestrictions) {
+                return notam.notamCode.startsWith("QR");
+            }
+            return defaultFilter(notam);
+        },
+        [showOnlyRestrictions]
+    );
 
     useEffect(() => {
         (async () => {
@@ -37,7 +49,13 @@ function App() {
                 <br />
                 <div className="inline-block w-40 h-20 bg-green-500"></div>
             </div>
-            <NotamMap notams={notams}></NotamMap>
+            <div>
+                <label>
+                    Show Only Airspace Restrictions
+                    <input className="m-2" type="checkbox" onChange={(e) => setShowOnlyRestrictions(e.target.checked)} />
+                </label>
+            </div>
+            <NotamMap notams={notams} filter={filter} markerProducer={defaultMarkerProducer}></NotamMap>
         </>
     );
 }
