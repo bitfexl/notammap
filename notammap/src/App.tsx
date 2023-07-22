@@ -1,18 +1,22 @@
 import { useState, useEffect } from "react";
-import { MapTest } from "./lib/map/MapTest";
+import { NotamMap } from "./lib/map/NotamMap";
 import { fetchCountries, fetchNotams } from "./lib/notams/NotamFetch";
+import { Notam } from "./lib/notams/notamextractor";
 
 function App() {
     const [count, setCount] = useState(0);
+    const [notams, setNotmas] = useState<Notam[]>([]);
 
     useEffect(() => {
         (async () => {
             const countries = await fetchCountries();
-            for (const country of countries) {
-                console.log(country + ":");
-                const notams = await fetchNotams(country);
-                console.log(notams);
-            }
+            setNotmas(await fetchNotams(countries[0]));
+            // for (const country of countries) {
+            //     console.log(country + ":");
+            //     const notams = await fetchNotams(country);
+            //     console.log(notams);
+            //     setNotmas((old) => [...old, ...notams]);
+            // }
         })();
     }, []);
 
@@ -33,7 +37,7 @@ function App() {
                 <br />
                 <div className="inline-block w-40 h-20 bg-green-500"></div>
             </div>
-            <MapTest></MapTest>
+            <NotamMap notams={notams}></NotamMap>
         </>
     );
 }
