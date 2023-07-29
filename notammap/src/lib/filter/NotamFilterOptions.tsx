@@ -139,7 +139,7 @@ export function NotamFilterOptionsSelector({ onChange, options }: NotamFilterOpt
                     {
                         label: "Obstacles",
                         key: "OBSTACLES",
-                        help: <>Obstacle NOTAMs (QOBXX, OQLXX).</>,
+                        help: <>Obstacle NOTAMs (QOBXX, QOLXX).</>,
                         checked: options.QCODES.OBSTACLES,
                     },
                     {
