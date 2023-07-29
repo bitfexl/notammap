@@ -19,10 +19,6 @@ export type NotamFilter = (notam: Notam) => boolean;
  */
 export type NotamMarkerProducer = (notams: Notam[], map: L.Map) => L.Layer;
 
-export function defaultFilter(notam: Notam) {
-    return true;
-}
-
 export function defaultMarkerProducer(notams: Notam[], map: L.Map) {
     const notam = notams[0];
 

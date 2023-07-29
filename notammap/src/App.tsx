@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { NotamMap } from "./lib/map/notammap/NotamMap";
 import { fetchCountries, fetchNotams } from "./lib/notams/NotamFetch";
 import { Notam } from "./lib/notams/notamextractor";
-import { NotamFilter, NotamMarkerProducer, defaultFilter, defaultMarkerProducer } from "./lib/map/notammap/NotamDisplayHelpers";
+import { NotamFilter, NotamMarkerProducer, defaultMarkerProducer } from "./lib/map/notammap/NotamDisplayHelpers";
 import { NotamFilterOptions, NotamFilterOptionsSelector, defaultFilterOptions } from "./lib/filter/NotamFilterOptions";
 import { createFilter } from "./lib/filter/CreateFilter";
 
@@ -10,16 +10,16 @@ function App() {
     const [notams, setNotmas] = useState<Notam[]>([]);
 
     const [notamFilterOptions, setNotamFitlerOptions] = useState<NotamFilterOptions>(defaultFilterOptions);
-    const [notamFilter, _setNotamFilter] = useState<NotamFilter>(() => defaultFilter);
+    const [notamFilter, _setNotamFilter] = useState<NotamFilter>(() => createFilter(defaultFilterOptions));
     const [notamMarkerProducer, _setNotamMarkerProducer] = useState<NotamMarkerProducer>(() => defaultMarkerProducer);
 
     function setNotamFilter(filter: NotamFilter) {
         _setNotamFilter(() => filter);
     }
 
-    function setNotamMarkerProducer(markerProducer: NotamMarkerProducer) {
-        _setNotamMarkerProducer(() => markerProducer);
-    }
+    // function setNotamMarkerProducer(markerProducer: NotamMarkerProducer) {
+    //     _setNotamMarkerProducer(() => markerProducer);
+    // }
 
     useEffect(() => {
         setNotamFilter(createFilter(notamFilterOptions));
