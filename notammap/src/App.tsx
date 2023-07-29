@@ -5,6 +5,7 @@ import { Notam } from "./lib/notams/notamextractor";
 import { NotamFilter, NotamMarkerProducer, defaultMarkerProducer } from "./lib/map/notammap/NotamDisplayHelpers";
 import { NotamFilterOptions, NotamFilterOptionsSelector, defaultFilterOptions } from "./lib/filter/NotamFilterOptions";
 import { createFilter } from "./lib/filter/CreateFilter";
+import { isSmallWidth } from "./lib/deviceUtils";
 
 function App() {
     const [notams, setNotmas] = useState<Notam[]>([]);
@@ -13,7 +14,7 @@ function App() {
     const [notamFilter, _setNotamFilter] = useState<NotamFilter>(() => createFilter(defaultFilterOptions));
     const [notamMarkerProducer, _setNotamMarkerProducer] = useState<NotamMarkerProducer>(() => defaultMarkerProducer);
 
-    const [menuOpen, setMenuOpen] = useState(false);
+    const [menuOpen, setMenuOpen] = useState(!isSmallWidth());
 
     function setNotamFilter(filter: NotamFilter) {
         _setNotamFilter(() => filter);
@@ -40,9 +41,15 @@ function App() {
         })();
     }, []);
 
+    function closeMenuSmallDevices() {
+        if (isSmallWidth()) {
+            setMenuOpen(false);
+        }
+    }
+
     return (
         <>
-            <div className="fixed top-0 left-0 w-[100vw] h-[100vh] -z-10">
+            <div onClick={closeMenuSmallDevices} className="fixed top-0 left-0 w-[100vw] h-[100vh] -z-10">
                 <NotamMap notams={notams} filter={notamFilter} markerProducer={notamMarkerProducer}></NotamMap>
             </div>
 
