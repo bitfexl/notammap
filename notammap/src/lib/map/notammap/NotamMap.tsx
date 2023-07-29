@@ -28,7 +28,7 @@ export const NotamMap = memo(function NotamMap({ notams, filter, markerProducer 
     });
 
     return (
-        <div className="inline-block w-[600px] h-[600px]">
+        <div className="inline-block w-full h-full">
             <LeafletMap ref={mapRef} init={initMap}></LeafletMap>
         </div>
     );

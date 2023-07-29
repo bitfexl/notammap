@@ -13,6 +13,8 @@ function App() {
     const [notamFilter, _setNotamFilter] = useState<NotamFilter>(() => createFilter(defaultFilterOptions));
     const [notamMarkerProducer, _setNotamMarkerProducer] = useState<NotamMarkerProducer>(() => defaultMarkerProducer);
 
+    const [menuOpen, setMenuOpen] = useState(false);
+
     function setNotamFilter(filter: NotamFilter) {
         _setNotamFilter(() => filter);
     }
@@ -40,10 +42,23 @@ function App() {
 
     return (
         <>
-            <h1>Notam Map</h1>
-            <NotamMap notams={notams} filter={notamFilter} markerProducer={notamMarkerProducer}></NotamMap>
-            <br />
-            <NotamFilterOptionsSelector options={notamFilterOptions} onChange={setNotamFitlerOptions}></NotamFilterOptionsSelector>
+            <div className="fixed top-0 left-0 w-[100vw] h-[100vh] -z-10">
+                <NotamMap notams={notams} filter={notamFilter} markerProducer={notamMarkerProducer}></NotamMap>
+            </div>
+
+            {menuOpen ? (
+                <div className="fixed top-0 right-0 w-80 h-[100vh] bg-white p-3 overflow-auto">
+                    <div className="text-right">
+                        <button onClick={() => setMenuOpen(false)}>Close Menu</button>
+                    </div>
+
+                    <NotamFilterOptionsSelector options={notamFilterOptions} onChange={setNotamFitlerOptions}></NotamFilterOptionsSelector>
+                </div>
+            ) : (
+                <div className="fixed top-0 right-0 p-3">
+                    <button onClick={() => setMenuOpen(true)}>Open Menu</button>
+                </div>
+            )}
         </>
     );
 }
