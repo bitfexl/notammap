@@ -25,7 +25,9 @@ export function defaultMarkerProducer(notams: Notam[], map: L.Map) {
     const latlng: L.LatLngTuple = [notam.latitude, notam.longitude];
     const radius = notam.radius * NM_TO_M;
 
-    const marker = L.marker(latlng);
+    const marker = L.marker(latlng, {
+        icon: createIcon("lightblue", "ABCD"),
+    });
     const circle = L.circle(latlng, { radius });
 
     const openPoupu = () => {
@@ -48,4 +50,31 @@ export function defaultMarkerProducer(notams: Notam[], map: L.Map) {
 
     finalLayer.addTo(map);
     return finalLayer;
+}
+
+/**
+ * Create a leaflet marker icon.
+ * @param color The color (css color).
+ * @param text The text at maximum 3 characters. Watch out for xss.
+ * @returns A leaflet marker.
+ */
+export function createIcon(color: string, text: string): L.DivIcon {
+    text = text.substring(0, 3); // no xss in 3 chars?
+
+    const style = `
+    background-color: ${color};
+    width: 1.5rem;
+    height: 1.5rem;
+    display: block;
+    left: -0.75rem;
+    top: -0.75rem;
+    position: relative;
+    border-radius: 1.5rem 1.5rem 0;
+    transform: rotate(45deg);
+    border: 1px solid #FFFFFF`;
+
+    return L.divIcon({
+        iconAnchor: [0, 20],
+        html: `<span style="${style}"><span style="display: block; transform: rotate(-45deg); text-align: center; font-size: 1rem; font-family: monospace;">${text}</span></span>`,
+    });
 }
