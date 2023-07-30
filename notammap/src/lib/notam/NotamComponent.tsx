@@ -1,4 +1,5 @@
 import { Notam } from "../notams/notamextractor";
+import { useState } from "react";
 
 export interface NotamComponentProps {
     /**
@@ -8,6 +9,24 @@ export interface NotamComponentProps {
 }
 
 export function NotamComponent({ notam }: NotamComponentProps) {
+    const [showRaw, setShowRaw] = useState(false);
+
+    if (showRaw) {
+        return (
+            <div
+                onClick={(e) => {
+                    setShowRaw(false);
+                    e.stopPropagation();
+                }}
+            >
+                <div className="text-right">
+                    <button className="linklike pr-2">Show Formatted</button>
+                </div>
+                <pre>{notam.raw}</pre>
+            </div>
+        );
+    }
+
     const notamId = notam.series + "/" + (notam.year - 2000);
     const notamIdText = <span className="font-mono text-sm">{notamId}</span>;
 
@@ -68,7 +87,18 @@ export function NotamComponent({ notam }: NotamComponentProps) {
     return (
         <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-1">
-                <b>{notam.notamCode}</b>
+                <div className="flex justify-between">
+                    <b>{notam.notamCode}</b>
+                    <button
+                        className="linklike pr-2"
+                        onClick={(e) => {
+                            setShowRaw(true);
+                            e.stopPropagation();
+                        }}
+                    >
+                        Show Raw
+                    </button>
+                </div>
                 <div>{headerInformation}</div>
                 <div>{locationInformation}</div>
             </div>

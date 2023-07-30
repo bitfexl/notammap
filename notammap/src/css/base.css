@@ -36,19 +36,21 @@
         @apply text-sm;
     }
 
-    button {
+    button:not(.linklike) {
         @apply p-1 bg-gray-100 border border-gray-200;
     }
 
-    button:hover {
+    button:not(.linklike):hover {
         @apply bg-gray-200 border-gray-300;
     }
 
-    a {
+    a,
+    .linklike {
         @apply text-blue-500;
     }
 
-    a:hover {
+    a:hover,
+    .linklike:hover {
         @apply underline;
     }
 
