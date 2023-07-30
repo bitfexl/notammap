@@ -1,3 +1,4 @@
+import { toText } from "../notams/QCodes";
 import { Notam } from "../notams/notamextractor";
 import { useState } from "react";
 
@@ -88,7 +89,7 @@ export function NotamComponent({ notam }: NotamComponentProps) {
         <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-1">
                 <div className="flex justify-between">
-                    <b>{notam.notamCode}</b>
+                    <b>{toText(notam.notamCode)}</b>
                     <button
                         className="linklike pr-2"
                         onClick={(e) => {
