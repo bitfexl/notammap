@@ -8,12 +8,14 @@ export function toText(qcode: string) {
     const code1 = qcode.substring(1, 3);
     const code2 = qcode.substring(3, 5);
 
-    let part1: string = (qcodeTables.firstTablesTable as any)[code1] ?? "'" + code1 + "' unknown";
-    let part2: string = (qcodeTables.secondTablesTable as any)[code2] ?? "'" + code2 + "' unknown";
+    let part1: string = (qcodeTables.firstTablesTable as any)[code1] ?? "('" + code1 + "' unknown)";
+    let part2: string = (qcodeTables.secondTablesTable as any)[code2] ?? "('" + code2 + "' unknown)";
 
     // add free part if it exists
     if (code2 == "XX" && qcode.length > 5) {
         part2 = qcode.split(" ", 2)[1];
+    } else if (code2 == "XX") {
+        part2 = "";
     }
 
     // lowercase first char
