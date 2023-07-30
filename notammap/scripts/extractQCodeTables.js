@@ -22,7 +22,6 @@ JSON.stringify(
                 let value = row.querySelector("td:nth-child(2)").innerText;
 
                 value = value.replace(/\(.*\)/, "");
-                value = value.replaceAll("...", "");
                 value = value.replace("  ", " ");
                 value = value.trim();
 
