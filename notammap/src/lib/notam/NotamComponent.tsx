@@ -9,13 +9,13 @@ export interface NotamComponentProps {
 
 export function NotamComponent({ notam }: NotamComponentProps) {
     const notamId = notam.series + "/" + (notam.year - 2000);
-    const notamIdText = <span className="font-mono">{notamId}</span>;
+    const notamIdText = <span className="font-mono text-sm">{notamId}</span>;
 
     const headerInformation =
         notam.type == "REPLACE" ? (
             <>
                 {notamIdText} replaces{" "}
-                <span className="font-mono">
+                <span className="font-mono text-sm">
                     {notam.previousNotam.series}/{notam.previousNotam.year - 2000}
                 </span>
             </>
@@ -24,6 +24,22 @@ export function NotamComponent({ notam }: NotamComponentProps) {
         ) : (
             <>{notamIdText}</>
         );
+
+    const locationInformation = (
+        <>
+            Location{notam.locationIndicators.length > 1 ? "s" : ""}:{" "}
+            <span className="font-mono font-semibold">{notam.locationIndicators.join(", ")}</span>
+            {notam.locationIndicators.includes(notam.fir) ? (
+                <> (FIR)</>
+            ) : (
+                <>
+                    <span className="pl-4"></span>
+                    FIR:
+                    <span className="font-mono">{notam.fir}</span>
+                </>
+            )}
+        </>
+    );
 
     const heightInformation =
         notam.lowerLimit != null && notam.upperLimit != null ? (
@@ -42,7 +58,9 @@ export function NotamComponent({ notam }: NotamComponentProps) {
         <>Permanent</>
     ) : (
         <>
-            From {new Date(notam.from).toLocaleString()} to {new Date(notam.to).toLocaleString()} local time
+            From {new Date(notam.from).toLocaleString()}
+            <br />
+            To {new Date(notam.to).toLocaleString()} local time
             {notam.isEstimation && " (estimation)"}
         </>
     );
@@ -52,11 +70,17 @@ export function NotamComponent({ notam }: NotamComponentProps) {
             <div className="flex flex-col gap-1">
                 <b>{notam.notamCode}</b>
                 <div>{headerInformation}</div>
+                <div>{locationInformation}</div>
             </div>
 
             <div className="flex flex-col gap-1">
                 <b>Validity</b>
                 <div>{dateInformation}</div>
+            </div>
+
+            <div className="flex flex-col">
+                <b>Affected Traffic</b>
+                <span className="font-mono">{notam.traffic.join(", ")}</span>
             </div>
 
             <div className="flex flex-col gap-1">
