@@ -26,13 +26,19 @@ export function defaultMarkerProducer(notams: Notam[], map: L.Map) {
     const radius = notam.radius * NM_TO_M;
 
     const marker = L.marker(latlng, {
-        icon: createIcon("lightblue", "ABCD"),
+        icon: createIcon("lightblue", "" + notams.length),
     });
     const circle = L.circle(latlng, { radius });
 
     const openPoupu = () => {
-        const content = document.createElement("p");
-        content.innerText = notam.notamText;
+        const content = document.createElement("div");
+
+        for (const notam of notams) {
+            const notamContent = document.createElement("p");
+            notamContent.innerText = notam.notamText;
+            content.appendChild(notamContent);
+        }
+
         L.popup().setLatLng(latlng).setContent(content).openOn(map);
     };
 

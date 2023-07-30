@@ -12,7 +12,7 @@ export interface NotamMapProps {
 
 export const NotamMap = memo(function NotamMap({ notams, filter, markerProducer }: NotamMapProps) {
     const mapRef = useRef<L.Map>(null);
-    const displayedNotams = useRef(new Map<Notam, L.Layer>());
+    const displayedNotams = useRef(new Set<L.Layer>());
 
     const initMap = useCallback((map: L.Map) => {
         displayedNotams.current.clear();
@@ -37,37 +37,46 @@ export const NotamMap = memo(function NotamMap({ notams, filter, markerProducer 
 function updateNotams(
     map: L.Map,
     notams: Notam[],
-    displayedNotams: Map<Notam, L.Layer>,
+    displayedNotams: Set<L.Layer>,
     filter: NotamFilter,
     markerProducer: NotamMarkerProducer
 ) {
     console.log("Updating " + notams.length + " notams...");
-    let removedCount = 0;
-
-    for (const oldNotam of displayedNotams.keys()) {
-        if (!notams.includes(oldNotam) || !filter(oldNotam)) {
-            map.removeLayer(displayedNotams.get(oldNotam) as L.Layer);
-            displayedNotams.delete(oldNotam);
-            removedCount++;
-        }
+    for (const layer of displayedNotams) {
+        map.removeLayer(layer);
     }
+    displayedNotams.clear();
 
-    console.log("Removed " + removedCount + " notams.");
-    let addedCount = 0;
+    //                          lat         lng     notams
+    const notamGroups = new Map<number, Map<number, Notam[]>>();
 
     for (const notam of notams.filter(filter)) {
-        if (!displayedNotams.has(notam)) {
-            // TODO: group
-            displayedNotams.set(notam, createMarker(map, notam, markerProducer));
-            addedCount++;
+        let lngMap = notamGroups.get(notam.latitude);
+
+        if (lngMap == null) {
+            lngMap = new Map();
+            notamGroups.set(notam.latitude, lngMap);
         }
+
+        let notams = lngMap.get(notam.longitude);
+
+        if (notams == null) {
+            notams = [];
+            lngMap.set(notam.longitude, notams);
+        }
+
+        notams.push(notam);
     }
 
-    console.log("Added " + addedCount + " notams.");
+    notamGroups.forEach((lngMap) => {
+        lngMap.forEach((notams) => {
+            displayedNotams.add(createMarker(map, notams, markerProducer));
+        });
+    });
 }
 
-function createMarker(map: L.Map, notam: Notam, markerProducer: NotamMarkerProducer): L.Layer {
-    return markerProducer([notam], map);
+function createMarker(map: L.Map, notams: Notam[], markerProducer: NotamMarkerProducer): L.Layer {
+    return markerProducer(notams, map);
 }
 
 function initAeronauticalMap(map: L.Map, center: L.LatLngTuple, zoom: number) {
