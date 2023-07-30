@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useRef } from "react";
+import { ReactPortal, memo, useCallback, useEffect, useRef, useState } from "react";
 import { LeafletMap } from "../LeafletMap";
 import * as L from "leaflet";
 import { Notam } from "../../notams/notamextractor";
@@ -11,6 +11,7 @@ export interface NotamMapProps {
 }
 
 export const NotamMap = memo(function NotamMap({ notams, filter, markerProducer }: NotamMapProps) {
+    const [portals, setPortals] = useState<ReactPortal[]>([]);
     const mapRef = useRef<L.Map>(null);
     const displayedNotams = useRef(new Set<L.Layer>());
 
@@ -21,16 +22,19 @@ export const NotamMap = memo(function NotamMap({ notams, filter, markerProducer 
 
     useEffect(() => {
         if (mapRef.current != null) {
-            updateNotams(mapRef.current, notams, displayedNotams.current, filter, markerProducer);
+            setPortals(updateNotams(mapRef.current, notams, displayedNotams.current, filter, markerProducer));
         } else {
             displayedNotams.current.clear();
         }
-    });
+    }, [notams, filter, markerProducer]);
 
     return (
-        <div className="inline-block w-full h-full">
-            <LeafletMap ref={mapRef} init={initMap}></LeafletMap>
-        </div>
+        <>
+            <div className="inline-block w-full h-full">
+                <LeafletMap ref={mapRef} init={initMap}></LeafletMap>
+            </div>
+            {portals}
+        </>
     );
 });
 
@@ -46,6 +50,7 @@ function updateNotams(
         map.removeLayer(layer);
     }
     displayedNotams.clear();
+    const portals: ReactPortal[] = [];
 
     //                          lat         lng     notams
     const notamGroups = new Map<number, Map<number, Notam[]>>();
@@ -70,13 +75,16 @@ function updateNotams(
 
     notamGroups.forEach((lngMap) => {
         lngMap.forEach((notams) => {
-            displayedNotams.add(createMarker(map, notams, markerProducer));
+            const [layer, portal] = markerProducer(notams, map);
+            displayedNotams.add(layer);
+
+            if (portal != null) {
+                portals.push(portal);
+            }
         });
     });
-}
 
-function createMarker(map: L.Map, notams: Notam[], markerProducer: NotamMarkerProducer): L.Layer {
-    return markerProducer(notams, map);
+    return portals;
 }
 
 function initAeronauticalMap(map: L.Map, center: L.LatLngTuple, zoom: number) {

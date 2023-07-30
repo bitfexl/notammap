@@ -1,3 +1,4 @@
+import { ReactPortal } from "react";
 import { Notam } from "../../notams/notamextractor";
 import * as L from "leaflet";
 
@@ -17,46 +18,7 @@ export type NotamFilter = (notam: Notam) => boolean;
  * the same coordinates. The marker is responsible for showing
  * the notam on click.
  */
-export type NotamMarkerProducer = (notams: Notam[], map: L.Map) => L.Layer;
-
-export function defaultMarkerProducer(notams: Notam[], map: L.Map) {
-    const notam = notams[0];
-
-    const latlng: L.LatLngTuple = [notam.latitude, notam.longitude];
-    const radius = notam.radius * NM_TO_M;
-
-    const marker = L.marker(latlng, {
-        icon: createIcon("lightblue", "" + notams.length),
-    });
-    const circle = L.circle(latlng, { radius });
-
-    const openPoupu = () => {
-        const content = document.createElement("div");
-
-        for (const notam of notams) {
-            const notamContent = document.createElement("p");
-            notamContent.innerText = notam.notamText;
-            content.appendChild(notamContent);
-        }
-
-        L.popup().setLatLng(latlng).setContent(content).openOn(map);
-    };
-
-    marker.on("click", openPoupu);
-    circle.on("click", openPoupu);
-
-    const finalLayer = L.layerGroup();
-    finalLayer.addLayer(marker);
-
-    // do not show radius for notams with radius > 10km
-    // TODO: more filter options
-    if (radius < 10000) {
-        finalLayer.addLayer(circle);
-    }
-
-    finalLayer.addTo(map);
-    return finalLayer;
-}
+export type NotamMarkerProducer = (notams: Notam[], map: L.Map) => [L.Layer, ReactPortal | null];
 
 /**
  * Create a leaflet marker icon.
