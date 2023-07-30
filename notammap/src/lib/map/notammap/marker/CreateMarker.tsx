@@ -17,7 +17,12 @@ export function markerProducer(notams: Notam[], map: L.Map): [L.Layer, ReactPort
     const circle = L.circle(latlng, { radius });
 
     const content = document.createElement("div");
-    const portal = createPortal(<NotamListComponent notams={notams}></NotamListComponent>, content);
+    const portal = createPortal(
+        <div className="max-h-[80vh] overflow-auto ">
+            <NotamListComponent notams={notams}></NotamListComponent>
+        </div>,
+        content
+    );
     const openPoupu = () => {
         L.popup().setLatLng(latlng).setContent(content).openOn(map);
     };
