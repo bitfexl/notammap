@@ -9,9 +9,18 @@ export interface NotamListComponentProps {
 }
 
 export function NotamListComponent({ notams }: NotamListComponentProps) {
+    const addedNotams: string[] = [];
+    const filteredNotams = notams.filter((notam) => {
+        if (addedNotams.includes(notam.series)) {
+            addedNotams.push(notam.series);
+            return true;
+        }
+        return false;
+    });
+
     return (
         <div>
-            {notams.map((notam, i) => (
+            {filteredNotams.map((notam, i) => (
                 <div key={notam.series}>
                     {i != 0 && (
                         <div className="p-6">
