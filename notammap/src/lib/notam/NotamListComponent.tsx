@@ -11,7 +11,7 @@ export interface NotamListComponentProps {
 export function NotamListComponent({ notams }: NotamListComponentProps) {
     const addedNotams: string[] = [];
     const filteredNotams = notams.filter((notam) => {
-        if (addedNotams.includes(notam.series)) {
+        if (!addedNotams.includes(notam.series)) {
             addedNotams.push(notam.series);
             return true;
         }
