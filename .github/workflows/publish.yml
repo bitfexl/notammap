@@ -1,0 +1,42 @@
+name: Publish website to Github Pages repo
+
+on: [workflow_dispatch]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v3
+        with:
+          path: source
+
+      - name: Checkout publish repo
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ secrets.PUBLISH_REPO }}
+          token: ${{ secrets.PUBLISH_REPO_TOKEN }}
+          path: publish
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      
+      - name: Compile source
+        run: |
+          cd source
+          npm install
+          npm run build
+          cd ..
+          cp -r source/dist/* publish/
+      
+      - name: Publish
+        run: |
+          cd publish
+          date > page_update.txt
+          git config user.name actions
+          git config user.email actions@github.com
+          git add .
+          git commit -m "page update"
+          git push
