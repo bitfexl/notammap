@@ -25,10 +25,10 @@ jobs:
       
       - name: Compile source
         run: |
-          cd source
+          cd source/notammap
           npm install
           npm run build
-          cd ..
+          cd ../..
           cp -r source/dist/* publish/
       
       - name: Publish
