@@ -8,16 +8,18 @@ export interface NotamMapProps {
     notams: Notam[];
     filter: NotamFilter;
     markerProducer: NotamMarkerProducer;
+    initialCoords: L.LatLngTuple;
+    initialZoom: number;
 }
 
-export const NotamMap = memo(function NotamMap({ notams, filter, markerProducer }: NotamMapProps) {
+export const NotamMap = memo(function NotamMap({ notams, filter, markerProducer, initialCoords, initialZoom }: NotamMapProps) {
     const [portals, setPortals] = useState<ReactPortal[]>([]);
     const mapRef = useRef<L.Map>(null);
     const displayedNotams = useRef(new Set<L.Layer>());
 
     const initMap = useCallback((map: L.Map) => {
         displayedNotams.current.clear();
-        initAeronauticalMap(map, [52.351603163346255, 13.494656170576595], 9);
+        initAeronauticalMap(map, initialCoords, initialZoom);
     }, []);
 
     useEffect(() => {

@@ -52,7 +52,13 @@ function App() {
     return (
         <>
             <div onClick={closeMenuSmallDevices} className="fixed top-0 left-0 w-[100vw] h-[100vh] -z-10">
-                <NotamMap notams={notams} filter={notamFilter} markerProducer={notamMarkerProducer}></NotamMap>
+                <NotamMap
+                    notams={notams}
+                    filter={notamFilter}
+                    markerProducer={notamMarkerProducer}
+                    initialCoords={[49, 12]}
+                    initialZoom={6}
+                ></NotamMap>
             </div>
 
             {menuOpen ? (
