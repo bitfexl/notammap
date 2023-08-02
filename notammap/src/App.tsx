@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useId } from "react";
 import { NotamMap } from "./lib/map/notammap/NotamMap";
 import { fetchCountries, fetchNotams } from "./lib/notams/NotamFetch";
 import { Notam } from "./lib/notams/notamextractor";
@@ -10,6 +10,7 @@ import { useLocalStorage } from "./lib/LocalStorageHook";
 import { markerProducer } from "./lib/map/notammap/marker/CreateMarker";
 
 function App() {
+    const [countries, setCountries] = useState<string[]>([]);
     const [notams, setNotmas] = useState<Notam[]>([]);
 
     const [notamFilterOptions, setNotamFitlerOptions] = useLocalStorage<NotamFilterOptions>(defaultFilterOptions, "filter_options");
@@ -17,6 +18,8 @@ function App() {
     const [notamMarkerProducer, _setNotamMarkerProducer] = useState<NotamMarkerProducer>(() => markerProducer);
 
     const [menuOpen, setMenuOpen] = useState(!isSmallWidth());
+
+    const defaultValueId = useId();
 
     function setNotamFilter(filter: NotamFilter) {
         _setNotamFilter(() => filter);
@@ -32,16 +35,13 @@ function App() {
 
     useEffect(() => {
         (async () => {
-            const countries = await fetchCountries();
-            setNotmas(await fetchNotams(countries[0]));
-            // for (const country of countries) {
-            //     console.log(country + ":");
-            //     const notams = await fetchNotams(country);
-            //     console.log(notams);
-            //     setNotmas((old) => [...old, ...notams]);
-            // }
+            setCountries(await fetchCountries());
         })();
     }, []);
+
+    async function updateNotams(country: string) {
+        setNotmas(await fetchNotams(country));
+    }
 
     function closeMenuSmallDevices() {
         if (isSmallWidth()) {
@@ -56,11 +56,32 @@ function App() {
             </div>
 
             {menuOpen ? (
-                <div className="fixed top-0 right-0 w-80 h-[100vh] bg-white p-3 overflow-auto">
+                <div className="fixed top-0 right-0 w-80 h-[100vh] bg-white p-3 overflow-auto flex flex-col gap-4">
                     <div className="text-right">
                         <button onClick={() => setMenuOpen(false)}>Close Menu</button>
                     </div>
 
+                    <h2>Country</h2>
+                    <div>
+                        <select
+                            defaultValue={defaultValueId}
+                            onChange={(e) => updateNotams(e.target.value)}
+                            className="w-60 border border-black p-1"
+                        >
+                            <option value={defaultValueId} disabled={true}>
+                                Select a country
+                            </option>
+                            {countries.map((country) => (
+                                <option key={country} value={country}>
+                                    {country}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <span className="p-1">{/* spacing */}</span>
+
+                    <h2>Filter</h2>
                     <NotamFilterOptionsSelector options={notamFilterOptions} onChange={setNotamFitlerOptions}></NotamFilterOptionsSelector>
                 </div>
             ) : (
