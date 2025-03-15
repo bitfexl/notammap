@@ -23,7 +23,7 @@ public class DinsQuery {
         final List<String> notams = new ArrayList<>();
 
         for (int i = 0; i < locations.size(); i += 50) {
-            notams.addAll(_50NotamsByICAOIdentifiers(locations.subList(i, Math.min(locations.size(), i + 50)).stream().map(ICAOLocation::getIcao).toList()));
+            notams.addAll(_50NotamsByICAOIdentifiers(locations.subList(i, Math.min(locations.size(), i + 50)).stream().map(ICAOLocation::icao).toList()));
         }
 
         return notams;
