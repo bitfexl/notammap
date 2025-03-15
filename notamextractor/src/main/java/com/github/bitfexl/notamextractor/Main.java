@@ -19,9 +19,12 @@ public class Main {
 
     public static void main(String[] args) {
         // generateLocationJsonIndex();
-        final List<ICAOLocation> locations = loadLocationJsonIndex();
-        final ICAOLocation location = locations.get((int)(Math.random() * locations.size()));
-        generateNotamsJson(List.of(location));
+
+        final String countryName = args[0];
+        final List<ICAOLocation> allLocations = loadLocationJsonIndex();
+        final List<ICAOLocation> filteredLocations = allLocations.stream().filter(loc -> loc.country().equalsIgnoreCase(countryName)).toList();
+
+        generateNotamsJson(filteredLocations);
     }
 
     @SneakyThrows
