@@ -22,7 +22,7 @@ export function NotamListComponent({ notams }: NotamListComponentProps) {
     });
 
     return (
-        <div>
+        <div className="pb-2">
             <div>
                 <NotamComponent notam={filteredNotams[notamIndex]}></NotamComponent>
             </div>
@@ -32,7 +32,7 @@ export function NotamListComponent({ notams }: NotamListComponentProps) {
                         onClick={() => setNotamIndex((notamIndex == 0 ? filteredNotams.length : notamIndex) - 1)}
                         className="w-20 linklike text-right"
                     >
-                        {"PREVIOUS"}
+                        {"Previous"}
                     </button>
                     <span className="inline-block w-16">
                         {notamIndex + 1} / {filteredNotams.length}
@@ -41,7 +41,7 @@ export function NotamListComponent({ notams }: NotamListComponentProps) {
                         onClick={() => setNotamIndex(notamIndex == filteredNotams.length - 1 ? 0 : notamIndex + 1)}
                         className="w-20 linklike text-left"
                     >
-                        {"NEXT"}
+                        {"Next"}
                     </button>
                 </div>
             )}
