@@ -111,6 +111,7 @@ function initAeronauticalMap(map: L.Map, center: L.LatLngTuple, zoom: number) {
 
     const openAipMap = L.tileLayer("https://api.tiles.openaip.net/api/data/openaip/{z}/{x}/{y}.png?apiKey=" + openAipApiKey, {
         maxZoom,
+        minZoom: 7,
         attribution: '<a href="https://www.openaip.net">OpenAIP</a>',
     });
 
@@ -127,6 +128,10 @@ function initAeronauticalMap(map: L.Map, center: L.LatLngTuple, zoom: number) {
 
     map.setView(center, zoom);
     L.control.layers(baseMaps, overlayMaps).setPosition("topleft").addTo(map);
+    osmMap.addTo(map); // added first to have the correct ordering in the map attribution
     osmHOTMap.addTo(map);
     openAipMap.addTo(map);
+
+    // initially remove the standard layer (only osm hot map base layer)
+    map.removeLayer(osmMap);
 }
