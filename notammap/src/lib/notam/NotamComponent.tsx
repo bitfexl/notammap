@@ -54,8 +54,7 @@ export function NotamComponent({ notam }: NotamComponentProps) {
             ) : (
                 <>
                     <span className="pl-4"></span>
-                    FIR:
-                    <span className="font-mono">{notam.fir}</span>
+                    FIR: <span className="font-mono">{notam.fir}</span>
                 </>
             )}
         </>
@@ -99,6 +98,7 @@ export function NotamComponent({ notam }: NotamComponentProps) {
                     >
                         Show Raw
                     </button>
+                    {/* <button onClick={() => console.log(notam)}>Log JSON</button> */}
                 </div>
                 <div>{headerInformation}</div>
                 <div>{locationInformation}</div>
@@ -116,7 +116,9 @@ export function NotamComponent({ notam }: NotamComponentProps) {
 
             <div className="flex flex-col gap-1">
                 <b>NOTAM text</b>
-                <div>{notam.notamText}</div>
+                <div>
+                    <FormattedNotamText text={notam.notamText}></FormattedNotamText>
+                </div>
             </div>
 
             <div className="flex flex-col gap-1">
@@ -124,5 +126,34 @@ export function NotamComponent({ notam }: NotamComponentProps) {
                 <div>{heightInformation}</div>
             </div>
         </div>
+    );
+}
+
+function FormattedNotamText({ text }: { text: string }) {
+    const words = text.split(" ");
+    return (
+        <>
+            {words
+                .map((word) => {
+                    if (word.toLowerCase().startsWith("https://") || word.toLowerCase().startsWith("http://")) {
+                        const parts = word.split("/");
+                        if (parts[2] == "") {
+                            // only "https://"
+                            return word;
+                        }
+                        parts[0] = parts[0].toLowerCase();
+                        parts[2] = parts[2].toLowerCase();
+                        word = parts.join("/");
+                        return <a href={word}>{word}</a>;
+                    }
+                    return word;
+                })
+                .flatMap((element, index) => {
+                    if (index == 0) {
+                        return element;
+                    }
+                    return [" ", element];
+                })}
+        </>
     );
 }
