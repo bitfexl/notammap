@@ -102,10 +102,17 @@ function initAeronauticalMap(map: L.Map, center: L.LatLngTuple, zoom: number) {
         opacity: 0.6,
     });
 
-    const osmHOTMap = L.tileLayer("https://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
+    const osmHOTMap = L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
         maxZoom,
         attribution:
             '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <a href="https://wiki.openstreetmap.org/wiki/HOT_style">HOT style</a>',
+        opacity: 0.6,
+    });
+
+    const openTopoMap = L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
+        maxZoom,
+        attribution:
+            '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <a href="https://opentopomap.org/">OpenTopoMap</a>',
         opacity: 0.6,
     });
 
@@ -118,6 +125,7 @@ function initAeronauticalMap(map: L.Map, center: L.LatLngTuple, zoom: number) {
     const baseMaps = {
         Standard: osmMap,
         Humanitarian: osmHOTMap,
+        Topographic: openTopoMap,
     };
 
     const overlayMaps = {
@@ -130,8 +138,10 @@ function initAeronauticalMap(map: L.Map, center: L.LatLngTuple, zoom: number) {
     L.control.layers(baseMaps, overlayMaps).setPosition("topleft").addTo(map);
     osmMap.addTo(map); // added first to have the correct ordering in the map attribution
     osmHOTMap.addTo(map);
+    openTopoMap.addTo(map);
     openAipMap.addTo(map);
 
-    // initially remove the standard layer (only osm hot map base layer)
+    // initially remove the layers (only osm hot map base layer)
     map.removeLayer(osmMap);
+    map.removeLayer(openTopoMap);
 }
