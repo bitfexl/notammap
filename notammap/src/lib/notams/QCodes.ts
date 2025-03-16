@@ -16,6 +16,8 @@ export function toText(qcode: string) {
         part2 = qcode.split(" ", 2)[1];
     } else if (code2 == "XX") {
         part2 = "";
+    } else if (code2 == "TT") {
+        part2 = "trigger NOTAM (AIP changes)";
     }
 
     // lowercase first char
