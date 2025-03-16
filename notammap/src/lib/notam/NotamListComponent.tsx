@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Notam } from "../notams/notamextractor";
 import { NotamComponent } from "./NotamComponent";
 
@@ -9,6 +10,8 @@ export interface NotamListComponentProps {
 }
 
 export function NotamListComponent({ notams }: NotamListComponentProps) {
+    const [notamIndex, setNotamIndex] = useState(0);
+
     const addedNotams: string[] = [];
     const filteredNotams = notams.filter((notam) => {
         if (!addedNotams.includes(notam.series)) {
@@ -20,18 +23,28 @@ export function NotamListComponent({ notams }: NotamListComponentProps) {
 
     return (
         <div>
-            {filteredNotams.map((notam, i) => (
-                <div key={notam.series}>
-                    {i != 0 && (
-                        <div className="p-6">
-                            <hr />
-                        </div>
-                    )}
-                    <div>
-                        <NotamComponent notam={notam}></NotamComponent>
-                    </div>
+            <div>
+                <NotamComponent notam={filteredNotams[notamIndex]}></NotamComponent>
+            </div>
+            {filteredNotams.length > 1 && (
+                <div className="text-center pt-6">
+                    <button
+                        onClick={() => setNotamIndex((notamIndex == 0 ? filteredNotams.length : notamIndex) - 1)}
+                        className="w-20 linklike text-right"
+                    >
+                        {"PREVIOUS"}
+                    </button>
+                    <span className="inline-block w-16">
+                        {notamIndex + 1}/{filteredNotams.length}
+                    </span>
+                    <button
+                        onClick={() => setNotamIndex(notamIndex == filteredNotams.length - 1 ? 0 : notamIndex + 1)}
+                        className="w-20 linklike text-left"
+                    >
+                        {"NEXT"}
+                    </button>
                 </div>
-            ))}
+            )}
         </div>
     );
 }
