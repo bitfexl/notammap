@@ -35,7 +35,7 @@ export function NotamListComponent({ notams }: NotamListComponentProps) {
                         {"PREVIOUS"}
                     </button>
                     <span className="inline-block w-16">
-                        {notamIndex + 1}/{filteredNotams.length}
+                        {notamIndex + 1} / {filteredNotams.length}
                     </span>
                     <button
                         onClick={() => setNotamIndex(notamIndex == filteredNotams.length - 1 ? 0 : notamIndex + 1)}

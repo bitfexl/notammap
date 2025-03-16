@@ -148,7 +148,7 @@ function FormattedNotamText({ text }: { text: string }) {
                         parts[2] = parts[2].toLowerCase();
                         word = parts.join("/");
                         return (
-                            <a key={word} href={word}>
+                            <a key={word} href={word} target="_blank">
                                 {word}
                             </a>
                         );
