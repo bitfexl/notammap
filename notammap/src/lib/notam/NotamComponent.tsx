@@ -17,14 +17,17 @@ export function NotamComponent({ notam }: NotamComponentProps) {
 
     if (showRaw) {
         return (
-            <div
-                onClick={(e) => {
-                    setShowRaw(false);
-                    e.stopPropagation();
-                }}
-            >
+            <div>
                 <div className="text-right">
-                    <button className="linklike pr-2">Show Formatted</button>
+                    <button
+                        className="linklike pr-2"
+                        onClick={(e) => {
+                            setShowRaw(false);
+                            e.stopPropagation();
+                        }}
+                    >
+                        Show Formatted
+                    </button>
                 </div>
                 <pre>{notam.raw}</pre>
             </div>
