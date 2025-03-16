@@ -36,6 +36,13 @@
         @apply text-sm;
     }
 
+    button,
+    input,
+    select,
+    [class*="leaflet-control"] {
+        @apply select-none;
+    }
+
     button:not(.linklike) {
         @apply p-1 bg-gray-100 border border-gray-200;
     }
