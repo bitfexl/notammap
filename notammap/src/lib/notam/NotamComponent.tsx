@@ -144,7 +144,11 @@ function FormattedNotamText({ text }: { text: string }) {
                         parts[0] = parts[0].toLowerCase();
                         parts[2] = parts[2].toLowerCase();
                         word = parts.join("/");
-                        return <a href={word}>{word}</a>;
+                        return (
+                            <a key={word} href={word}>
+                                {word}
+                            </a>
+                        );
                     }
                     return word;
                 })
