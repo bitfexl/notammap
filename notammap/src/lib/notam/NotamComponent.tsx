@@ -9,6 +9,9 @@ export interface NotamComponentProps {
     notam: Notam;
 }
 
+// if the coordinates are separated by "-" then it is an area
+const coordinatesPattern = "(?:\\d{6}N\\s\\d{7}E(?:\\s-\\s)?)+";
+
 export function NotamComponent({ notam }: NotamComponentProps) {
     const [showRaw, setShowRaw] = useState(false);
 

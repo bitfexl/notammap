@@ -64,7 +64,7 @@ function App() {
             {menuOpen ? (
                 <div className="fixed top-0 right-0 w-80 h-[100vh] bg-white p-3 overflow-auto flex flex-col gap-4">
                     <div className="text-right">
-                        <button onClick={() => setMenuOpen(false)}>Close Menu</button>
+                        <button onClick={() => setMenuOpen(false)}>🗙 Close Menu</button>
                     </div>
 
                     <h2>Country</h2>
@@ -92,7 +92,7 @@ function App() {
                 </div>
             ) : (
                 <div className="fixed top-0 right-0 p-3">
-                    <button onClick={() => setMenuOpen(true)}>Open Menu</button>
+                    <button onClick={() => setMenuOpen(true)}>⇶ Open Menu</button>
                 </div>
             )}
         </>

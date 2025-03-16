@@ -12,9 +12,18 @@ export function markerProducer(notams: Notam[], map: L.Map): [L.Layer, ReactPort
     const radius = notam.radius * NM_TO_M;
 
     const marker = L.marker(latlng, {
-        icon: createIcon("lightblue", "" + notams.length),
+        icon: createIcon("lightgray", "" + notams.length),
     });
     const circle = L.circle(latlng, { radius });
+
+    const onHover = (hover: boolean) => {
+        circle.setStyle({ color: hover ? "#00b894" : "#0984e3" });
+    };
+    onHover(false);
+    circle.on("mouseover", () => onHover(true));
+    circle.on("mouseout", () => onHover(false));
+    marker.on("mouseover", () => onHover(true));
+    marker.on("mouseout", () => onHover(false));
 
     const content = document.createElement("div");
     const portal = createPortal(
