@@ -1,4 +1,4 @@
-import { NotamFilter } from "../map/notammap/NotamDisplayHelpers";
+import { NotamFilter } from "../map/notammap/notamDisplayHelpers";
 import { Notam } from "../notams/notamextractor";
 import { NotamFilterOptions } from "./NotamFilterOptions";
 

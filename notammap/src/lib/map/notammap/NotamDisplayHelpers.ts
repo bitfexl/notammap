@@ -19,12 +19,12 @@ export const NM_TO_M = 1852;
 export type NotamFilter = (notam: Notam) => boolean;
 
 /**
- * Generate a marker for one or more notams and add to the map.
+ * Generate a marker for one or more notams. Do not add the final layer to the map.
  * The notams will all have the same or approximately
- * the same coordinates. The marker is responsible for showing
+ * the same coordinates. The marker (tile layer) is responsible for showing
  * the notam on click.
  */
-export type NotamMarkerProducer = (notams: Notam[], map: L.Map) => [L.Layer, ReactPortal | null];
+export type NotamRenderer = (notams: Notam[], map: L.Map) => [L.Layer, ReactPortal | null];
 
 /**
  * Create a leaflet marker icon.

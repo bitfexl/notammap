@@ -2,38 +2,39 @@ import { useState, useEffect, useId } from "react";
 import { NotamMap } from "./lib/map/notammap/NotamMap";
 import { fetchCountries, fetchNotams } from "./lib/notams/NotamFetch";
 import { Notam } from "./lib/notams/notamextractor";
-import { NotamFilter, NotamMarkerProducer } from "./lib/map/notammap/NotamDisplayHelpers";
+import { NotamFilter, NotamRenderer } from "./lib/map/notammap/notamDisplayHelpers";
 import { NotamFilterOptions, NotamFilterOptionsSelector, defaultFilterOptions } from "./lib/filter/NotamFilterOptions";
 import { createFilter } from "./lib/filter/CreateFilter";
 import { isSmallWidth } from "./lib/DeviceUtils";
 import { useLocalStorage } from "./lib/LocalStorageHook";
-import { markerProducer } from "./lib/map/notammap/marker/CreateMarker";
 import menuIcon from "./assets/icons/menu.svg?raw";
 import closeIcon from "./assets/icons/x.svg?raw";
+import { renderNotam } from "./lib/map/notammap/notamRenderer";
 
-function App() {
+export default function App() {
     const [countries, setCountries] = useState<string[]>([]);
     const [notams, setNotmas] = useState<Notam[]>([]);
+    const [currentCords, setCurrentCords] = useState<L.LatLngTuple>([49, 12]);
+    const [currentZoom, setCurrentZoom] = useState<number>(5);
 
     const [notamFilterOptions, setNotamFitlerOptions] = useLocalStorage<NotamFilterOptions>(defaultFilterOptions, "filter_options");
-    const [notamFilter, _setNotamFilter] = useState<NotamFilter>(() => createFilter(defaultFilterOptions));
-    const [notamMarkerProducer, _setNotamMarkerProducer] = useState<NotamMarkerProducer>(() => markerProducer);
+    // const [notamFilter, _setNotamFilter] = useState<NotamFilter>(() => createFilter(defaultFilterOptions));
 
     const [menuOpen, setMenuOpen] = useState(!isSmallWidth());
 
     const defaultValueId = useId();
 
-    function setNotamFilter(filter: NotamFilter) {
-        _setNotamFilter(() => filter);
-    }
+    // function setNotamFilter(filter: NotamFilter) {
+    //     _setNotamFilter(() => filter);
+    // }
 
     // function setNotamMarkerProducer(markerProducer: NotamMarkerProducer) {
     //     _setNotamMarkerProducer(() => markerProducer);
     // }
 
-    useEffect(() => {
-        setNotamFilter(createFilter(notamFilterOptions));
-    }, [notamFilterOptions]);
+    // useEffect(() => {
+    //     setNotamFilter(createFilter(notamFilterOptions));
+    // }, [notamFilterOptions]);
 
     useEffect(() => {
         (async () => {
@@ -59,13 +60,7 @@ function App() {
     return (
         <>
             <div onClick={closeMenuSmallDevices} className="fixed top-0 left-0 w-[100vw] h-[100vh] -z-10">
-                <NotamMap
-                    notams={notams}
-                    filter={notamFilter}
-                    markerProducer={notamMarkerProducer}
-                    initialCoords={[49, 12]}
-                    initialZoom={5}
-                ></NotamMap>
+                <NotamMap notams={notams} notamRenderer={renderNotam} currentCords={currentCords} currentZoom={currentZoom}></NotamMap>
             </div>
 
             {menuOpen ? (
@@ -109,5 +104,3 @@ function App() {
         </>
     );
 }
-
-export default App;

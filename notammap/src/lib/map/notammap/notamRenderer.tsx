@@ -1,11 +1,11 @@
 import { ReactPortal } from "react";
-import { NotamListComponent } from "../../../notam/NotamListComponent";
-import { Notam } from "../../../notams/notamextractor";
-import { COORDINATES_PATTERN, NM_TO_M, createIcon } from "../NotamDisplayHelpers";
+import { NotamListComponent } from "../../notam/NotamListComponent";
+import { Notam } from "../../notams/notamextractor";
+import { COORDINATES_PATTERN, NM_TO_M, createIcon } from "./notamDisplayHelpers";
 import * as L from "leaflet";
 import { createPortal } from "react-dom";
 
-export function markerProducer(notams: Notam[], map: L.Map): [L.Layer, ReactPortal | null] {
+export function renderNotam(notams: Notam[], map: L.Map): [L.Layer, ReactPortal | null] {
     const latlng: L.LatLngTuple = [notams[0].latitude, notams[0].longitude];
     const radius = notams[0].radius * NM_TO_M; // TODO: use max radius of all notams
 
@@ -49,7 +49,6 @@ export function markerProducer(notams: Notam[], map: L.Map): [L.Layer, ReactPort
         finalLayer.addLayer(circle);
     }
 
-    finalLayer.addTo(map);
     return [finalLayer, portal];
 }
 

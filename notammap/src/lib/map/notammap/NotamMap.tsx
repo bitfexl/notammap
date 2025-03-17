@@ -2,62 +2,62 @@ import { ReactPortal, memo, useCallback, useEffect, useRef, useState } from "rea
 import { LeafletMap } from "../LeafletMap";
 import * as L from "leaflet";
 import { Notam } from "../../notams/notamextractor";
-import { NotamFilter, NotamMarkerProducer } from "./NotamDisplayHelpers";
+import { NotamRenderer } from "./notamDisplayHelpers";
 
 export interface NotamMapProps {
     notams: Notam[];
-    filter: NotamFilter;
-    markerProducer: NotamMarkerProducer;
-    initialCoords: L.LatLngTuple;
-    initialZoom: number;
+    notamRenderer: NotamRenderer;
+    /**
+     * The current/initial cords. Changing this causes the map to switch to these coordinates.
+     */
+    currentCords: L.LatLngTuple;
+
+    /**
+     * The current/initial zoom. Changing this causes the map to switch to this zoom level.
+     */
+    currentZoom: number;
 }
 
-export const NotamMap = memo(function NotamMap({ notams, filter, markerProducer, initialCoords, initialZoom }: NotamMapProps) {
+export function NotamMap({ notams, notamRenderer, currentCords, currentZoom }: NotamMapProps) {
     const [portals, setPortals] = useState<ReactPortal[]>([]);
-    const mapRef = useRef<L.Map>(null);
+    const mapRef = useRef<L.Map | null>(null);
     const displayedNotams = useRef(new Set<L.Layer>());
 
     const initMap = useCallback((map: L.Map) => {
-        displayedNotams.current.clear();
-        initAeronauticalMap(map, initialCoords, initialZoom);
+        mapRef.current = map;
+        initAeronauticalMap(map);
     }, []);
 
     useEffect(() => {
         if (mapRef.current != null) {
-            setPortals(updateNotams(mapRef.current, notams, displayedNotams.current, filter, markerProducer));
-        } else {
-            displayedNotams.current.clear();
+            setPortals(updateNotams(mapRef.current, notams, displayedNotams.current, notamRenderer));
         }
-    }, [notams, filter, markerProducer]);
+    }, [notams, notamRenderer]);
 
     return (
         <>
             <div className="inline-block w-full h-full">
-                <LeafletMap ref={mapRef} init={initMap}></LeafletMap>
+                <LeafletMap onInit={initMap} currentCords={currentCords} currentZoom={currentZoom}></LeafletMap>
             </div>
             {portals}
         </>
     );
-});
+}
 
-function updateNotams(
-    map: L.Map,
-    notams: Notam[],
-    displayedNotams: Set<L.Layer>,
-    filter: NotamFilter,
-    markerProducer: NotamMarkerProducer
-) {
-    console.log("Updating " + notams.length + " notams...");
+function updateNotams(map: L.Map, notams: Notam[], displayedNotams: Set<L.Layer>, notamRenderer: NotamRenderer) {
+    console.log("Rendering " + notams.length + " notams...");
+
     for (const layer of displayedNotams) {
         map.removeLayer(layer);
     }
+
     displayedNotams.clear();
     const portals: ReactPortal[] = [];
 
     //                          lat         lng     notams
     const notamGroups = new Map<number, Map<number, Notam[]>>();
 
-    for (const notam of notams.filter(filter)) {
+    for (const notam of notams) {
         let lngMap = notamGroups.get(notam.latitude);
 
         if (lngMap == null) {
@@ -75,25 +75,23 @@ function updateNotams(
         notams.push(notam);
     }
 
-    notamGroups.forEach((lngMap) => {
-        lngMap.forEach((notams) => {
-            const [layer, portal] = markerProducer(notams, map);
+    for (const lngMap of notamGroups) {
+        for (const notams of lngMap[1]) {
+            const [layer, portal] = notamRenderer(notams[1], map);
+
+            map.addLayer(layer);
             displayedNotams.add(layer);
 
             if (portal != null) {
                 portals.push(portal);
             }
-        });
-    });
+        }
+    }
 
     return portals;
 }
 
-function initAeronauticalMap(map: L.Map, center: L.LatLngTuple, zoom: number) {
-    const openAipApiKey = import.meta.env.VITE_OPENAPI_API_KEY;
-
-    // create map layers
-
+function initAeronauticalMap(map: L.Map) {
     const maxZoom = 14;
 
     const osmMap = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -116,7 +114,9 @@ function initAeronauticalMap(map: L.Map, center: L.LatLngTuple, zoom: number) {
         opacity: 0.6,
     });
 
-    const openAipMap = L.tileLayer("https://api.tiles.openaip.net/api/data/openaip/{z}/{x}/{y}.png?apiKey=" + openAipApiKey, {
+    // OpenAIP layer uses proxy
+    const openAipTileLayerUrl = import.meta.env.VITE_OPENAPI_TILE_LAYER_URL;
+    const openAipMap = L.tileLayer(openAipTileLayerUrl, {
         maxZoom,
         minZoom: 7,
         attribution: '<a href="https://www.openaip.net">OpenAIP</a>',
@@ -134,7 +134,6 @@ function initAeronauticalMap(map: L.Map, center: L.LatLngTuple, zoom: number) {
 
     // add to map
 
-    map.setView(center, zoom);
     L.control.layers(baseMaps, overlayMaps).setPosition("topleft").addTo(map);
     osmMap.addTo(map); // added first to have the correct ordering in the map attribution
     osmHOTMap.addTo(map);
