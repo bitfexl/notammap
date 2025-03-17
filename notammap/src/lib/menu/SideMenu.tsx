@@ -47,8 +47,8 @@ export function SideMenu({ onNotamsChange, onCountryChange, menuOpen, setMenuOpe
     }, [country, notamFilterOptions]);
 
     useEffect(() => {
-        if (countryData[country]) {
-            onCountryChange(countryData[country].view.center, countryData[country].view.zoom);
+        if (country && (countryData as any)[country]) {
+            onCountryChange((countryData as any)[country].view.center, (countryData as any)[country].view.zoom);
         }
     }, [country]);
 
@@ -89,6 +89,19 @@ export function SideMenu({ onNotamsChange, onCountryChange, menuOpen, setMenuOpe
                                 </option>
                             ))}
                         </select>
+                    </div>
+
+                    <div className="flex gap-4">
+                        {country && (countryData as any)[country]?.AIPLinks.allProducts && (
+                            <a href={(countryData as any)[country].AIPLinks.allProducts} target="_blank">
+                                Online AIM
+                            </a>
+                        )}
+                        {country && (countryData as any)[country]?.AIPLinks.aipDirect && (
+                            <a href={(countryData as any)[country].AIPLinks.aipDirect} target="_blank">
+                                Online AIP
+                            </a>
+                        )}
                     </div>
 
                     <span className="p-1">{/* spacing */}</span>
