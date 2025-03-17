@@ -1,8 +1,8 @@
 {
     "Austria": {
         "view": {
-            "center": [],
-            "zoom": 7
+            "center": [48, 14.7],
+            "zoom": 8
         },
         "AIPLinks": {
             "allProducts": "https://www.austrocontrol.at/piloten/vor_dem_flug/aim_produkte",
@@ -11,8 +11,8 @@
     },
     "Czech Republic": {
         "view": {
-            "center": [],
-            "zoom": 7
+            "center": [50, 16],
+            "zoom": 8
         },
         "AIPLinks": {
             "allProducts": "https://aim.rlp.cz/",
@@ -21,7 +21,7 @@
     },
     "France": {
         "view": {
-            "center": [],
+            "center": [47, 3],
             "zoom": 7
         },
         "AIPLinks": {
@@ -32,7 +32,7 @@
     },
     "Germany": {
         "view": {
-            "center": [],
+            "center": [51, 11],
             "zoom": 7
         },
         "AIPLinks": {

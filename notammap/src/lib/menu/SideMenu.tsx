@@ -6,6 +6,7 @@ import { fetchCountries, fetchNotams } from "../notams/NotamFetch";
 import { useLocalStorage } from "../LocalStorageHook";
 import { defaultFilterOptions, NotamFilterOptions, NotamFilterOptionsSelector } from "./filter/NotamFilterOptions";
 import { createFilter } from "./filter/CreateFilter";
+import countryData from "../../assets/CountryData.json";
 
 export interface SideMenuProps {
     /**
@@ -45,6 +46,12 @@ export function SideMenu({ onNotamsChange, onCountryChange, menuOpen, setMenuOpe
         updateNotams();
     }, [country, notamFilterOptions]);
 
+    useEffect(() => {
+        if (countryData[country]) {
+            onCountryChange(countryData[country].view.center, countryData[country].view.zoom);
+        }
+    }, [country]);
+
     async function updateNotams() {
         // todo: zoom to country somewhere here
         if (country == null) {
@@ -69,7 +76,7 @@ export function SideMenu({ onNotamsChange, onCountryChange, menuOpen, setMenuOpe
                     <h2>Country</h2>
                     <div>
                         <select
-                            defaultValue={country ?? defaultValueId}
+                            value={country ?? defaultValueId}
                             onChange={(e) => setCountry(e.target.value)}
                             className="w-60 border border-black p-1"
                         >

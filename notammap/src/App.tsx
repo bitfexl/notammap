@@ -1,4 +1,4 @@
-import { useState, useEffect, useId } from "react";
+import { useState } from "react";
 import { NotamMap } from "./lib/map/notammap/NotamMap";
 import { Notam } from "./lib/notams/notamextractor";
 import { isSmallWidth } from "./lib/DeviceUtils";
