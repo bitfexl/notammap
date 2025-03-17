@@ -22,9 +22,9 @@ export type NotamFilter = (notam: Notam) => boolean;
  * Generate a marker for one or more notams. Do not add the final layer to the map.
  * The notams will all have the same or approximately
  * the same coordinates. The marker (tile layer) is responsible for showing
- * the notam on click.
+ * the notam on click. Use setPortal to render a react node on click.
  */
-export type NotamRenderer = (notams: Notam[], map: L.Map) => [L.Layer, ReactPortal | null];
+export type NotamRenderer = (notams: Notam[], map: L.Map, setPortal: (portal: ReactPortal) => void) => L.Layer;
 
 /**
  * Create a leaflet marker icon.

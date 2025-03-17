@@ -19,7 +19,8 @@ export interface NotamMapProps {
 }
 
 export function NotamMap({ notams, notamRenderer, currentCords, currentZoom }: NotamMapProps) {
-    const [portals, setPortals] = useState<ReactPortal[]>([]);
+    // set portal for the currently displayed notam
+    const [portal, setPortal] = useState<ReactPortal>();
     const mapRef = useRef<L.Map | null>(null);
     const displayedNotams = useRef(new Set<L.Layer>());
 
@@ -30,7 +31,7 @@ export function NotamMap({ notams, notamRenderer, currentCords, currentZoom }: N
 
     useEffect(() => {
         if (mapRef.current != null) {
-            setPortals(updateNotams(mapRef.current, notams, displayedNotams.current, notamRenderer));
+            updateNotams(mapRef.current, notams, displayedNotams.current, notamRenderer, setPortal);
         }
     }, [notams, notamRenderer]);
 
@@ -39,12 +40,18 @@ export function NotamMap({ notams, notamRenderer, currentCords, currentZoom }: N
             <div className="inline-block w-full h-full">
                 <LeafletMap onInit={initMap} currentCords={currentCords} currentZoom={currentZoom}></LeafletMap>
             </div>
-            {portals}
+            {portal}
         </>
     );
 }
 
-function updateNotams(map: L.Map, notams: Notam[], displayedNotams: Set<L.Layer>, notamRenderer: NotamRenderer) {
+function updateNotams(
+    map: L.Map,
+    notams: Notam[],
+    displayedNotams: Set<L.Layer>,
+    notamRenderer: NotamRenderer,
+    setPortal: (portal: ReactPortal) => void
+) {
     console.log("Rendering " + notams.length + " notams...");
 
     for (const layer of displayedNotams) {
@@ -52,7 +59,6 @@ function updateNotams(map: L.Map, notams: Notam[], displayedNotams: Set<L.Layer>
     }
 
     displayedNotams.clear();
-    const portals: ReactPortal[] = [];
 
     //                          lat         lng     notams
     const notamGroups = new Map<number, Map<number, Notam[]>>();
@@ -77,18 +83,11 @@ function updateNotams(map: L.Map, notams: Notam[], displayedNotams: Set<L.Layer>
 
     for (const lngMap of notamGroups) {
         for (const notams of lngMap[1]) {
-            const [layer, portal] = notamRenderer(notams[1], map);
-
+            const layer = notamRenderer(notams[1], map, setPortal);
             map.addLayer(layer);
             displayedNotams.add(layer);
-
-            if (portal != null) {
-                portals.push(portal);
-            }
         }
     }
-
-    return portals;
 }
 
 function initAeronauticalMap(map: L.Map) {

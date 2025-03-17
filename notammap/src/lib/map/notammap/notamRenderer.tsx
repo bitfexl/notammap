@@ -5,7 +5,7 @@ import { COORDINATES_PATTERN, NM_TO_M, createIcon } from "./notamDisplayHelpers"
 import * as L from "leaflet";
 import { createPortal } from "react-dom";
 
-export function renderNotam(notams: Notam[], map: L.Map): [L.Layer, ReactPortal | null] {
+export function renderNotam(notams: Notam[], map: L.Map, setPortal: (portal: ReactPortal) => void): L.Layer {
     const latlng: L.LatLngTuple = [notams[0].latitude, notams[0].longitude];
     const radius = notams[0].radius * NM_TO_M; // TODO: use max radius of all notams
 
@@ -27,15 +27,17 @@ export function renderNotam(notams: Notam[], map: L.Map): [L.Layer, ReactPortal 
         createLocationMarkers(notam);
     }
 
-    const content = document.createElement("div");
-    const portal = createPortal(
-        <div className="max-h-[80vh] overflow-auto ">
-            <NotamListComponent notams={notams}></NotamListComponent>
-        </div>,
-        content
-    );
     const openPoupu = () => {
+        const content = document.createElement("div");
+        content.style.minWidth = "300px";
+        const portal = createPortal(
+            <div className="max-h-[80vh] overflow-auto ">
+                <NotamListComponent notams={notams}></NotamListComponent>
+            </div>,
+            content
+        );
         L.popup().setLatLng(latlng).setContent(content).openOn(map);
+        setPortal(portal);
     };
 
     marker.on("click", openPoupu);
@@ -49,7 +51,7 @@ export function renderNotam(notams: Notam[], map: L.Map): [L.Layer, ReactPortal 
         finalLayer.addLayer(circle);
     }
 
-    return [finalLayer, portal];
+    return finalLayer;
 }
 
 function createLocationMarkers(notam: Notam) {
