@@ -18,7 +18,8 @@ export function NotamListComponent({ notams }: NotamListComponentProps) {
             addedNotams.push(notam.series);
             return true;
         }
-        return false;
+        // return false; TODO: correct filter (why are some present more than once?)
+        return true;
     });
 
     return (

@@ -8,6 +8,8 @@ import { createFilter } from "./lib/filter/CreateFilter";
 import { isSmallWidth } from "./lib/DeviceUtils";
 import { useLocalStorage } from "./lib/LocalStorageHook";
 import { markerProducer } from "./lib/map/notammap/marker/CreateMarker";
+import menuIcon from "./assets/icons/menu.svg?raw";
+import closeIcon from "./assets/icons/x.svg?raw";
 
 function App() {
     const [countries, setCountries] = useState<string[]>([]);
@@ -40,7 +42,12 @@ function App() {
     }, []);
 
     async function updateNotams(country: string) {
-        setNotmas(await fetchNotams(country));
+        const notams = await fetchNotams(country);
+
+        notams.sort((a, b) => a.series.localeCompare(b.series));
+        console.log(notams); // TODO Test
+
+        setNotmas(notams);
     }
 
     function closeMenuSmallDevices() {
@@ -57,14 +64,16 @@ function App() {
                     filter={notamFilter}
                     markerProducer={notamMarkerProducer}
                     initialCoords={[49, 12]}
-                    initialZoom={6}
+                    initialZoom={5}
                 ></NotamMap>
             </div>
 
             {menuOpen ? (
                 <div className="fixed top-0 right-0 w-80 h-[100vh] bg-white p-3 overflow-auto flex flex-col gap-4">
                     <div className="text-right">
-                        <button onClick={() => setMenuOpen(false)}>🗙 Close Menu</button>
+                        <button onClick={() => setMenuOpen(false)}>
+                            <span dangerouslySetInnerHTML={{ __html: closeIcon }} className="inline-block align-bottom"></span> Close Menu
+                        </button>
                     </div>
 
                     <h2>Country</h2>
@@ -92,7 +101,9 @@ function App() {
                 </div>
             ) : (
                 <div className="fixed top-0 right-0 p-3">
-                    <button onClick={() => setMenuOpen(true)}>⇶ Open Menu</button>
+                    <button onClick={() => setMenuOpen(true)}>
+                        <span dangerouslySetInnerHTML={{ __html: menuIcon }} className="inline-block align-bottom"></span> Open Menu
+                    </button>
                 </div>
             )}
         </>

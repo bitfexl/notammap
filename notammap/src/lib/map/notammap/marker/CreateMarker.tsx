@@ -1,15 +1,13 @@
 import { ReactPortal } from "react";
 import { NotamListComponent } from "../../../notam/NotamListComponent";
 import { Notam } from "../../../notams/notamextractor";
-import { NM_TO_M, createIcon } from "../NotamDisplayHelpers";
+import { COORDINATES_PATTERN, NM_TO_M, createIcon } from "../NotamDisplayHelpers";
 import * as L from "leaflet";
 import { createPortal } from "react-dom";
 
 export function markerProducer(notams: Notam[], map: L.Map): [L.Layer, ReactPortal | null] {
-    const notam = notams[0];
-
-    const latlng: L.LatLngTuple = [notam.latitude, notam.longitude];
-    const radius = notam.radius * NM_TO_M;
+    const latlng: L.LatLngTuple = [notams[0].latitude, notams[0].longitude];
+    const radius = notams[0].radius * NM_TO_M; // TODO: use max radius of all notams
 
     const marker = L.marker(latlng, {
         icon: createIcon("lightgray", "" + notams.length),
@@ -24,6 +22,10 @@ export function markerProducer(notams: Notam[], map: L.Map): [L.Layer, ReactPort
     circle.on("mouseout", () => onHover(false));
     marker.on("mouseover", () => onHover(true));
     marker.on("mouseout", () => onHover(false));
+
+    for (const notam of notams) {
+        createLocationMarkers(notam);
+    }
 
     const content = document.createElement("div");
     const portal = createPortal(
@@ -49,4 +51,11 @@ export function markerProducer(notams: Notam[], map: L.Map): [L.Layer, ReactPort
 
     finalLayer.addTo(map);
     return [finalLayer, portal];
+}
+
+function createLocationMarkers(notam: Notam) {
+    // todo find all unique areas and attached notams to display on the map, refactoring, when loading notams
+    for (const match of notam.notamText.match(COORDINATES_PATTERN) ?? []) {
+        console.log(notam, match);
+    }
 }

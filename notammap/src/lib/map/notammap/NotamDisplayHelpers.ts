@@ -3,6 +3,12 @@ import { Notam } from "../../notams/notamextractor";
 import * as L from "leaflet";
 
 /**
+ * Pattern to match coordinates in notam text.
+ * If the coordinates are separated by "-" then it is an area.
+ */
+export const COORDINATES_PATTERN = "(?:\\d{6}N\\s\\d{7}E(?:(?:\\s-\\s)|\\s)?)+";
+
+/**
  * One nautical mile in meters.
  */
 export const NM_TO_M = 1852;

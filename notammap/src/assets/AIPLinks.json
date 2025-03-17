@@ -1,0 +1,19 @@
+{
+    "austria": {
+        "allProducts": "https://www.austrocontrol.at/piloten/vor_dem_flug/aim_produkte",
+        "aipDirect": "https://eaip.austrocontrol.at/"
+    },
+    "czech republic": {
+        "allProducts": "https://aim.rlp.cz/",
+        "aipDirect": "https://aim.rlp.cz/ais_data/www_main_control/frm_en_aip.htm"
+    },
+    "france": {
+        "allProducts": "https://www.sia.aviation-civile.gouv.fr/",
+        "__TODO": "Direct aip link is a dynamic link.",
+        "aipDirect": "https://www.sia.aviation-civile.gouv.fr/dvd/eAIP_20_FEB_2025/FRANCE/AIRAC-2025-02-20/html/index-fr-FR.html"
+    },
+    "germany": {
+        "allProducts": null,
+        "aipDirect": "https://aip.dfs.de/basicAIP/"
+    }
+}
