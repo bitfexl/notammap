@@ -1,5 +1,5 @@
 {
-    "austria": {
+    "Austria": {
         "view": {
             "center": [],
             "zoom": 7
@@ -9,7 +9,7 @@
             "aipDirect": "https://eaip.austrocontrol.at/"
         }
     },
-    "czech republic": {
+    "Czech Republic": {
         "view": {
             "center": [],
             "zoom": 7
@@ -19,7 +19,7 @@
             "aipDirect": "https://aim.rlp.cz/ais_data/www_main_control/frm_en_aip.htm"
         }
     },
-    "france": {
+    "France": {
         "view": {
             "center": [],
             "zoom": 7
@@ -30,7 +30,7 @@
             "aipDirect": "https://www.sia.aviation-civile.gouv.fr/dvd/eAIP_20_FEB_2025/FRANCE/AIRAC-2025-02-20/html/index-fr-FR.html"
         }
     },
-    "germany": {
+    "Germany": {
         "view": {
             "center": [],
             "zoom": 7

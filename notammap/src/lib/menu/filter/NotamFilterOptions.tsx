@@ -1,4 +1,4 @@
-import { CheckBoxInputs } from "../form/CheckBoxInputs";
+import { CheckBoxInputs } from "../../form/CheckBoxInputs";
 
 export interface NotamFilterOptions {
     TRAFFIC: {

@@ -1,4 +1,4 @@
-import { ReactPortal, memo, useCallback, useEffect, useRef, useState } from "react";
+import { ReactPortal, useCallback, useEffect, useRef, useState } from "react";
 import { LeafletMap } from "../LeafletMap";
 import * as L from "leaflet";
 import { Notam } from "../../notams/notamextractor";

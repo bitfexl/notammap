@@ -1,5 +1,5 @@
-import { NotamFilter } from "../map/notammap/notamDisplayHelpers";
-import { Notam } from "../notams/notamextractor";
+import { NotamFilter } from "../../map/notammap/notamDisplayHelpers";
+import { Notam } from "../../notams/notamextractor";
 import { NotamFilterOptions } from "./NotamFilterOptions";
 
 export function createFilter(options: NotamFilterOptions): NotamFilter {
