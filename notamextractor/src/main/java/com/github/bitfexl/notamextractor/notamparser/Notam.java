@@ -15,10 +15,16 @@ public class Notam {
     String raw;
 
     /**
-     * The notam series, everything infront of the first /.
-     * A letter and a 4-digit number e.g. A0001.
+     * The notam series, the letter in front of the notam number.
+     * Each series is unique to the fir and must have a unique numbering.
+     * A letter (A-Z without S and T) e.g. 'A' for A0001.
      */
-    String series;
+    Character series;
+
+    /**
+     * The notam number right after the series, which is unique to that series.
+     */
+    Integer number;
 
     /**
      * The notam year (after first /). The full year and not just
@@ -34,7 +40,7 @@ public class Notam {
     /**
      * Only available (not null) if type
      * is REPLACE or CANCEL.
-     * Only the series and year fields are
+     * Only the series, number and year fields are
      * guarantied to be set.
      */
     Notam previousNotam;
@@ -68,7 +74,7 @@ public class Notam {
     List<NotamScope> scopes;
 
     /**
-     * The lower limit in FL as provided in item Q.
+     * The lower limit in FL or in thousands of feet below the transition level as provided in item Q.
      * Item F and G should be the same.
      * If no specific height information is provided
      * 0 and 999 are assumed for lower and upper limit.
@@ -76,7 +82,7 @@ public class Notam {
     Integer qLower;
 
     /**
-     * The lower limit in FL as provided in item Q.
+     * The lower limit in FL or in thousands of feet below the transition level as provided in item Q.
      * Item F and G should be the same.
      * If no specific height information is provided
      * 0 and 999 are assumed for lower and upper limit.
@@ -109,6 +115,7 @@ public class Notam {
      * The date and time as provided in item B (UTC).
      * In the ISO 8601 (https://en.wikipedia.org/wiki/ISO_8601) format.
      */
+    // TODO: REAL DATES
     String from;
 
     /**

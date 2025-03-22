@@ -2,6 +2,10 @@ package com.github.bitfexl.notamextractor.notamparser;
 
 import java.util.*;
 
+/**
+ * Parse notams according to Icao Doc 8126
+ * https://www.icao.int/NACC/Documents/eDOCS/AIM/8126_unedited_en%20Jul2021.pdf
+ */
 public class NotamParser {
     private final String CREATED_PREFIX = "CREATED:";
     private final String SOURCE_PREFIX = "SOURCE:";
@@ -59,7 +63,8 @@ public class NotamParser {
 
     private void parseHeader(Notam.NotamBuilder notam, String header) {
         String[] parts = header.split("[/ ]");
-        notam.series(parts[0]);
+        notam.series(parts[0].charAt(0));
+        notam.number(Integer.parseInt(parts[0].substring(1)));
 
         notam.year(parseYear(Integer.parseInt(parts[1])));
 
@@ -69,7 +74,8 @@ public class NotamParser {
         if (type != NotamType.NEW) {
             notam.previousNotam(
                 Notam.builder()
-                    .series(parts[3])
+                    .series(parts[3].charAt(0))
+                    .number(Integer.parseInt(parts[3].substring(1)))
                     .year(parseYear(Integer.parseInt(parts[4])))
                     .build()
             );
@@ -89,6 +95,7 @@ public class NotamParser {
 
         for (char newItem : new char[] {'Q', 'A', 'B', 'C', 'D', 'E', 'F', 'G'}) {
             // Q is the first item, so no space
+            // TODO: dangerous if item E (message contains ')')
             final String itemId = newItem == 'Q' ? "Q) " : " " + newItem + ") ";
             int newIndex = raw.indexOf(itemId, currentStartingIndex);
 
