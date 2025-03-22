@@ -15,24 +15,26 @@ public class DetailedNotamParser {
      * @return The parsed data.
      */
     public NotamData parseNotams(List<Notam> notams) {
-        final List<DetailedNotam> detailedNotams = new ArrayList<>();
+        final Map<Long, DetailedNotam> detailedNotams = new HashMap<>();
         final Map<String, CoordinatesList> coordinates = new HashMap<>();
 
         for (Notam notam : notams) {
-            detailedNotams.add(new DetailedNotam(
-                    notam,
-                    computeId(notam),
-                    notam.getPreviousNotam() == null ? null : computeId(notam.getPreviousNotam(), notam.getFir()),
-                    parseTextNodes(notam, coordinates),
-                    parsePeriods(notam)
-            ));
-        }
+            final long notamId = computeId(notam);
 
-        // todo: filter detailed notams (remove duplicates by id)
+            if (!detailedNotams.containsKey(notamId)) {
+                detailedNotams.put(notamId, new DetailedNotam(
+                        notam,
+                        notamId,
+                        notam.getPreviousNotam() == null ? null : computeId(notam.getPreviousNotam(), notam.getFir()),
+                        parseTextNodes(notam, coordinates),
+                        parsePeriods(notam)
+                ));
+            }
+        }
 
         return new NotamData(
                 NOTAM_DATA_VERSION,
-                detailedNotams,
+                detailedNotams.values().stream().toList(),
                 coordinates.values().stream().toList()
         );
     }
