@@ -28,6 +28,8 @@ public class DetailedNotamParser {
             ));
         }
 
+        // todo: filter detailed notams (remove duplicates by id)
+
         return new NotamData(
                 NOTAM_DATA_VERSION,
                 detailedNotams,
