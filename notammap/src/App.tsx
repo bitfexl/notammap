@@ -19,6 +19,9 @@ export default function App() {
         }
     }
 
+    // TDOD: deduplicate notams, notams are duplicated if for multiple locations
+    // in backend remove notams which might have been fetched for two different locations
+
     return (
         <>
             <div onClick={closeMenuSmallDevices} className="fixed top-0 left-0 w-[100vw] h-[100vh] -z-10">
