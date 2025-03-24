@@ -4,11 +4,13 @@ import com.github.bitfexl.notamextractor.notamparser.Notam;
 import com.github.bitfexl.notamextractor.notamparser.detailsparser.data.*;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DetailedNotamParser {
     private static final String NOTAM_DATA_VERSION = "1.0";
     private static final byte ID_VERSION = 1;
-    private static final String COORDINATES_PATTERN = "(?:\\d{6}N\\s\\d{7}E(?:(?:\\s-\\s)|\\s)?)+";
+    private static final Pattern COORDINATES_PATTERN = Pattern.compile("(?:\\d{6}[NS]\\s\\d{7}[EW](?:(?:\\s-\\s)|\\s)?)+");
 
     /**
      * Generate notam data with details for a number of notams.
@@ -45,49 +47,99 @@ public class DetailedNotamParser {
         return null;
     }
 
+    /**
+     * A text snippet inside a longer text.
+     * @param start The start of the text snippet (inclusive).
+     * @param end The end of the text snipped (exclusive).
+     * @param node The node this text snippet represents.
+     */
+    private record TextSnippet(int start, int end, TextNode node) {}
+
     private List<TextNode> parseTextNodes(Notam notam, Map<String, CoordinatesList> coordinates) {
         // TODO: implement text nodes parsing
-        final String[] words = notam.getNotamText().split("[ \n]");
+        final String text = notam.getNotamText();
+
+        if (text == null) {
+            return List.of();
+        }
+
+        final List<TextSnippet> textSnippets = new ArrayList<>();
+
+        // --- find coordinates ---
+
+        // todo: separation sometimes with only "-" no space
+        //  sometimes no separation of latitude and longitude
+        final Matcher matcher = COORDINATES_PATTERN.matcher(text);
+
+        while (matcher.find()) {
+            final String coordinatesGroup = matcher.group();
+            final CoordinatesList coordinatesList = parseCoordinatesList(coordinatesGroup);
+            coordinates.put(coordinatesList.hash(), coordinatesList);
+            textSnippets.add(new TextSnippet(
+                    matcher.start(), matcher.end(), new TextNode(coordinatesGroup, Reference.coordinatesList(coordinatesList.hash()))
+            ));
+        }
+
+        // --- find links ---
+
+        // todo: implement link findings
+
+        // --- build text node list ---
 
         final List<TextNode> textNodes = new ArrayList<>();
 
-        final StringBuilder currentText = new StringBuilder();
+        textSnippets.sort(Comparator.comparingInt(TextSnippet::start));
 
-        for (String word : words) {
-            final String lowercaseWord = word.toLowerCase();
-            final Reference reference;
+        int startIndex = 0;
 
-            // links
-            if (lowercaseWord.startsWith("https://") || lowercaseWord.startsWith("http://")) {
-                final String[] parts = word.split("/");
-                parts[0] = parts[0].toLowerCase();
-                parts[2] = parts[2].toLowerCase();
-                reference = Reference.webLink(String.join("/", parts));
-            } else if (lowercaseWord.startsWith("www.") && lowercaseWord.indexOf(".", 4) != -1) {
-                final String[] parts = word.split("/");
-                parts[0] = parts[0].toLowerCase();
-                reference = Reference.webLink("https://" + String.join("/", parts));
-            } else {
-                reference = null;
+        for (TextSnippet snippet : textSnippets) {
+            if (startIndex < snippet.start) {
+                textNodes.add(new TextNode(text.substring(startIndex, snippet.start), null));
+            } else if (startIndex > snippet.start) {
+                throw new RuntimeException("Overlapping matches found.");
             }
-
-            if (reference == null) {
-                if (!currentText.isEmpty()) {
-                    currentText.append(" ");
-                }
-                currentText.append(word);
-            } else {
-                textNodes.add(new TextNode(currentText.append(" ").toString(), null));
-                currentText.setLength(0);
-                textNodes.add(new TextNode(word, reference));
-            }
+            textNodes.add(snippet.node);
+            startIndex = snippet.end;
         }
 
-        if (!currentText.isEmpty()) {
-            textNodes.add(new TextNode(currentText.toString(), null));
+        if (startIndex != text.length() - 1) {
+            textNodes.add(new TextNode(text.substring(startIndex), null));
         }
 
         return textNodes;
+    }
+
+    private CoordinatesList parseCoordinatesList(String rawCoordinatesList) {
+        final List<String> rawCoordinates = Arrays.stream(rawCoordinatesList.split(" ")).filter(s -> s.length() > 6).toList();
+
+        if (rawCoordinates.size() % 2 != 0) {
+            throw new IllegalArgumentException("Error parsing coordinates list: Coordinates list not in the correct format (latitude or longitude missing): '" + rawCoordinatesList + "'.");
+        }
+
+        final List<Coordinates> parsedCoordinates = new ArrayList<>();
+
+        for (int i = 0; i < rawCoordinates.size(); i += 2) {
+            final String latCords = rawCoordinates.get(i);
+            final String lngCords = rawCoordinates.get(i + 1);
+
+            // https://en.wikipedia.org/wiki/ISO_6709 with 6 and 7 digits
+
+            double lat = Double.parseDouble(latCords.substring(0, 2));
+            lat += (Double.parseDouble(latCords.substring(2, 4)) / 60);
+            lat += (Double.parseDouble(latCords.substring(4, 6)) / 3600);
+            lat *= (latCords.charAt(6) == 'S' || latCords.charAt(6) == 's' ? -1 : 1);
+
+            double lng = Double.parseDouble(lngCords.substring(0, 3));
+            lng += (Double.parseDouble(lngCords.substring(3, 5)) / 60);
+            lng += (Double.parseDouble(lngCords.substring(5, 7)) / 3600);
+            lng *= (lngCords.charAt(7) == 'W' || lngCords.charAt(7) == 'w' ? -1 : 1);
+
+            parsedCoordinates.add(new Coordinates(lat, lng));
+        }
+
+        // todo: maybe a better hash code
+        final String hash = String.valueOf(parsedCoordinates.hashCode());
+        return new CoordinatesList(hash, parsedCoordinates);
     }
 
     private long computeId(Notam notam, String fir) {
@@ -107,7 +159,7 @@ public class DetailedNotamParser {
      * @return A unique id, always positive.
      */
     private long computeId(int year, char series, int number, String fir) {
-        // 1 byte id, first bit reserved to stay positive
+        // 1 byte id version, first bit reserved to stay positive
         // 1 + 1/2 byte year (to 4095)
         // 2 + 1/2 byte series + number
         //   5 bit series (letter)
