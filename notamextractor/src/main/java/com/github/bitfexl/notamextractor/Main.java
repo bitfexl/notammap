@@ -7,6 +7,8 @@ import com.github.bitfexl.notamextractor.dins.DinsQuery;
 import com.github.bitfexl.notamextractor.dins.ICAOLocation;
 import com.github.bitfexl.notamextractor.notamparser.Notam;
 import com.github.bitfexl.notamextractor.notamparser.NotamParser;
+import com.github.bitfexl.notamextractor.notamparser.detailsparser.DetailedNotamParser;
+import com.github.bitfexl.notamextractor.notamparser.detailsparser.data.NotamData;
 import lombok.SneakyThrows;
 
 import java.io.InputStream;
@@ -42,7 +44,9 @@ public class Main {
             }
         }).toList();
 
-        final String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(parsedNotams);
+        final NotamData data = new DetailedNotamParser().parseNotams(parsedNotams);
+
+        final String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data);
         System.out.println(json);
     }
 

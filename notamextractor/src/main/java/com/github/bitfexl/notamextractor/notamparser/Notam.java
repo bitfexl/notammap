@@ -23,6 +23,7 @@ public class Notam {
 
     /**
      * The notam number right after the series, which is unique to that series.
+     * Always 4 digits, for correct display prefix with 0 if less.
      */
     Integer number;
 

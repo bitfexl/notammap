@@ -8,6 +8,7 @@ import java.util.*;
 public class DetailedNotamParser {
     private static final String NOTAM_DATA_VERSION = "1.0";
     private static final byte ID_VERSION = 1;
+    private static final String COORDINATES_PATTERN = "(?:\\d{6}N\\s\\d{7}E(?:(?:\\s-\\s)|\\s)?)+";
 
     /**
      * Generate notam data with details for a number of notams.
@@ -46,7 +47,47 @@ public class DetailedNotamParser {
 
     private List<TextNode> parseTextNodes(Notam notam, Map<String, CoordinatesList> coordinates) {
         // TODO: implement text nodes parsing
-        return null;
+        final String[] words = notam.getNotamText().split("[ \n]");
+
+        final List<TextNode> textNodes = new ArrayList<>();
+
+        final StringBuilder currentText = new StringBuilder();
+
+        for (String word : words) {
+            final String lowercaseWord = word.toLowerCase();
+            final Reference reference;
+
+            // links
+            if (lowercaseWord.startsWith("https://") || lowercaseWord.startsWith("http://")) {
+                final String[] parts = word.split("/");
+                parts[0] = parts[0].toLowerCase();
+                parts[2] = parts[2].toLowerCase();
+                reference = Reference.webLink(String.join("/", parts));
+            } else if (lowercaseWord.startsWith("www.") && lowercaseWord.indexOf(".", 4) != -1) {
+                final String[] parts = word.split("/");
+                parts[0] = parts[0].toLowerCase();
+                reference = Reference.webLink("https://" + String.join("/", parts));
+            } else {
+                reference = null;
+            }
+
+            if (reference == null) {
+                if (!currentText.isEmpty()) {
+                    currentText.append(" ");
+                }
+                currentText.append(word);
+            } else {
+                textNodes.add(new TextNode(currentText.append(" ").toString(), null));
+                currentText.setLength(0);
+                textNodes.add(new TextNode(word, reference));
+            }
+        }
+
+        if (!currentText.isEmpty()) {
+            textNodes.add(new TextNode(currentText.toString(), null));
+        }
+
+        return textNodes;
     }
 
     private long computeId(Notam notam, String fir) {
