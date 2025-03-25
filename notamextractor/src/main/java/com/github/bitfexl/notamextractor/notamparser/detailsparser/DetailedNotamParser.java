@@ -4,13 +4,15 @@ import com.github.bitfexl.notamextractor.notamparser.Notam;
 import com.github.bitfexl.notamextractor.notamparser.detailsparser.data.*;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 public class DetailedNotamParser {
     private static final String NOTAM_DATA_VERSION = "1.0";
     private static final byte ID_VERSION = 1;
-    private static final Pattern COORDINATES_PATTERN = Pattern.compile("(?:\\d{6}[NS]\\s\\d{7}[EW](?:(?:\\s-\\s)|\\s)?)+");
+    private static final Pattern COORDINATES_PATTERN = Pattern.compile("(?:\\d{6}[NS]\\s?\\d{7}[EW](?:\\s?-?\\s?)?)+");
 
     /**
      * Generate notam data with details for a number of notams.
@@ -67,8 +69,6 @@ public class DetailedNotamParser {
 
         // --- find coordinates ---
 
-        // todo: separation sometimes with only "-" no space
-        //  sometimes no separation of latitude and longitude
         final Matcher matcher = COORDINATES_PATTERN.matcher(text);
 
         while (matcher.find()) {
@@ -110,7 +110,13 @@ public class DetailedNotamParser {
     }
 
     private CoordinatesList parseCoordinatesList(String rawCoordinatesList) {
-        final List<String> rawCoordinates = Arrays.stream(rawCoordinatesList.split(" ")).filter(s -> s.length() > 6).toList();
+        final List<String> rawCoordinates = Arrays.stream(rawCoordinatesList.split("[\\s-]"))
+                .flatMap(
+                        (Function<String, Stream<String>>) s -> // parse different coordinate notations
+                                s.length() == 7 || s.length() == 8 ? Stream.of(s) : // "123456N" or "1234567E" if notated as "123456N 1234567E"
+                                s.length() == 15 ? Stream.of(s.substring(0, 7), s.substring(7)) : // "123456N1234567E"
+                                Stream.of()) // ignore everything else
+                .toList();
 
         if (rawCoordinates.size() % 2 != 0) {
             throw new IllegalArgumentException("Error parsing coordinates list: Coordinates list not in the correct format (latitude or longitude missing): '" + rawCoordinatesList + "'.");
@@ -119,27 +125,22 @@ public class DetailedNotamParser {
         final List<Coordinates> parsedCoordinates = new ArrayList<>();
 
         for (int i = 0; i < rawCoordinates.size(); i += 2) {
-            final String latCords = rawCoordinates.get(i);
-            final String lngCords = rawCoordinates.get(i + 1);
-
-            // https://en.wikipedia.org/wiki/ISO_6709 with 6 and 7 digits
-
-            double lat = Double.parseDouble(latCords.substring(0, 2));
-            lat += (Double.parseDouble(latCords.substring(2, 4)) / 60);
-            lat += (Double.parseDouble(latCords.substring(4, 6)) / 3600);
-            lat *= (latCords.charAt(6) == 'S' || latCords.charAt(6) == 's' ? -1 : 1);
-
-            double lng = Double.parseDouble(lngCords.substring(0, 3));
-            lng += (Double.parseDouble(lngCords.substring(3, 5)) / 60);
-            lng += (Double.parseDouble(lngCords.substring(5, 7)) / 3600);
-            lng *= (lngCords.charAt(7) == 'W' || lngCords.charAt(7) == 'w' ? -1 : 1);
-
-            parsedCoordinates.add(new Coordinates(lat, lng));
+            parsedCoordinates.add(new Coordinates(parseCordPart(rawCoordinates.get(i)), parseCordPart(rawCoordinates.get(i + 1))));
         }
 
         // todo: maybe a better hash code
         final String hash = String.valueOf(parsedCoordinates.hashCode());
         return new CoordinatesList(hash, parsedCoordinates);
+    }
+
+    private double parseCordPart(String cordPart) {
+        // https://en.wikipedia.org/wiki/ISO_6709 with 6 and 7 digits
+        final int offset = cordPart.length() - 7;
+        double cord = Double.parseDouble(cordPart.substring(0, 2 + offset));
+        cord += (Double.parseDouble(cordPart.substring(2 + offset, 4 + offset)) / 60);
+        cord += (Double.parseDouble(cordPart.substring(4 + offset, 6 + offset)) / 3600);
+        cord *= (cordPart.charAt(6 + offset) == (offset == 0 ? 'S' : 'W') ? -1 : 1);
+        return cord;
     }
 
     private long computeId(Notam notam, String fir) {
