@@ -1,33 +1,30 @@
 import { useEffect, useId, useState } from "react";
-import { Notam } from "../notams/notamextractor";
 import menuIcon from "../../assets/icons/menu.svg?raw";
 import closeIcon from "../../assets/icons/x.svg?raw";
-import { fetchCountries, fetchNotams } from "../notams/NotamFetch";
+import { fetchCountries } from "../notams/NotamFetch";
 import { useLocalStorage } from "../LocalStorageHook";
 import { defaultFilterOptions, NotamFilterOptions, NotamFilterOptionsSelector } from "./filter/NotamFilterOptions";
-import { createFilter } from "./filter/CreateFilter";
 import countryData from "../../assets/CountryData.json";
 
 export interface SideMenuProps {
     /**
-     * Called when the notams change (filter or country).
-     * @param notams The new notams to display.
+     * Called when the notam filter options change.
+     * @param filter The new notam filter options.
      */
-    onNotamsChange: (notams: Notam[]) => void;
+    onFilterChange: (filter: NotamFilterOptions) => void;
 
     /**
-     * Called when the country changes (new map location and zoom).
-     * @param cords The new initial cords.
-     * @param zoom The new initial zoom.
+     * Called when the country changes.
+     * @param country The new country.
      */
-    onCountryChange: (cords: L.LatLngTuple, zoom: number) => void;
+    onCountryChange: (country: string) => void;
 
     menuOpen: boolean;
 
     setMenuOpen: (open: boolean) => void;
 }
 
-export function SideMenu({ onNotamsChange, onCountryChange, menuOpen, setMenuOpen }: SideMenuProps) {
+export function SideMenu({ onCountryChange, onFilterChange, menuOpen, setMenuOpen }: SideMenuProps) {
     const [countries, setCountries] = useState<string[]>([]);
 
     const [notamFilterOptions, setNotamFitlerOptions] = useLocalStorage<NotamFilterOptions>(defaultFilterOptions, "filter_options");
@@ -38,29 +35,18 @@ export function SideMenu({ onNotamsChange, onCountryChange, menuOpen, setMenuOpe
     useEffect(() => {
         (async () => {
             setCountries(await fetchCountries());
-            updateNotams();
         })();
     }, []);
 
     useEffect(() => {
-        updateNotams();
-    }, [country, notamFilterOptions]);
-
-    useEffect(() => {
-        if (country && (countryData as any)[country]) {
-            onCountryChange((countryData as any)[country].view.center, (countryData as any)[country].view.zoom);
+        if (country) {
+            onCountryChange(country);
         }
     }, [country]);
 
-    async function updateNotams() {
-        // todo: zoom to country somewhere here
-        if (country == null) {
-            return;
-        }
-        let notams = await fetchNotams(country);
-        notams = notams.filter(createFilter(notamFilterOptions));
-        notams.sort((a, b) => a.series.localeCompare(b.series)); // TODO: better sorting
-        onNotamsChange(notams);
+    function onFilterOptionsUpdate(filter: NotamFilterOptions) {
+        onFilterChange(filter);
+        setNotamFitlerOptions(filter);
     }
 
     return (
@@ -107,7 +93,7 @@ export function SideMenu({ onNotamsChange, onCountryChange, menuOpen, setMenuOpe
                     <span className="p-1">{/* spacing */}</span>
 
                     <h2>Filter</h2>
-                    <NotamFilterOptionsSelector options={notamFilterOptions} onChange={setNotamFitlerOptions}></NotamFilterOptionsSelector>
+                    <NotamFilterOptionsSelector options={notamFilterOptions} onChange={onFilterOptionsUpdate}></NotamFilterOptionsSelector>
                 </div>
             ) : (
                 <div className="fixed top-0 right-0 p-3">

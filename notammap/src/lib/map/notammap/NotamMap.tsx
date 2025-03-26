@@ -1,12 +1,17 @@
 import { ReactPortal, useCallback, useEffect, useRef, useState } from "react";
 import { LeafletMap } from "../LeafletMap";
 import * as L from "leaflet";
-import { Notam } from "../../notams/notamextractor";
-import { NotamRenderer } from "./notamDisplayHelpers";
+import { Coordinates, CoordinatesList, DetailedNotam, NotamData } from "../../notams/notamextractor";
+import { CoordinatesRenderer, NotamRenderer } from "./notamDisplayHelpers";
 
 export interface NotamMapProps {
-    notams: Notam[];
+    /**
+     * The notam data to display on the map.
+     * Must be already filtered (both notams and coordinates),
+     */
+    notamData: NotamData;
     notamRenderer: NotamRenderer;
+    coordinatesRenderer: CoordinatesRenderer;
     /**
      * The current/initial cords. Changing this causes the map to switch to these coordinates.
      */
@@ -18,11 +23,13 @@ export interface NotamMapProps {
     currentZoom: number;
 }
 
-export function NotamMap({ notams, notamRenderer, currentCords, currentZoom }: NotamMapProps) {
+export function NotamMap({ notamData, notamRenderer, coordinatesRenderer, currentCords, currentZoom }: NotamMapProps) {
     // set portal for the currently displayed notam
     const [portal, setPortal] = useState<ReactPortal>();
     const mapRef = useRef<L.Map | null>(null);
+
     const displayedNotams = useRef(new Set<L.Layer>());
+    const displayedCoordinates = useRef(new Map<string, L.Layer>());
 
     const initMap = useCallback((map: L.Map) => {
         mapRef.current = map;
@@ -31,9 +38,15 @@ export function NotamMap({ notams, notamRenderer, currentCords, currentZoom }: N
 
     useEffect(() => {
         if (mapRef.current != null) {
-            updateNotams(mapRef.current, notams, displayedNotams.current, notamRenderer, setPortal);
+            updateNotams(mapRef.current, notamData.notams, displayedNotams.current, notamRenderer, setPortal);
         }
-    }, [notams, notamRenderer]);
+    }, [notamData, notamRenderer]);
+
+    useEffect(() => {
+        if (mapRef.current != null) {
+            updateCoordinates(mapRef.current, notamData.coordinatesLists, displayedCoordinates.current, coordinatesRenderer);
+        }
+    }, [notamData, coordinatesRenderer]);
 
     return (
         <>
@@ -45,9 +58,37 @@ export function NotamMap({ notams, notamRenderer, currentCords, currentZoom }: N
     );
 }
 
+function updateCoordinates(
+    map: L.Map,
+    coordinateLists: CoordinatesList[],
+    displayedCoordinatesList: Map<string, L.Layer>,
+    coordinatesRenderer: CoordinatesRenderer
+) {
+    console.log("Rendering " + coordinateLists.length + " coordinates...");
+
+    const remainingCoordiantes = new Map<string, CoordinatesList>();
+    for (const coordinatesList of coordinateLists) {
+        remainingCoordiantes.set(coordinatesList.hash, coordinatesList);
+    }
+
+    for (const displayedCoordinates of displayedCoordinatesList) {
+        if (!remainingCoordiantes.delete(displayedCoordinates[0])) {
+            map.removeLayer(displayedCoordinates[1]);
+        }
+    }
+
+    for (const coordinates of remainingCoordiantes) {
+        const layer = coordinatesRenderer(coordinates[1]);
+        if (layer != null) {
+            map.addLayer(layer);
+            displayedCoordinatesList.set(coordinates[0], layer);
+        }
+    }
+}
+
 function updateNotams(
     map: L.Map,
-    notams: Notam[],
+    notams: DetailedNotam[],
     displayedNotams: Set<L.Layer>,
     notamRenderer: NotamRenderer,
     setPortal: (portal: ReactPortal) => void
@@ -57,13 +98,14 @@ function updateNotams(
     for (const layer of displayedNotams) {
         map.removeLayer(layer);
     }
-
     displayedNotams.clear();
 
     //                          lat         lng     notams
-    const notamGroups = new Map<number, Map<number, Notam[]>>();
+    const notamGroups = new Map<number, Map<number, DetailedNotam[]>>();
 
-    for (const notam of notams) {
+    for (const detailedNotam of notams) {
+        const notam = detailedNotam.notam;
+
         let lngMap = notamGroups.get(notam.latitude);
 
         if (lngMap == null) {
@@ -71,14 +113,14 @@ function updateNotams(
             notamGroups.set(notam.latitude, lngMap);
         }
 
-        let notams = lngMap.get(notam.longitude);
+        let filteredNotams = lngMap.get(notam.longitude);
 
-        if (notams == null) {
-            notams = [];
-            lngMap.set(notam.longitude, notams);
+        if (filteredNotams == null) {
+            filteredNotams = [];
+            lngMap.set(notam.longitude, filteredNotams);
         }
 
-        notams.push(notam);
+        filteredNotams.push(detailedNotam);
     }
 
     for (const lngMap of notamGroups) {

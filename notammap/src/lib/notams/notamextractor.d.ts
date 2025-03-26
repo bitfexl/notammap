@@ -1,10 +1,47 @@
-/* tslint:disable */
-/* eslint-disable */
-// See: https://github.com/bitfexl/notamextractor
+// See the notamextractor subfolder
+
+export interface NotamData {
+    version: "1.0" | string;
+    notams: DetailedNotam[];
+    coordinatesLists: CoordinatesList[];
+}
+
+export interface CoordinatesList {
+    hash: string;
+    coordinates: Coordinates[];
+}
+
+export interface Coordinates {
+    latitude: number;
+    longitude: number;
+}
+
+export interface DetailedNotam {
+    notam: Notam;
+    id: number;
+    previousNotamId: number;
+    textNodes: TextNode[];
+    activePeriods: Period[];
+}
+
+export interface Period {}
+
+export interface TextNode {
+    text: string;
+    reference?: Reference;
+}
+
+export interface Reference {
+    abbreviation?: string;
+    coordinatesList?: string;
+    webLink?: string;
+    notamId?: number;
+}
 
 export interface Notam {
     raw: string;
     series: string;
+    number: string;
     year: number;
     type: NotamType;
     previousNotam: Notam;

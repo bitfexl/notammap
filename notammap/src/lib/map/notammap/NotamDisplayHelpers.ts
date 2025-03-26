@@ -1,12 +1,6 @@
 import { ReactPortal } from "react";
-import { Notam } from "../../notams/notamextractor";
+import { Coordinates, CoordinatesList, DetailedNotam, Notam } from "../../notams/notamextractor";
 import * as L from "leaflet";
-
-/**
- * Pattern to match coordinates in notam text.
- * If the coordinates are separated by "-" then it is an area.
- */
-export const COORDINATES_PATTERN = "(?:\\d{6}N\\s\\d{7}E(?:(?:\\s-\\s)|\\s)?)+";
 
 /**
  * One nautical mile in meters.
@@ -16,7 +10,7 @@ export const NM_TO_M = 1852;
 /**
  * Should return true if a notam should be displayed false if hidden.
  */
-export type NotamFilter = (notam: Notam) => boolean;
+export type NotamFilter = (detailedNoatm: DetailedNotam) => boolean;
 
 /**
  * Generate a marker for one or more notams. Do not add the final layer to the map.
@@ -24,7 +18,12 @@ export type NotamFilter = (notam: Notam) => boolean;
  * the same coordinates. The marker (tile layer) is responsible for showing
  * the notam on click. Use setPortal to render a react node on click.
  */
-export type NotamRenderer = (notams: Notam[], map: L.Map, setPortal: (portal: ReactPortal) => void) => L.Layer;
+export type NotamRenderer = (detailedNotams: DetailedNotam[], map: L.Map, setPortal: (portal: ReactPortal) => void) => L.Layer;
+
+/**
+ * Render coordinates for display on the map, or return null if not to render.
+ */
+export type CoordinatesRenderer = (coordinates: CoordinatesList) => L.Layer | null;
 
 /**
  * Create a leaflet marker icon.

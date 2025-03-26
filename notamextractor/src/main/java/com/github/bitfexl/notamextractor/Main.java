@@ -12,24 +12,30 @@ import com.github.bitfexl.notamextractor.notamparser.detailsparser.data.NotamDat
 import lombok.SneakyThrows;
 
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.List;
 
 public class Main {
     private static final DinsQuery dinsQuery = new DinsQuery();
     private static final ObjectMapper objectMapper = new ObjectMapper().setSerializationInclusion(Include.NON_NULL);
 
+    @SneakyThrows
     public static void main(String[] args) {
         // generateLocationJsonIndex();
 
-        final String countryName = args[0];
         final List<ICAOLocation> allLocations = loadLocationJsonIndex();
-        final List<ICAOLocation> filteredLocations = allLocations.stream().filter(loc -> loc.country().equalsIgnoreCase(countryName)).toList();
 
-        generateNotamsJson(filteredLocations);
+        for (String countryName : args) {
+            final List<ICAOLocation> filteredLocations = allLocations.stream().filter(loc -> loc.country().equalsIgnoreCase(countryName)).toList();
+
+            try (PrintStream file = new PrintStream(countryName + ".json")) {
+                file.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(generateNotamsJson(filteredLocations)));
+            }
+        }
     }
 
     @SneakyThrows
-    private static void generateNotamsJson(List<ICAOLocation> locations) {
+    private static NotamData generateNotamsJson(List<ICAOLocation> locations) {
         final NotamParser parser = new NotamParser();
 
         final List<String> notams = dinsQuery.getNotams(locations);
@@ -44,10 +50,7 @@ public class Main {
             }
         }).toList();
 
-        final NotamData data = new DetailedNotamParser().parseNotams(parsedNotams);
-
-        final String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data);
-        System.out.println(json);
+        return new DetailedNotamParser().parseNotams(parsedNotams);
     }
 
     @SneakyThrows

@@ -1,16 +1,18 @@
 import { toText } from "../notams/QCodes";
-import { Notam } from "../notams/notamextractor";
+import { DetailedNotam, TextNode } from "../notams/notamextractor";
 import { useState } from "react";
 
 export interface NotamComponentProps {
     /**
      * The notam to display.
      */
-    notam: Notam;
+    detailedNotam: DetailedNotam;
 }
 
-export function NotamComponent({ notam }: NotamComponentProps) {
+export function NotamComponent({ detailedNotam }: NotamComponentProps) {
     const [showRaw, setShowRaw] = useState(false);
+
+    const notam = detailedNotam.notam;
 
     if (showRaw) {
         return (
@@ -31,7 +33,7 @@ export function NotamComponent({ notam }: NotamComponentProps) {
         );
     }
 
-    const notamId = notam.series + "/" + (notam.year - 2000);
+    const notamId = notam.series + notam.number + "/" + (notam.year - 2000);
     const notamIdText = <span className="font-mono text-sm">{notamId}</span>;
 
     const headerInformation =
@@ -39,7 +41,8 @@ export function NotamComponent({ notam }: NotamComponentProps) {
             <>
                 {notamIdText} replaces{" "}
                 <span className="font-mono text-sm">
-                    {notam.previousNotam.series}/{notam.previousNotam.year - 2000}
+                    {notam.previousNotam.series}
+                    {notam.previousNotam.number}/{notam.previousNotam.year - 2000}
                 </span>
             </>
         ) : notam.type == "CANCEL" ? (
@@ -120,7 +123,7 @@ export function NotamComponent({ notam }: NotamComponentProps) {
             <div className="flex flex-col gap-1">
                 <b>NOTAM text</b>
                 <div>
-                    <FormattedNotamText text={notam.notamText}></FormattedNotamText>
+                    <FormattedNotamText textNodes={detailedNotam.textNodes}></FormattedNotamText>
                 </div>
             </div>
 
@@ -132,35 +135,18 @@ export function NotamComponent({ notam }: NotamComponentProps) {
     );
 }
 
-function FormattedNotamText({ text }: { text: string }) {
-    const words = text.split(" ");
+function FormattedNotamText({ textNodes }: { textNodes: TextNode[] }) {
     return (
         <>
-            {words
-                .map((word) => {
-                    if (word.toLowerCase().startsWith("https://") || word.toLowerCase().startsWith("http://")) {
-                        const parts = word.split("/");
-                        if (parts[2] == "") {
-                            // only "https://"
-                            return word;
-                        }
-                        parts[0] = parts[0].toLowerCase();
-                        parts[2] = parts[2].toLowerCase();
-                        word = parts.join("/");
-                        return (
-                            <a key={word} href={word} target="_blank">
-                                {word}
-                            </a>
-                        );
-                    }
-                    return word;
-                })
-                .flatMap((element, index) => {
-                    if (index == 0) {
-                        return element;
-                    }
-                    return [" ", element];
-                })}
+            {textNodes.map((node) => {
+                if (node.reference?.coordinatesList) {
+                    return <a href="javascript:alert('TODO')">view on map</a>;
+                } else if (node.reference?.abbreviation) {
+                    return node.text; // TODO: long form
+                } else {
+                    return node.text;
+                }
+            })}
         </>
     );
 }

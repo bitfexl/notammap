@@ -1,9 +1,11 @@
 import { NotamFilter } from "../../map/notammap/notamDisplayHelpers";
-import { Notam } from "../../notams/notamextractor";
+import { DetailedNotam } from "../../notams/notamextractor";
 import { NotamFilterOptions } from "./NotamFilterOptions";
 
 export function createFilter(options: NotamFilterOptions): NotamFilter {
-    return function (notam: Notam) {
+    return function (detailedNoatm: DetailedNotam) {
+        const notam = detailedNoatm.notam;
+
         // Trafic
         if (!anyMatch(options.TRAFFIC, notam.traffic)) {
             return false;
