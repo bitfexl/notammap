@@ -1,5 +1,5 @@
 import { ReactPortal } from "react";
-import { Coordinates, CoordinatesList, DetailedNotam, Notam } from "../../notams/notamextractor";
+import { CoordinatesList, DetailedNotam } from "../../notams/notamextractor";
 import * as L from "leaflet";
 
 /**
