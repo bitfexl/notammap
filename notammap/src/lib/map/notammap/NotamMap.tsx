@@ -1,7 +1,7 @@
 import { ReactPortal, useCallback, useEffect, useRef, useState } from "react";
 import { LeafletMap } from "../LeafletMap";
 import * as L from "leaflet";
-import { Coordinates, CoordinatesList, DetailedNotam, NotamData } from "../../notams/notamextractor";
+import { CoordinatesList, DetailedNotam, NotamData } from "../../notams/notamextractor";
 import { CoordinatesRenderer, NotamRenderer } from "./notamDisplayHelpers";
 
 export interface NotamMapProps {
@@ -74,6 +74,7 @@ function updateCoordinates(
     for (const displayedCoordinates of displayedCoordinatesList) {
         if (!remainingCoordiantes.delete(displayedCoordinates[0])) {
             map.removeLayer(displayedCoordinates[1]);
+            displayedCoordinatesList.delete(displayedCoordinates[0]);
         }
     }
 

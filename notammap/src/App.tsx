@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { NotamMap } from "./lib/map/notammap/NotamMap";
 import { isSmallWidth } from "./lib/DeviceUtils";
 
-import { renderNotams } from "./lib/map/notammap/notamRenderer";
+import { renderCoordinates, renderNotams } from "./lib/map/notammap/notamRenderer";
 import { SideMenu } from "./lib/menu/SideMenu";
 
 import countryData from "./assets/CountryData.json";
@@ -74,7 +74,7 @@ export default function App() {
                 <NotamMap
                     notamData={displayedNotamData}
                     notamRenderer={renderNotams}
-                    coordinatesRenderer={() => null}
+                    coordinatesRenderer={renderCoordinates}
                     currentCords={currentCords}
                     currentZoom={currentZoom}
                 ></NotamMap>

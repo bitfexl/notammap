@@ -1,9 +1,19 @@
 import { ReactPortal } from "react";
 import { NotamListComponent } from "../../notam/NotamListComponent";
-import { DetailedNotam } from "../../notams/notamextractor";
+import { CoordinatesList, DetailedNotam } from "../../notams/notamextractor";
 import { NM_TO_M, createIcon } from "./notamDisplayHelpers";
 import * as L from "leaflet";
 import { createPortal } from "react-dom";
+
+export function renderCoordinates(cooridnatesList: CoordinatesList): L.Layer {
+    // TODO: onclick show notams
+    return L.polygon(
+        cooridnatesList.coordinates.map((c) => [c.latitude, c.longitude]),
+        {
+            color: "#ff0000",
+        }
+    );
+}
 
 export function renderNotams(detailedNotams: DetailedNotam[], map: L.Map, setPortal: (portal: ReactPortal) => void): L.Layer {
     const latlng: L.LatLngTuple = [detailedNotams[0].notam.latitude, detailedNotams[0].notam.longitude];
