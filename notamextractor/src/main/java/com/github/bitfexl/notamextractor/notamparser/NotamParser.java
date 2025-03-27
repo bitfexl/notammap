@@ -93,23 +93,41 @@ public class NotamParser {
         Character currentItem = null;
         int currentStartingIndex = 0;
 
-        for (char newItem : new char[] {'Q', 'A', 'B', 'C', 'D', 'E', 'F', 'G'}) {
+        for (char item : new char[] {'Q', 'A', 'B', 'C', 'D', 'E', 'F', 'G'}) {
             // Q is the first item, so no space
-            // TODO: dangerous if item E (message contains ')')
-            final String itemId = newItem == 'Q' ? "Q) " : " " + newItem + ") ";
-            int newIndex = raw.indexOf(itemId, currentStartingIndex);
+            final String nextItemName = item == 'Q' ? "Q) " : " " + item + ") ";
 
-            if (newIndex == -1) {
+            final int nextItemIndex;
+
+            // item F and G are after item E but item E might contain " F) " or " G) "
+
+            if (item == 'F' || item == 'G') {
+                nextItemIndex = raw.lastIndexOf(nextItemName);
+            } else {
+                nextItemIndex = raw.indexOf(nextItemName, currentStartingIndex);
+            }
+
+            if (nextItemIndex == -1) {
                 // item does not exist
                 continue;
             }
 
-            if (currentItem != null) {
-                items.put(currentItem, raw.substring(currentStartingIndex, newIndex));
+            // item D is optional and " D) " might be contained in item E
+
+            if (item == 'D') {
+                final int itemEIndex = raw.indexOf(" E) ", currentStartingIndex);
+                if (itemEIndex != -1 && itemEIndex < nextItemIndex) {
+                    // skip as item D does not exist (string is contained in item E)
+                    continue;
+                }
             }
 
-            currentItem = newItem;
-            currentStartingIndex = newIndex + itemId.length();
+            if (currentItem != null) {
+                items.put(currentItem, raw.substring(currentStartingIndex, nextItemIndex));
+            }
+
+            currentItem = item;
+            currentStartingIndex = nextItemIndex + nextItemName.length();
         }
 
         if (currentItem != null) {
