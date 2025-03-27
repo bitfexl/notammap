@@ -10,6 +10,7 @@ import { NotamData } from "./lib/notams/notamextractor";
 import { fetchNotamData } from "./lib/notams/NotamFetch";
 import { defaultFilterOptions, NotamFilterOptions } from "./lib/menu/filter/NotamFilterOptions";
 import { createFilter } from "./lib/menu/filter/CreateFilter";
+import { useLocalStorage } from "./lib/LocalStorageHook";
 
 const EMPTY_NOTAM_DATA = { version: "0.0", notams: [], coordinatesLists: [] };
 
@@ -19,7 +20,8 @@ export default function App() {
 
     const [menuOpen, setMenuOpen] = useState(!isSmallWidth());
 
-    const [filter, setFilter] = useState<NotamFilterOptions>(defaultFilterOptions);
+    const [country, setCountry] = useLocalStorage<string | null>(null, "country");
+    const [filter, setFilter] = useLocalStorage<NotamFilterOptions>(defaultFilterOptions, "filter");
 
     const [notamData, setNotamData] = useState<NotamData | null>(null);
     const [displayedNotamData, setDisplayedNotamData] = useState<NotamData>(EMPTY_NOTAM_DATA);
@@ -30,22 +32,32 @@ export default function App() {
         }
     }
 
-    async function onCountryChange(country: string) {
-        if (country && (countryData as any)[country]) {
-            setCurrentCords((countryData as any)[country].view.center);
-            setCurrentZoom((countryData as any)[country].view.zoom);
-        }
+    useEffect(() => {
+        (async () => {
+            if (!country) {
+                return;
+            }
 
-        const newNotamData = await fetchNotamData(country);
+            if ((countryData as any)[country]) {
+                setCurrentCords((countryData as any)[country].view.center);
+                setCurrentZoom((countryData as any)[country].view.zoom);
+            }
 
-        if (newNotamData?.version == "1.0") {
-            setNotamData(newNotamData);
-        } else {
-            alert(
-                "Notamdata for " + country + " is on version " + newNotamData.version + ", but the app currently only supports version 1.0."
-            );
-        }
-    }
+            const newNotamData = await fetchNotamData(country);
+
+            if (newNotamData?.version == "1.0") {
+                setNotamData(newNotamData);
+            } else {
+                alert(
+                    "Notamdata for " +
+                        country +
+                        " is on version " +
+                        newNotamData.version +
+                        ", but the app currently only supports version 1.0."
+                );
+            }
+        })();
+    }, [country]);
 
     useEffect(() => {
         if (notamData == null) {
@@ -80,7 +92,14 @@ export default function App() {
                 ></NotamMap>
             </div>
 
-            <SideMenu onCountryChange={onCountryChange} onFilterChange={setFilter} menuOpen={menuOpen} setMenuOpen={setMenuOpen}></SideMenu>
+            <SideMenu
+                country={country}
+                filter={filter}
+                onCountryChange={setCountry}
+                onFilterChange={setFilter}
+                menuOpen={menuOpen}
+                setMenuOpen={setMenuOpen}
+            ></SideMenu>
         </>
     );
 }
