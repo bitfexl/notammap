@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 public class DetailedNotamParser {
     private static final String NOTAM_DATA_VERSION = "1.0";
     private static final byte ID_VERSION = 1;
-    private static final Pattern COORDINATES_PATTERN = Pattern.compile("(?:\\d{6}[NS]\\s?\\d{7}[EW](?:\\s?-?\\s?)?)+");
+    private static final Pattern COORDINATES_PATTERN = Pattern.compile("(?:\\d{6}[NS]\\s*\\d{7}[EW](?:\\s*-?\\s*)?)+");
 
     /**
      * Generate notam data with details for a number of notams.
