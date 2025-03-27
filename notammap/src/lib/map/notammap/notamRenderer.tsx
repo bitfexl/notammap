@@ -11,6 +11,7 @@ export function renderCoordinates(cooridnatesList: CoordinatesList): L.Layer {
         cooridnatesList.coordinates.map((c) => [c.latitude, c.longitude]),
         {
             color: "#ff0000",
+            weight: cooridnatesList.coordinates.length == 1 ? 6 : 3,
         }
     );
 }
