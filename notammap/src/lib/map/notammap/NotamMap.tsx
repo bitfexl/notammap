@@ -1,7 +1,7 @@
 import { ReactPortal, useCallback, useEffect, useRef, useState } from "react";
 import { LeafletMap } from "../LeafletMap";
 import * as L from "leaflet";
-import { CoordinatesList, DetailedNotam, NotamData } from "../../notams/notamextractor";
+import { CoordinatesList, DetailedNotam, Notam, NotamData } from "../../notams/notamextractor";
 import { CoordinatesRenderer, NotamRenderer } from "./notamDisplayHelpers";
 import { createPortal } from "react-dom";
 import { NotamListComponent } from "../../notam/NotamListComponent";
@@ -23,9 +23,30 @@ export interface NotamMapProps {
      * The current/initial zoom. Changing this causes the map to switch to this zoom level.
      */
     currentZoom: number;
+
+    /**
+     * Executed when a notams marker is clicked.
+     * @param notams The notams displayed by the marker.
+     * @returns true: show popup with notams on map, false: do not show popup;
+     */
+    onNotamsClick: (notams: DetailedNotam[]) => boolean;
+
+    /**
+     * Executed when coordinates marker is clicked.
+     * @param coordinates The clicked coordinates.
+     */
+    onCooridnatesClick: (coordinates: CoordinatesList) => void;
 }
 
-export function NotamMap({ notamData, notamRenderer, coordinatesRenderer, currentCords, currentZoom }: NotamMapProps) {
+export function NotamMap({
+    notamData,
+    notamRenderer,
+    coordinatesRenderer,
+    currentCords,
+    currentZoom,
+    onNotamsClick,
+    onCooridnatesClick,
+}: NotamMapProps) {
     // set portal for the currently displayed notam
     const [portal, setPortal] = useState<ReactPortal>();
     const mapRef = useRef<L.Map | null>(null);
@@ -40,15 +61,21 @@ export function NotamMap({ notamData, notamRenderer, coordinatesRenderer, curren
 
     useEffect(() => {
         if (mapRef.current != null) {
-            updateNotams(mapRef.current, notamData.notams, displayedNotams.current, notamRenderer, setPortal);
+            updateNotams(mapRef.current, notamData.notams, displayedNotams.current, notamRenderer, setPortal, onNotamsClick);
         }
-    }, [notamData, notamRenderer]);
+    }, [notamData, notamRenderer, onNotamsClick]);
 
     useEffect(() => {
         if (mapRef.current != null) {
-            updateCoordinates(mapRef.current, notamData.coordinatesLists, displayedCoordinates.current, coordinatesRenderer);
+            updateCoordinates(
+                mapRef.current,
+                notamData.coordinatesLists,
+                displayedCoordinates.current,
+                coordinatesRenderer,
+                onCooridnatesClick
+            );
         }
-    }, [notamData, coordinatesRenderer]);
+    }, [notamData, coordinatesRenderer, onCooridnatesClick]);
 
     return (
         <>
@@ -64,7 +91,8 @@ function updateCoordinates(
     map: L.Map,
     coordinateLists: CoordinatesList[],
     displayedCoordinatesList: Map<string, L.Layer>,
-    coordinatesRenderer: CoordinatesRenderer
+    coordinatesRenderer: CoordinatesRenderer,
+    onCooridnatesClick: (coordinatesList: CoordinatesList) => void
 ) {
     console.log("Rendering " + coordinateLists.length + " coordinates...");
 
@@ -80,13 +108,13 @@ function updateCoordinates(
         }
     }
 
-    for (const coordinates of remainingCoordiantes) {
-        const layer = coordinatesRenderer(coordinates[1], () => {
-            alert("Clicked Coordinates!");
+    for (const [hash, coordinates] of remainingCoordiantes) {
+        const layer = coordinatesRenderer(coordinates, () => {
+            onCooridnatesClick(coordinates);
         });
         if (layer != null) {
             map.addLayer(layer);
-            displayedCoordinatesList.set(coordinates[0], layer);
+            displayedCoordinatesList.set(hash, layer);
         }
     }
 }
@@ -96,7 +124,8 @@ function updateNotams(
     notams: DetailedNotam[],
     displayedNotams: Set<L.Layer>,
     notamRenderer: NotamRenderer,
-    setPortal: (portal: ReactPortal) => void
+    setPortal: (portal: ReactPortal) => void,
+    onNoatmsClick: (notams: DetailedNotam[]) => boolean
 ) {
     console.log("Rendering " + notams.length + " notams...");
 
@@ -128,19 +157,22 @@ function updateNotams(
         filteredNotams.push(detailedNotam);
     }
 
-    for (const lngMap of notamGroups) {
-        for (const notams of lngMap[1]) {
-            const layer = notamRenderer(notams[1], () => {
-                const content = document.createElement("div");
-                content.style.minWidth = "300px";
-                const portal = createPortal(
-                    <div className="max-h-[80vh] overflow-auto ">
-                        <NotamListComponent detailedNotams={notams[1]}></NotamListComponent>
-                    </div>,
-                    content
-                );
-                L.popup().setLatLng([lngMap[0], notams[0]]).setContent(content).openOn(map);
-                setPortal(portal);
+    for (const [lat, lngNotams] of notamGroups) {
+        for (const [lng, notams] of lngNotams) {
+            const layer = notamRenderer(notams, () => {
+                if (onNoatmsClick(notams)) {
+                    const content = document.createElement("div");
+                    content.style.minWidth = "300px";
+                    L.popup().setLatLng([lat, lng]).setContent(content).openOn(map);
+
+                    const portal = createPortal(
+                        <div className="max-h-[80vh] overflow-auto ">
+                            <NotamListComponent detailedNotams={notams}></NotamListComponent>
+                        </div>,
+                        content
+                    );
+                    setPortal(portal);
+                }
             });
 
             map.addLayer(layer);

@@ -89,6 +89,13 @@ export default function App() {
                     coordinatesRenderer={renderCoordinates}
                     currentCords={currentCords}
                     currentZoom={currentZoom}
+                    onNotamsClick={() => true}
+                    onCooridnatesClick={(c) =>
+                        setDisplayedNotamData((data) => ({
+                            ...data,
+                            coordinatesLists: data.coordinatesLists.filter((c2) => c2.hash != c.hash),
+                        }))
+                    }
                 ></NotamMap>
             </div>
 
