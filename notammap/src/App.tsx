@@ -82,7 +82,7 @@ export default function App() {
 
     return (
         <>
-            <div onClick={closeMenuSmallDevices} className="fixed top-0 left-0 w-[100vw] h-[100vh] -z-10">
+            <div onClick={closeMenuSmallDevices} className="fixed top-0 left-0 w-[100vw] h-[100vh]">
                 <NotamMap
                     notamData={displayedNotamData}
                     notamRenderer={renderNotams}

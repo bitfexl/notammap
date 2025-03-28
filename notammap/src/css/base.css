@@ -64,4 +64,9 @@
     .font-mono {
         @apply text-base;
     }
+
+    a[href="https://leafletjs.com"], a[href="https://leafletjs.com"] + span
+    {
+        @apply hidden;
+    }
 }

@@ -151,10 +151,10 @@ export function LeafletMap({ onInit, currentCords, currentZoom, layers }: Leafle
 
     return (
         <>
-            <div className="w-full h-full" ref={containerRef}></div>
-            <div className="fixed top-20 left-0 border border-red-500">
+            <div className="w-full h-full -z-[9999]" ref={containerRef}></div>
+            <div className="fixed top-20 left-2 flex flex-col gap-2">
                 {layers.map((layer, index) => (
-                    <div id={layer.name}>
+                    <div key={layer.name}>
                         {layer.type == "base" ? (
                             <button onClick={() => setLayerStatus(index, true)}>
                                 {layer.name} {layerStatus[index] && "(active)"}

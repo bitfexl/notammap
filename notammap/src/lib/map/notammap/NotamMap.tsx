@@ -78,9 +78,7 @@ export function NotamMap({
 
     return (
         <>
-            <div className="inline-block w-full h-full">
-                <LeafletMap onInit={initMap} currentCords={currentCords} currentZoom={currentZoom} layers={LAYERS}></LeafletMap>
-            </div>
+            <LeafletMap onInit={initMap} currentCords={currentCords} currentZoom={currentZoom} layers={LAYERS}></LeafletMap>
             {portal}
         </>
     );
