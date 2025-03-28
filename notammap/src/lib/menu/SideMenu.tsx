@@ -1,9 +1,11 @@
 import { useEffect, useId, useState } from "react";
 import menuIcon from "../../assets/icons/menu.svg?raw";
 import closeIcon from "../../assets/icons/x.svg?raw";
+import gpsLocateIcon from "../../assets/icons/layers.svg?raw";
 import { fetchCountries } from "../notams/NotamFetch";
 import { NotamFilterOptions, NotamFilterOptionsSelector } from "./filter/NotamFilterOptions";
 import countryData from "../../assets/CountryData.json";
+import { SVGIcon } from "../icons/SVGIcon";
 
 export interface SideMenuProps {
     filter: NotamFilterOptions;
@@ -44,7 +46,7 @@ export function SideMenu({ filter, country, onCountryChange, onFilterChange, men
                 <div className="fixed top-0 right-0 w-80 h-[100vh] bg-white p-3 overflow-auto flex flex-col gap-4">
                     <div className="text-right">
                         <button onClick={() => setMenuOpen(false)}>
-                            <SVGIcon svg={closeIcon}></SVGIcon> Close Menu
+                            <SVGIcon inline svg={closeIcon}></SVGIcon> Close Menu
                         </button>
                     </div>
 
@@ -83,18 +85,19 @@ export function SideMenu({ filter, country, onCountryChange, onFilterChange, men
 
                     <h2>Filter</h2>
                     <NotamFilterOptionsSelector options={filter} onChange={onFilterChange}></NotamFilterOptionsSelector>
+
+                    <div className="w-20 h-20">
+                        <SVGIcon svg={gpsLocateIcon}></SVGIcon>
+                    </div>
+                    <SVGIcon inline svg={gpsLocateIcon}></SVGIcon>
                 </div>
             ) : (
                 <div className="fixed top-0 right-0 p-3">
                     <button onClick={() => setMenuOpen(true)}>
-                        <SVGIcon svg={menuIcon}></SVGIcon> Open Menu
+                        <SVGIcon inline svg={menuIcon}></SVGIcon> Open Menu
                     </button>
                 </div>
             )}
         </>
     );
-}
-
-function SVGIcon({ svg }: { svg: string }) {
-    return <span dangerouslySetInnerHTML={{ __html: svg }} className="inline-block align-bottom"></span>;
 }

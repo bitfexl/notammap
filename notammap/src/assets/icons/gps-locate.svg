@@ -2,7 +2,7 @@
     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
     class="feather feather-gps-locate">
     <circle cx="12" cy="12" r="8"></circle>
-    <circle cx="12" cy="12" r="3" fill="currentColor"></circle>
+    <circle cx="12" cy="12" r="2" fill="currentColor"></circle>
     <line x1="22" y1="12" x2="18" y2="12"></line>
     <line x1="6" y1="12" x2="2" y2="12"></line>
     <line x1="12" y1="6" x2="12" y2="2"></line>

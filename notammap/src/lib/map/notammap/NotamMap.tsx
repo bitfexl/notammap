@@ -3,6 +3,8 @@ import { LeafletMap } from "../LeafletMap";
 import * as L from "leaflet";
 import { CoordinatesList, DetailedNotam, NotamData } from "../../notams/notamextractor";
 import { CoordinatesRenderer, NotamRenderer } from "./notamDisplayHelpers";
+import { createPortal } from "react-dom";
+import { NotamListComponent } from "../../notam/NotamListComponent";
 
 export interface NotamMapProps {
     /**
@@ -79,7 +81,9 @@ function updateCoordinates(
     }
 
     for (const coordinates of remainingCoordiantes) {
-        const layer = coordinatesRenderer(coordinates[1]);
+        const layer = coordinatesRenderer(coordinates[1], () => {
+            alert("Clicked Coordinates!");
+        });
         if (layer != null) {
             map.addLayer(layer);
             displayedCoordinatesList.set(coordinates[0], layer);
@@ -126,7 +130,19 @@ function updateNotams(
 
     for (const lngMap of notamGroups) {
         for (const notams of lngMap[1]) {
-            const layer = notamRenderer(notams[1], map, setPortal);
+            const layer = notamRenderer(notams[1], () => {
+                const content = document.createElement("div");
+                content.style.minWidth = "300px";
+                const portal = createPortal(
+                    <div className="max-h-[80vh] overflow-auto ">
+                        <NotamListComponent detailedNotams={notams[1]}></NotamListComponent>
+                    </div>,
+                    content
+                );
+                L.popup().setLatLng([lngMap[0], notams[0]]).setContent(content).openOn(map);
+                setPortal(portal);
+            });
+
             map.addLayer(layer);
             displayedNotams.add(layer);
         }

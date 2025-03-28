@@ -1,4 +1,3 @@
-import { ReactPortal } from "react";
 import { CoordinatesList, DetailedNotam } from "../../notams/notamextractor";
 import * as L from "leaflet";
 
@@ -13,17 +12,18 @@ export const NM_TO_M = 1852;
 export type NotamFilter = (detailedNoatm: DetailedNotam) => boolean;
 
 /**
- * Generate a marker for one or more notams. Do not add the final layer to the map.
+ * Generate a marker for one or more notams.
  * The notams will all have the same or approximately
- * the same coordinates. The marker (tile layer) is responsible for showing
- * the notam on click. Use setPortal to render a react node on click.
+ * the same coordinates.
+ * The onClick function should be called when the marker is clicked.
  */
-export type NotamRenderer = (detailedNotams: DetailedNotam[], map: L.Map, setPortal: (portal: ReactPortal) => void) => L.Layer;
+export type NotamRenderer = (detailedNotams: DetailedNotam[], onClick: () => void) => L.Layer;
 
 /**
  * Render coordinates for display on the map, or return null if not to render.
+ * The onClick function should be called when the marker is clicked.
  */
-export type CoordinatesRenderer = (coordinates: CoordinatesList) => L.Layer | null;
+export type CoordinatesRenderer = (coordinates: CoordinatesList, onClick: () => void) => L.Layer | null;
 
 /**
  * Create a leaflet marker icon.
