@@ -1,5 +1,5 @@
 import { ReactPortal, useCallback, useEffect, useRef, useState } from "react";
-import { LeafletMap } from "../LeafletMap";
+import { Layer, LeafletMap } from "../LeafletMap";
 import * as L from "leaflet";
 import { CoordinatesList, DetailedNotam, Notam, NotamData } from "../../notams/notamextractor";
 import { CoordinatesRenderer, NotamRenderer } from "./notamDisplayHelpers";
@@ -54,10 +54,9 @@ export function NotamMap({
     const displayedNotams = useRef(new Set<L.Layer>());
     const displayedCoordinates = useRef(new Map<string, L.Layer>());
 
-    const initMap = useCallback((map: L.Map) => {
+    function initMap(map: L.Map) {
         mapRef.current = map;
-        initAeronauticalMap(map);
-    }, []);
+    }
 
     useEffect(() => {
         if (mapRef.current != null) {
@@ -80,7 +79,7 @@ export function NotamMap({
     return (
         <>
             <div className="inline-block w-full h-full">
-                <LeafletMap onInit={initMap} currentCords={currentCords} currentZoom={currentZoom}></LeafletMap>
+                <LeafletMap onInit={initMap} currentCords={currentCords} currentZoom={currentZoom} layers={LAYERS}></LeafletMap>
             </div>
             {portal}
         </>
@@ -181,56 +180,74 @@ function updateNotams(
     }
 }
 
-function initAeronauticalMap(map: L.Map) {
-    const maxZoom = 14;
+const maxZoom = 14;
+const minZoom = 0;
 
-    const osmMap = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+const LAYERS: Layer[] = [
+    {
+        tmsUrl: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        name: "Standard",
+        type: "base",
         maxZoom,
-        attribution: '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        minZoom,
         opacity: 0.6,
-    });
-
-    const osmHOTMap = L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
+        attributions: [
+            {
+                name: "OpenStreetMap",
+                url: "http://www.openstreetmap.org/copyright",
+            },
+        ],
+    },
+    {
+        tmsUrl: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
+        name: "Humanitarian",
+        type: "base",
+        defaultActive: true,
         maxZoom,
-        attribution:
-            '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <a href="https://wiki.openstreetmap.org/wiki/HOT_style">HOT style</a>',
+        minZoom,
         opacity: 0.6,
-    });
-
-    const openTopoMap = L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
+        attributions: [
+            {
+                name: "OpenStreetMap",
+                url: "http://www.openstreetmap.org/copyright",
+            },
+            {
+                name: "HOT style",
+                url: "https://wiki.openstreetmap.org/wiki/HOT_style",
+            },
+        ],
+    },
+    {
+        tmsUrl: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+        name: "Topographic",
+        type: "base",
         maxZoom,
-        attribution:
-            '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <a href="https://opentopomap.org/">OpenTopoMap</a>',
+        minZoom,
         opacity: 0.6,
-    });
-
-    // OpenAIP layer uses proxy
-    const openAipTileLayerUrl = import.meta.env.VITE_OPENAPI_TILE_LAYER_URL;
-    const openAipMap = L.tileLayer(openAipTileLayerUrl, {
+        attributions: [
+            {
+                name: "OpenStreetMap",
+                url: "http://www.openstreetmap.org/copyright",
+            },
+            {
+                name: "OpenTopoMap",
+                url: "https://opentopomap.org/",
+            },
+        ],
+    },
+    {
+        tmsUrl: import.meta.env.VITE_OPENAPI_TILE_LAYER_URL,
+        name: "Aeronautical Data",
+        type: "annotation",
+        defaultActive: true,
         maxZoom,
         minZoom: 7,
-        attribution: '<a href="https://www.openaip.net">OpenAIP</a>',
-    });
-
-    const baseMaps = {
-        Standard: osmMap,
-        Humanitarian: osmHOTMap,
-        Topographic: openTopoMap,
-    };
-
-    const overlayMaps = {
-        "Aeronautical Data": openAipMap,
-    };
-
-    // add to map
-
-    L.control.layers(baseMaps, overlayMaps).setPosition("topleft").addTo(map);
-    osmMap.addTo(map); // added first to have the correct ordering in the map attribution
-    osmHOTMap.addTo(map);
-    openTopoMap.addTo(map);
-    openAipMap.addTo(map);
-
-    // initially remove the layers (only osm hot map base layer)
-    map.removeLayer(osmMap);
-    map.removeLayer(openTopoMap);
-}
+        opacity: 1,
+        attributions: [
+            {
+                name: "OpenAIP",
+                url: "https://www.openaip.net/",
+            },
+        ],
+    },
+];
