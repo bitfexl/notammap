@@ -1,56 +1,5 @@
 import { CheckBoxInputs } from "../../form/CheckBoxInputs";
-
-export interface NotamFilterOptions {
-    TRAFFIC: {
-        VFR: boolean;
-        IFR: boolean;
-    };
-
-    PURPOSE: {
-        IMMEDIATE_ATTENTION: boolean;
-        BULLETIN: boolean;
-        OPERATIONS: boolean;
-        MISCELLANEOUS: boolean;
-    };
-
-    QCODES: {
-        OBSTACLES: boolean;
-        AIRSPACE_RESTRICTIONS: boolean;
-        WARNINGS: boolean;
-        ATM: boolean;
-        CNS: boolean;
-        AGA: boolean;
-        COM: boolean;
-    };
-
-    FROM: string;
-
-    TO: string;
-}
-
-export const defaultFilterOptions: NotamFilterOptions = {
-    TRAFFIC: {
-        VFR: true,
-        IFR: true,
-    },
-    PURPOSE: {
-        IMMEDIATE_ATTENTION: true,
-        BULLETIN: true,
-        OPERATIONS: true,
-        MISCELLANEOUS: true,
-    },
-    QCODES: {
-        OBSTACLES: true,
-        AIRSPACE_RESTRICTIONS: true,
-        WARNINGS: true,
-        ATM: true,
-        CNS: true,
-        AGA: true,
-        COM: true,
-    },
-    FROM: "",
-    TO: "",
-};
+import { NotamFilterOptions } from "./notamFilter";
 
 export interface NotamFilterOptionsSelectorProps {
     /**

@@ -2,10 +2,11 @@ import { useEffect, useId, useState } from "react";
 import menuIcon from "../../assets/icons/menu.svg?raw";
 import closeIcon from "../../assets/icons/x.svg?raw";
 import gpsLocateIcon from "../../assets/icons/layers.svg?raw";
-import { fetchCountries } from "../notams/NotamFetch";
-import { NotamFilterOptions, NotamFilterOptionsSelector } from "./filter/NotamFilterOptions";
+import { NotamFilterOptionsSelector } from "./filter/NotamFilterOptionsSelector";
 import countryData from "../../assets/CountryData.json";
 import { SVGIcon } from "../icons/SVGIcon";
+import { NotamFilterOptions } from "./filter/notamFilter";
+import { fetchCountries } from "../notams/notamFetch";
 
 export interface SideMenuProps {
     filter: NotamFilterOptions;
