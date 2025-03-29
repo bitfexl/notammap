@@ -170,7 +170,7 @@ export function LeafletMap({ onInit, currentCords, currentZoom, layers }: Leafle
         <>
             <div className="w-full h-full -z-[9999]" ref={containerRef}></div>
             {mapRef.current && (
-                <div className="fixed top-4 left-4 flex flex-col gap-2">
+                <div className="fixed top-4 right-8 flex flex-col gap-2">
                     <MapButton svgIcon={zoomInIcon} onClick={() => mapRef.current?.zoomIn()}></MapButton>
                     <MapButton svgIcon={zoomOutIcon} onClick={() => mapRef.current?.zoomOut()}></MapButton>
                     <MapButton svgIcon={gpsLocateIcon} onClick={() => alert("not yet implemented")}></MapButton>
@@ -190,11 +190,13 @@ export function LeafletMap({ onInit, currentCords, currentZoom, layers }: Leafle
 
 function MapButton({ svgIcon, onClick }: { svgIcon: string; onClick: () => void }) {
     return (
-        <button className="nostyle inline-block rounded-md w-10 h-10 bg-white cursor-pointer" style={boxShadowStyle} onClick={onClick}>
-            <div className="p-2">
-                <SVGIcon svg={svgIcon}></SVGIcon>
-            </div>
-        </button>
+        <div className="text-right">
+            <button className="nostyle inline-block rounded-md w-10 h-10 bg-white cursor-pointer" style={boxShadowStyle} onClick={onClick}>
+                <div className="p-2">
+                    <SVGIcon svg={svgIcon}></SVGIcon>
+                </div>
+            </button>
+        </div>
     );
 }
 
@@ -215,25 +217,27 @@ function LayerSelector({
 }) {
     return (
         <div className="flex flex-col gap-0">
-            <button
-                className={`nostyle inline-block rounded-t-md w-10 h-10 bg-white z-10 ${!open && "rounded-b-md"}`}
-                style={boxShadowStyle}
-                onClick={() => setOpen(!open)}
-            >
-                <div className="p-2">
-                    <SVGIcon svg={open ? closeIcon : layersIcon}></SVGIcon>
-                </div>
-                {open && (
-                    <div
-                        className="w-full h-[5px] bg-white"
-                        style={{
-                            boxShadow: "5px 0 0px white",
-                        }}
-                    ></div>
-                )}
-            </button>
+            <div className="text-right z-10" style={{ lineHeight: "0" }}>
+                <button
+                    className={`nostyle inline-block rounded-t-md w-10 h-10 bg-white ${!open && "rounded-b-md"}`}
+                    style={boxShadowStyle}
+                    onClick={() => setOpen(!open)}
+                >
+                    <div className="p-2">
+                        <SVGIcon svg={open ? closeIcon : layersIcon}></SVGIcon>
+                    </div>
+                    {open && (
+                        <div
+                            className="w-full h-[5px] bg-white"
+                            style={{
+                                boxShadow: "-5px 0 0px white",
+                            }}
+                        ></div>
+                    )}
+                </button>
+            </div>
             {open && (
-                <div className="flex flex-col gap-2 bg-white rounded-md p-2 rounded-tl-none" style={boxShadowStyle}>
+                <div className="flex flex-col gap-2 bg-white rounded-md p-2 rounded-tr-none" style={boxShadowStyle}>
                     {layers.map((layer, index) => (
                         <div key={layer.name} className="text-center flex flex-col">
                             <div>

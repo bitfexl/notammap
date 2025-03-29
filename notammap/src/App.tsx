@@ -83,14 +83,14 @@ export default function App() {
                 ></NotamMap>
             </div>
 
-            <SideMenu
+            {/* <SideMenu
                 country={country}
                 filter={filter}
                 onCountryChange={setCountry}
                 onFilterChange={setFilter}
                 menuOpen={menuOpen}
                 setMenuOpen={setMenuOpen}
-            ></SideMenu>
+            ></SideMenu> */}
         </>
     );
 }
