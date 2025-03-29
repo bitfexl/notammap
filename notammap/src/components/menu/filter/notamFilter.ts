@@ -1,4 +1,4 @@
-import { DetailedNotam, NotamData } from "../../notams/notamextractor";
+import { DetailedNotam, NotamData } from "../../../api/notams/notamextractor";
 
 /**
  * Should return true if a notam should be displayed false if hidden.

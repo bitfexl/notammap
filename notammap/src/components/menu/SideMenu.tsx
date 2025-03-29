@@ -6,7 +6,7 @@ import { NotamFilterOptionsSelector } from "./filter/NotamFilterOptionsSelector"
 import countryData from "../../assets/CountryData.json";
 import { SVGIcon } from "../icons/SVGIcon";
 import { NotamFilterOptions } from "./filter/notamFilter";
-import { fetchCountries } from "../notams/notamFetch";
+import { fetchCountries } from "../../api/notams/notamFetch";
 
 export interface SideMenuProps {
     filter: NotamFilterOptions;

@@ -1,5 +1,5 @@
-import { toText } from "../notams/QCodes";
-import { DetailedNotam, TextNode } from "../notams/notamextractor";
+import { toText } from "../../api/notams/QCodes";
+import { DetailedNotam, TextNode } from "../../api/notams/notamextractor";
 import { useState } from "react";
 
 export interface NotamComponentProps {

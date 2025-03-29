@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import { NotamMap } from "./lib/map/notammap/NotamMap";
-import { isSmallWidth } from "./lib/DeviceUtils";
+import { NotamMap } from "./components/map/notammap/NotamMap";
+import { isSmallWidth } from "./utils/deviceUtils";
 
-import { renderCoordinates, renderNotams } from "./lib/map/notammap/notamMapRenderers";
-import { SideMenu } from "./lib/menu/SideMenu";
+import { renderCoordinates, renderNotams } from "./components/map/notammap/notamMapRenderers";
+import { SideMenu } from "./components/menu/SideMenu";
 
 import countryData from "./assets/CountryData.json";
-import { NotamData } from "./lib/notams/notamextractor";
-import { fetchNotamData } from "./lib/notams/notamFetch";
-import { defaultFilterOptions, filterNotamData, NotamFilterOptions } from "./lib/menu/filter/notamFilter";
-import { useLocalStorage } from "./lib/LocalStorageHook";
+import { NotamData } from "./api/notams/notamextractor";
+import { fetchNotamData } from "./api/notams/notamFetch";
+import { defaultFilterOptions, filterNotamData, NotamFilterOptions } from "./components/menu/filter/notamFilter";
+import { useLocalStorage } from "./hooks/useLocalStorage";
 
 const EMPTY_NOTAM_DATA = { version: "0.0", notams: [], coordinatesLists: [] };
 

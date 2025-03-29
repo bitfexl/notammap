@@ -1,7 +1,7 @@
 import { ReactPortal, useEffect, useRef, useState } from "react";
 import { Layer, LeafletMap } from "../LeafletMap";
 import * as L from "leaflet";
-import { CoordinatesList, DetailedNotam, NotamData } from "../../notams/notamextractor";
+import { CoordinatesList, DetailedNotam, NotamData } from "../../../api/notams/notamextractor";
 import { createPortal } from "react-dom";
 import { NotamListComponent } from "../../notam/NotamListComponent";
 import { CoordinatesRenderer, NotamRenderer } from "./notamMapRenderers";

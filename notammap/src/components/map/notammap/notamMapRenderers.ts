@@ -1,4 +1,4 @@
-import { CoordinatesList, DetailedNotam } from "../../notams/notamextractor";
+import { CoordinatesList, DetailedNotam } from "../../../api/notams/notamextractor";
 import * as L from "leaflet";
 
 /**

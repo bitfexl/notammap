@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { DetailedNotam } from "../notams/notamextractor";
+import { DetailedNotam } from "../../api/notams/notamextractor";
 import { NotamComponent } from "./NotamComponent";
 
 export interface NotamListComponentProps {
