@@ -43,11 +43,11 @@
         @apply select-none;
     }
 
-    button:not(.linklike) {
+    button:not(.linklike, .nostyle) {
         @apply p-1 bg-gray-100 border border-gray-200;
     }
 
-    button:not(.linklike):hover {
+    button:not(.linklike, .nostyle):hover {
         @apply bg-gray-200 border-gray-300;
     }
 

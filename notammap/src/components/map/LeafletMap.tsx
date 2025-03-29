@@ -1,6 +1,9 @@
 import "leaflet/dist/leaflet.css";
 import * as L from "leaflet";
 import { useEffect, useRef, useState } from "react";
+import { SVGIcon } from "../icons/SVGIcon";
+import layersIcon from "../../assets/icons/layers.svg?raw";
+import closeIcon from "../../assets/icons/x.svg?raw";
 
 export interface Layer {
     /**
@@ -152,23 +155,93 @@ export function LeafletMap({ onInit, currentCords, currentZoom, layers }: Leafle
     return (
         <>
             <div className="w-full h-full -z-[9999]" ref={containerRef}></div>
-            <div className="fixed top-20 left-2 flex flex-col gap-2">
-                {layers.map((layer, index) => (
-                    <div key={layer.name}>
-                        {layer.type == "base" ? (
-                            <button onClick={() => setLayerStatus(index, true)}>
-                                {layer.name} {layerStatus[index] && "(active)"}
-                            </button>
-                        ) : (
-                            <button onClick={() => setLayerStatus(index, !layerStatus[index])}>
-                                {layer.name} {layerStatus[index] ? "(shown)" : "(hidden)"}
-                            </button>
-                        )}
-                    </div>
-                ))}
-            </div>
+            {mapRef.current && (
+                <LayerSelector
+                    layers={layers}
+                    layerStatus={layerStatus}
+                    setLayerStatus={setLayerStatus}
+                    map={mapRef.current}
+                ></LayerSelector>
+            )}
         </>
     );
+}
+
+function LayerSelector({
+    layers,
+    layerStatus,
+    setLayerStatus,
+    map,
+}: {
+    layers: Layer[];
+    layerStatus: boolean[];
+    setLayerStatus: (layerIndex: number, active: boolean) => void;
+    map: L.Map;
+}) {
+    const [open, setOpen] = useState(false);
+
+    return (
+        <div className="fixed top-20 left-2 flex flex-col gap-0">
+            <button
+                className={`nostyle inline-block rounded-t-md w-10 h-10 bg-white cursor-pointer ${!open && "rounded-b-md"}`}
+                style={{ boxShadow: "0 0 5px black" }}
+                onClick={() => setOpen(!open)}
+            >
+                <div className="p-2">
+                    <SVGIcon svg={open ? closeIcon : layersIcon}></SVGIcon>
+                </div>
+                {open && (
+                    <div
+                        className="w-full h-[5px] bg-white"
+                        style={{
+                            boxShadow: "5px 0 0px white",
+                        }}
+                    ></div>
+                )}
+            </button>
+            {open && (
+                <div className="flex flex-col gap-2 bg-white rounded-md p-2 rounded-tl-none -z-10" style={{ boxShadow: "0 0 5px black" }}>
+                    {layers.map((layer, index) => (
+                        <div key={layer.name} className="text-center flex flex-col">
+                            <div>
+                                <button
+                                    className={`nostyle inline-block w-16 h-16 border-2 rounded-md overflow-hidden ${
+                                        layerStatus[index] && "border-gray-700"
+                                    }`}
+                                    onClick={() => {
+                                        setLayerStatus(index, layer.type == "base" ? true : !layerStatus[index]);
+                                        setOpen(false);
+                                    }}
+                                >
+                                    <img className="w-full h-full" src={getPreviewSrc(layer.tmsUrl, map)} alt="Layer Preview" />
+                                </button>
+                            </div>
+                            <p className="text-xs select-none" style={{ maxWidth: "80px" }}>
+                                {layer.name}
+                            </p>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
+function getPreviewSrc(tmsUrl: string, map: L.Map) {
+    const zoom = 7;
+    const center = map.getCenter();
+
+    const x = lon2tile(center.lng, zoom);
+    const y = lat2tile(center.lat, zoom);
+
+    tmsUrl = tmsUrl.replace("{s}", "a");
+    tmsUrl = tmsUrl.replace("{z}", zoom.toString());
+    tmsUrl = tmsUrl.replace("{x}", Math.round(x).toString());
+    tmsUrl = tmsUrl.replace("{y}", Math.round(y).toString());
+
+    console.log(tmsUrl);
+
+    return tmsUrl;
 }
 
 function createMap(container: HTMLDivElement) {
@@ -183,4 +256,16 @@ function createLayer(layer: Layer): L.TileLayer {
         opacity: layer.opacity,
         attribution: layer.attributions.map((a) => `<a href="${a.url}">${a.name}</a>`).join(", "),
     });
+}
+
+// https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
+
+function lon2tile(lon: number, zoom: number) {
+    return Math.floor(((lon + 180) / 360) * Math.pow(2, zoom));
+}
+
+function lat2tile(lat: number, zoom: number) {
+    return Math.floor(
+        ((1 - Math.log(Math.tan((lat * Math.PI) / 180) + 1 / Math.cos((lat * Math.PI) / 180)) / Math.PI) / 2) * Math.pow(2, zoom)
+    );
 }
