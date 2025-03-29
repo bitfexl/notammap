@@ -4,6 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { SVGIcon } from "../icons/SVGIcon";
 import layersIcon from "../../assets/icons/layers.svg?raw";
 import closeIcon from "../../assets/icons/x.svg?raw";
+import zoomOutIcon from "../../assets/icons/zoom-out.svg?raw";
+import zoomInIcon from "../../assets/icons/zoom-in.svg?raw";
+import gpsLocateIcon from "../../assets/icons/gps-locate.svg?raw";
 
 export interface Layer {
     /**
@@ -68,12 +71,16 @@ export interface LeafletMapProps {
     layers: Layer[];
 }
 
+const boxShadowStyle = { boxShadow: "0 0 5px black" };
+
 export function LeafletMap({ onInit, currentCords, currentZoom, layers }: LeafletMapProps) {
     const containerRef = useRef(null);
     const mapRef = useRef<L.Map | null>(null);
     const leafletLayers = useRef<L.TileLayer[]>([]);
 
     const [layerStatus, _setLayerStatus] = useState<boolean[]>([]);
+
+    const [layerSelectorOpen, setLayerSelectorOpen] = useState(false);
 
     function setLayerStatus(layerIndex: number, active: boolean) {
         const newStatus = [...layerStatus];
@@ -140,6 +147,13 @@ export function LeafletMap({ onInit, currentCords, currentZoom, layers }: Leafle
 
             onInit(map);
 
+            function mapChangeEventListener() {
+                setLayerSelectorOpen(false);
+            }
+
+            map.addEventListener("zoom", mapChangeEventListener);
+            map.addEventListener("move", mapChangeEventListener);
+
             return () => {
                 map.remove();
             };
@@ -156,14 +170,31 @@ export function LeafletMap({ onInit, currentCords, currentZoom, layers }: Leafle
         <>
             <div className="w-full h-full -z-[9999]" ref={containerRef}></div>
             {mapRef.current && (
-                <LayerSelector
-                    layers={layers}
-                    layerStatus={layerStatus}
-                    setLayerStatus={setLayerStatus}
-                    map={mapRef.current}
-                ></LayerSelector>
+                <div className="fixed top-4 left-4 flex flex-col gap-2">
+                    <MapButton svgIcon={zoomInIcon} onClick={() => mapRef.current?.zoomIn()}></MapButton>
+                    <MapButton svgIcon={zoomOutIcon} onClick={() => mapRef.current?.zoomOut()}></MapButton>
+                    <MapButton svgIcon={gpsLocateIcon} onClick={() => alert("not yet implemented")}></MapButton>
+                    <LayerSelector
+                        layers={layers}
+                        layerStatus={layerStatus}
+                        setLayerStatus={setLayerStatus}
+                        map={mapRef.current}
+                        open={layerSelectorOpen}
+                        setOpen={setLayerSelectorOpen}
+                    ></LayerSelector>
+                </div>
             )}
         </>
+    );
+}
+
+function MapButton({ svgIcon, onClick }: { svgIcon: string; onClick: () => void }) {
+    return (
+        <button className="nostyle inline-block rounded-md w-10 h-10 bg-white cursor-pointer" style={boxShadowStyle} onClick={onClick}>
+            <div className="p-2">
+                <SVGIcon svg={svgIcon}></SVGIcon>
+            </div>
+        </button>
     );
 }
 
@@ -172,19 +203,21 @@ function LayerSelector({
     layerStatus,
     setLayerStatus,
     map,
+    open,
+    setOpen,
 }: {
     layers: Layer[];
     layerStatus: boolean[];
     setLayerStatus: (layerIndex: number, active: boolean) => void;
     map: L.Map;
+    open: boolean;
+    setOpen: (open: boolean) => void;
 }) {
-    const [open, setOpen] = useState(false);
-
     return (
-        <div className="fixed top-20 left-2 flex flex-col gap-0">
+        <div className="flex flex-col gap-0">
             <button
-                className={`nostyle inline-block rounded-t-md w-10 h-10 bg-white cursor-pointer ${!open && "rounded-b-md"}`}
-                style={{ boxShadow: "0 0 5px black" }}
+                className={`nostyle inline-block rounded-t-md w-10 h-10 bg-white z-10 ${!open && "rounded-b-md"}`}
+                style={boxShadowStyle}
                 onClick={() => setOpen(!open)}
             >
                 <div className="p-2">
@@ -200,7 +233,7 @@ function LayerSelector({
                 )}
             </button>
             {open && (
-                <div className="flex flex-col gap-2 bg-white rounded-md p-2 rounded-tl-none -z-10" style={{ boxShadow: "0 0 5px black" }}>
+                <div className="flex flex-col gap-2 bg-white rounded-md p-2 rounded-tl-none" style={boxShadowStyle}>
                     {layers.map((layer, index) => (
                         <div key={layer.name} className="text-center flex flex-col">
                             <div>
@@ -245,7 +278,7 @@ function getPreviewSrc(tmsUrl: string, map: L.Map) {
 }
 
 function createMap(container: HTMLDivElement) {
-    const map = L.map(container);
+    const map = L.map(container, { zoomControl: false });
     return map;
 }
 
