@@ -10,6 +10,7 @@ import { CoordinatesList, DetailedNotam, NotamData } from "./api/notams/notamext
 import { fetchNotamData } from "./api/notams/notamFetch";
 import { defaultFilterOptions, filterNotamData, NotamFilterOptions } from "./components/menu/filter/notamFilter";
 import { useLocalStorage } from "./hooks/useLocalStorage";
+import { boxShadowStyle } from "./components/componentConstants";
 
 const EMPTY_NOTAM_DATA = { version: "0.0", notams: [], coordinatesLists: [] };
 
@@ -62,7 +63,7 @@ export default function App() {
         if (notamData != null) {
             setDisplayedNotamData(filterNotamData(notamData, filter));
         }
-        console.log("data or filter changed");
+        // console.log("data or filter changed");
     }, [notamData, filter]);
 
     const onCoordinatesClick = useCallback(function (c: CoordinatesList) {
@@ -88,15 +89,20 @@ export default function App() {
                 ></MemoMap>
             </div>
 
-            <div className="fixed top-4 left-4 h-[100vh] pb-8">
-                <SideMenu
-                    country={country}
-                    filter={filter}
-                    onCountryChange={setCountry}
-                    onFilterChange={setFilter}
-                    menuOpen={menuOpen}
-                    setMenuOpen={setMenuOpen}
-                ></SideMenu>
+            <div className="fixed top-4 left-4 h-[100vh] pb-8 flex flex-col gap-4 w-80">
+                <div className="p-4 rounded-md bg-white" style={boxShadowStyle}>
+                    <h2>Notam Map {country}</h2>
+                </div>
+                <div className="border border-red-500">
+                    <SideMenu
+                        country={country}
+                        filter={filter}
+                        onCountryChange={setCountry}
+                        onFilterChange={setFilter}
+                        menuOpen={menuOpen}
+                        setMenuOpen={setMenuOpen}
+                    ></SideMenu>
+                </div>
             </div>
         </>
     );
