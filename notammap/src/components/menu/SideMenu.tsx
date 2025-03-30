@@ -131,6 +131,11 @@ function SideMenuContent({
                         Online AIP
                     </a>
                 )}
+                {!(countryData as any)[country ?? ""] && (
+                    <a href="https://www.ead.eurocontrol.int/cms-eadbasic/opencms/en/login/ead-basic/" target="_blank">
+                        Eurocontrol EAD (Online AIP)
+                    </a>
+                )}
             </div>
             <span className="p-1">{/* spacing */}</span>
             <h2>Filter</h2>
