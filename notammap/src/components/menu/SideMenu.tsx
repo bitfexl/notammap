@@ -131,7 +131,7 @@ function SideMenuContent({
                         Online AIP
                     </a>
                 )}
-                {!(countryData as any)[country ?? ""] && (
+                {country && !(countryData as any)[country] && (
                     <a href="https://www.ead.eurocontrol.int/cms-eadbasic/opencms/en/login/ead-basic/" target="_blank">
                         Eurocontrol EAD (Online AIP)
                     </a>
