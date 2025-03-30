@@ -272,8 +272,6 @@ function getPreviewSrc(tmsUrl: string, map: L.Map) {
     tmsUrl = tmsUrl.replace("{x}", Math.round(x).toString());
     tmsUrl = tmsUrl.replace("{y}", Math.round(y).toString());
 
-    console.log(tmsUrl);
-
     return tmsUrl;
 }
 
