@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import menuIcon from "../../assets/icons/menu.svg?raw";
 import closeIcon from "../../assets/icons/x.svg?raw";
 import gpsLocateIcon from "../../assets/icons/layers.svg?raw";
@@ -35,6 +35,8 @@ export interface SideMenuProps {
 
 export function SideMenu({ filter, country, onCountryChange, onFilterChange, menuOpen, setMenuOpen }: SideMenuProps) {
     const [countries, setCountries] = useState<string[]>([]);
+    const headerRef = useRef<HTMLDivElement | null>(null);
+    const [headerHeight, setHeaderHeight] = useState(0);
 
     useEffect(() => {
         (async () => {
@@ -42,26 +44,40 @@ export function SideMenu({ filter, country, onCountryChange, onFilterChange, men
         })();
     }, []);
 
+    useEffect(() => {
+        if (headerRef.current) {
+            setHeaderHeight(headerRef.current.getBoundingClientRect().height);
+        }
+    }, [menuOpen]);
+
     return (
         <>
             {menuOpen ? (
-                <div className="w-80 h-full p-1 bg-white rounded-md" style={boxShadowStyle}>
-                    {/* change position of scrollbar, padding of parent for spacing around scrollbar */}
-                    <div className="overflow-auto h-full" style={{ direction: "rtl" }}>
-                        <div className="p-4" style={{ direction: "initial" }}>
-                            <SideMenuContent
-                                filter={filter}
-                                country={country}
-                                onCountryChange={onCountryChange}
-                                onFilterChange={onFilterChange}
-                                countries={countries}
-                            ></SideMenuContent>
+                <div className="h-full flex flex-col gap-4">
+                    <div className="p-4 rounded-md bg-white" style={boxShadowStyle} ref={headerRef}>
+                        <h2>Notammap {country}</h2>
+                    </div>
+                    <div
+                        className="w-80 p-1 bg-white rounded-md"
+                        style={{ ...boxShadowStyle, height: `calc(100% - ${headerHeight + 16 /* 16 px = p-4 padding*/}px` }}
+                    >
+                        {/* change position of scrollbar, padding of parent for spacing around scrollbar */}
+                        <div className="overflow-auto h-full" style={{ direction: "rtl" }}>
+                            <div className="p-4" style={{ direction: "initial" }}>
+                                <SideMenuContent
+                                    filter={filter}
+                                    country={country}
+                                    onCountryChange={onCountryChange}
+                                    onFilterChange={onFilterChange}
+                                    countries={countries}
+                                ></SideMenuContent>
+                            </div>
                         </div>
                     </div>
                 </div>
             ) : (
                 <div className="flex flex-col gap-4">
-                    <IconButton svgIcon={filterIcon} onClick={() => alert("filter")}></IconButton>
+                    <IconButton svgIcon={menuIcon} onClick={() => setMenuOpen(true)}></IconButton>
                     <IconButton svgIcon={filterIcon} onClick={() => alert("filter")}></IconButton>
                     <IconButton svgIcon={filterIcon} onClick={() => alert("filter")}></IconButton>
                 </div>
