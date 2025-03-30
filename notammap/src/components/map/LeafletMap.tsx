@@ -71,7 +71,7 @@ export interface LeafletMapProps {
     layers: Layer[];
 }
 
-const boxShadowStyle = { boxShadow: "0 0 5px black" };
+const boxShadowStyle = { boxShadow: "0 0 5px #374151" };
 
 export function LeafletMap({ onInit, currentCords, currentZoom, layers }: LeafletMapProps) {
     const containerRef = useRef(null);
