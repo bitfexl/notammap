@@ -90,5 +90,6 @@ export function renderIcon(color: string, text: string): L.DivIcon {
     return L.divIcon({
         iconAnchor: [0, 20],
         html: `<span style="${style}"><span style="display: block; transform: rotate(-45deg); text-align: center; font-size: 1rem; font-family: monospace;">${text}</span></span>`,
+        className: "",
     });
 }
