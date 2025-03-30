@@ -7,6 +7,9 @@ import countryData from "../../assets/CountryData.json";
 import { SVGIcon } from "../icons/SVGIcon";
 import { NotamFilterOptions } from "./filter/notamFilter";
 import { fetchCountries } from "../../api/notams/notamFetch";
+import { IconButton } from "../form/IconButton";
+import filterIcon from "../../assets/icons/filter.svg?raw";
+import { boxShadowStyle } from "../componentConstants";
 
 export interface SideMenuProps {
     filter: NotamFilterOptions;
@@ -33,8 +36,6 @@ export interface SideMenuProps {
 export function SideMenu({ filter, country, onCountryChange, onFilterChange, menuOpen, setMenuOpen }: SideMenuProps) {
     const [countries, setCountries] = useState<string[]>([]);
 
-    const defaultValueId = useId();
-
     useEffect(() => {
         (async () => {
             setCountries(await fetchCountries());
@@ -44,61 +45,80 @@ export function SideMenu({ filter, country, onCountryChange, onFilterChange, men
     return (
         <>
             {menuOpen ? (
-                <div className="fixed top-0 right-0 w-80 h-[100vh] bg-white p-3 overflow-auto flex flex-col gap-4">
-                    <div className="text-right">
-                        <button onClick={() => setMenuOpen(false)}>
-                            <SVGIcon inline svg={closeIcon}></SVGIcon> Close Menu
-                        </button>
+                <div className="w-80 h-full p-1 bg-white rounded-md" style={boxShadowStyle}>
+                    {/* change position of scrollbar, padding of parent for spacing around scrollbar */}
+                    <div className="overflow-auto h-full" style={{ direction: "rtl" }}>
+                        <div className="p-4" style={{ direction: "initial" }}>
+                            <SideMenuContent
+                                filter={filter}
+                                country={country}
+                                onCountryChange={onCountryChange}
+                                onFilterChange={onFilterChange}
+                                countries={countries}
+                            ></SideMenuContent>
+                        </div>
                     </div>
-
-                    <h2>Country</h2>
-                    <div>
-                        <select
-                            value={country ?? defaultValueId}
-                            onChange={(e) => onCountryChange(e.target.value)}
-                            className="w-60 border border-black p-1"
-                        >
-                            <option value={defaultValueId} disabled={true}>
-                                Select a country
-                            </option>
-                            {countries.map((country) => (
-                                <option key={country} value={country}>
-                                    {country}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div className="flex gap-4">
-                        {country && (countryData as any)[country]?.AIPLinks.allProducts && (
-                            <a href={(countryData as any)[country].AIPLinks.allProducts} target="_blank">
-                                Online AIM
-                            </a>
-                        )}
-                        {country && (countryData as any)[country]?.AIPLinks.aipDirect && (
-                            <a href={(countryData as any)[country].AIPLinks.aipDirect} target="_blank">
-                                Online AIP
-                            </a>
-                        )}
-                    </div>
-
-                    <span className="p-1">{/* spacing */}</span>
-
-                    <h2>Filter</h2>
-                    <NotamFilterOptionsSelector options={filter} onChange={onFilterChange}></NotamFilterOptionsSelector>
-
-                    <div className="w-20 h-20">
-                        <SVGIcon svg={gpsLocateIcon}></SVGIcon>
-                    </div>
-                    <SVGIcon inline svg={gpsLocateIcon}></SVGIcon>
                 </div>
             ) : (
-                <div className="fixed top-0 right-0 p-3">
-                    <button onClick={() => setMenuOpen(true)}>
-                        <SVGIcon inline svg={menuIcon}></SVGIcon> Open Menu
-                    </button>
+                <div className="flex flex-col gap-4">
+                    <IconButton svgIcon={filterIcon} onClick={() => alert("filter")}></IconButton>
+                    <IconButton svgIcon={filterIcon} onClick={() => alert("filter")}></IconButton>
+                    <IconButton svgIcon={filterIcon} onClick={() => alert("filter")}></IconButton>
                 </div>
             )}
         </>
+    );
+}
+
+function SideMenuContent({
+    filter,
+    country,
+    onCountryChange,
+    onFilterChange,
+    countries,
+}: {
+    filter: NotamFilterOptions;
+    onFilterChange: (filter: NotamFilterOptions) => void;
+    country: string | null;
+    onCountryChange: (country: string) => void;
+    countries: string[];
+}) {
+    const defaultValueId = useId();
+
+    return (
+        <div className="flex flex-col gap-4">
+            <h2>Country</h2>
+            <div>
+                <select
+                    value={country ?? defaultValueId}
+                    onChange={(e) => onCountryChange(e.target.value)}
+                    className="w-60 border border-black p-1"
+                >
+                    <option value={defaultValueId} disabled={true}>
+                        Select a country
+                    </option>
+                    {countries.map((country) => (
+                        <option key={country} value={country}>
+                            {country}
+                        </option>
+                    ))}
+                </select>
+            </div>
+            <div className="flex gap-4">
+                {country && (countryData as any)[country]?.AIPLinks.allProducts && (
+                    <a href={(countryData as any)[country].AIPLinks.allProducts} target="_blank">
+                        Online AIM
+                    </a>
+                )}
+                {country && (countryData as any)[country]?.AIPLinks.aipDirect && (
+                    <a href={(countryData as any)[country].AIPLinks.aipDirect} target="_blank">
+                        Online AIP
+                    </a>
+                )}
+            </div>
+            <span className="p-1">{/* spacing */}</span>
+            <h2>Filter</h2>
+            <NotamFilterOptionsSelector options={filter} onChange={onFilterChange}></NotamFilterOptionsSelector>
+        </div>
     );
 }

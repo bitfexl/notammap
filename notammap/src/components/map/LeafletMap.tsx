@@ -7,6 +7,8 @@ import closeIcon from "../../assets/icons/x.svg?raw";
 import zoomOutIcon from "../../assets/icons/zoom-out.svg?raw";
 import zoomInIcon from "../../assets/icons/zoom-in.svg?raw";
 import gpsLocateIcon from "../../assets/icons/gps-locate.svg?raw";
+import { boxShadowStyle } from "../componentConstants";
+import { IconButton } from "../form/IconButton";
 
 export interface Layer {
     /**
@@ -70,8 +72,6 @@ export interface LeafletMapProps {
      */
     layers: Layer[];
 }
-
-const boxShadowStyle = { boxShadow: "0 0 5px #374151" };
 
 export function LeafletMap({ onInit, currentCords, currentZoom, layers }: LeafletMapProps) {
     const containerRef = useRef(null);
@@ -170,7 +170,7 @@ export function LeafletMap({ onInit, currentCords, currentZoom, layers }: Leafle
         <>
             <div className="w-full h-full -z-[9999]" ref={containerRef}></div>
             {mapRef.current && (
-                <div className="fixed top-4 right-8 flex flex-col gap-2">
+                <div className="fixed top-4 right-8 flex flex-col gap-4">
                     <MapButton svgIcon={zoomInIcon} onClick={() => mapRef.current?.zoomIn()}></MapButton>
                     <MapButton svgIcon={zoomOutIcon} onClick={() => mapRef.current?.zoomOut()}></MapButton>
                     <MapButton svgIcon={gpsLocateIcon} onClick={() => alert("not yet implemented")}></MapButton>
@@ -190,12 +190,8 @@ export function LeafletMap({ onInit, currentCords, currentZoom, layers }: Leafle
 
 function MapButton({ svgIcon, onClick }: { svgIcon: string; onClick: () => void }) {
     return (
-        <div className="text-right">
-            <button className="nostyle inline-block rounded-md w-10 h-10 bg-white cursor-pointer" style={boxShadowStyle} onClick={onClick}>
-                <div className="p-2">
-                    <SVGIcon svg={svgIcon}></SVGIcon>
-                </div>
-            </button>
+        <div className="text-right" style={{ lineHeight: "0" }}>
+            <IconButton svgIcon={svgIcon} onClick={onClick}></IconButton>
         </div>
     );
 }
