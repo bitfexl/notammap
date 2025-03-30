@@ -5,7 +5,7 @@ import { isSmallWidth } from "./utils/deviceUtils";
 import { renderCoordinates, renderNotams } from "./components/map/notammap/notamMapRenderers";
 import { SideMenu } from "./components/menu/SideMenu";
 
-import countryData from "./assets/CountryData.json";
+import countryCenterData from "./assets/countryCenterData.json";
 import { CoordinatesList, DetailedNotam, NotamData } from "./api/notams/notamextractor";
 import { fetchNotamData } from "./api/notams/notamFetch";
 import { defaultFilterOptions, filterNotamData, NotamFilterOptions } from "./components/menu/filter/notamFilter";
@@ -37,9 +37,9 @@ export default function App() {
                 return;
             }
 
-            if ((countryData as any)[country]) {
-                setCurrentCords((countryData as any)[country].view.center);
-                setCurrentZoom((countryData as any)[country].view.zoom);
+            if ((countryCenterData as any)[country]) {
+                setCurrentCords((countryCenterData as any)[country]);
+                setCurrentZoom(7);
             }
 
             const newNotamData = await fetchNotamData(country);

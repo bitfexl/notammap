@@ -1,15 +1,15 @@
 import { useEffect, useId, useRef, useState } from "react";
-import menuIcon from "../../assets/icons/menu.svg?raw";
-import closeIcon from "../../assets/icons/x.svg?raw";
-import gpsLocateIcon from "../../assets/icons/layers.svg?raw";
+
 import { NotamFilterOptionsSelector } from "./filter/NotamFilterOptionsSelector";
 import countryData from "../../assets/CountryData.json";
-import { SVGIcon } from "../icons/SVGIcon";
 import { NotamFilterOptions } from "./filter/notamFilter";
 import { fetchCountries } from "../../api/notams/notamFetch";
 import { IconButton } from "../form/IconButton";
-import filterIcon from "../../assets/icons/filter.svg?raw";
 import { boxShadowStyle } from "../componentConstants";
+
+import filterIcon from "../../assets/icons/filter.svg?raw";
+import menuIcon from "../../assets/icons/menu.svg?raw";
+// import closeIcon from "../../assets/icons/x.svg?raw";
 
 export interface SideMenuProps {
     filter: NotamFilterOptions;

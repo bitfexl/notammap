@@ -1,6 +1,6 @@
 import { createContext } from "react";
 import { NotamData } from "../api/notams/notamextractor";
-import { defaultFilterOptions, NotamFilterOptions } from "../lib/menu/filter/notamFilter";
+import { defaultFilterOptions, NotamFilterOptions } from "../components/menu/filter/notamFilter";
 
 export interface NotamDataContextProps {
     /**
