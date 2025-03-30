@@ -1,0 +1,8 @@
+Some countries require a special query to extract the center location.
+Fixes applied manually, query executed at https://overpass-turbo.eu/.
+
+France:
+
+[out:json];
+relation["boundary"="administrative"]["name:en"="Metropolitan France"];
+out center;
