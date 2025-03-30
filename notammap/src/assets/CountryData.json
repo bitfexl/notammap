@@ -1,29 +1,17 @@
 {
     "Austria": {
-        "view": {
-            "center": [48, 14.7],
-            "zoom": 8
-        },
         "AIPLinks": {
             "allProducts": "https://www.austrocontrol.at/piloten/vor_dem_flug/aim_produkte",
             "aipDirect": "https://eaip.austrocontrol.at/"
         }
     },
     "Czech Republic": {
-        "view": {
-            "center": [50, 16],
-            "zoom": 8
-        },
         "AIPLinks": {
             "allProducts": "https://aim.rlp.cz/",
             "aipDirect": "https://aim.rlp.cz/ais_data/www_main_control/frm_en_aip.htm"
         }
     },
     "France": {
-        "view": {
-            "center": [47, 3],
-            "zoom": 7
-        },
         "AIPLinks": {
             "allProducts": "https://www.sia.aviation-civile.gouv.fr/",
             "__TODO": "Direct aip link is a dynamic link.",
@@ -31,10 +19,6 @@
         }
     },
     "Germany": {
-        "view": {
-            "center": [51, 11],
-            "zoom": 7
-        },
         "AIPLinks": {
             "allProducts": null,
             "aipDirect": "https://aip.dfs.de/basicAIP/"
