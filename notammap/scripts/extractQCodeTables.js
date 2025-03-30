@@ -2,6 +2,7 @@
     This script extracts the Q-Code tables from
     https://www.faa.gov/air_traffic/publications/atpubs/notam_html/appendix_b.html
     as json objects.
+    Copy and paste in browser console.
 */
 
 JSON.stringify(
