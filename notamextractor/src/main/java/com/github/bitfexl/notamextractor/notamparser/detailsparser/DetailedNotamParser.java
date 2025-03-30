@@ -75,14 +75,28 @@ public class DetailedNotamParser {
             final String coordinatesGroup = matcher.group();
             final CoordinatesList coordinatesList = parseCoordinatesList(coordinatesGroup);
             coordinates.put(coordinatesList.hash(), coordinatesList);
+            int end = matcher.end();
+            if (coordinatesGroup.endsWith(" ")) {
+                end--;
+            }
             textSnippets.add(new TextSnippet(
-                    matcher.start(), matcher.end(), new TextNode(coordinatesGroup, Reference.coordinatesList(coordinatesList.hash()))
+                    matcher.start(), end, new TextNode(coordinatesGroup, Reference.coordinatesList(coordinatesList.hash()))
             ));
         }
 
         // --- find links ---
 
-        // todo: implement link findings
+        final String[] words = text.split(" ");
+        int linkStartIndex = 0;
+        for (String word : words) {
+            final String lowercaseWord = word.toLowerCase();
+            if ((lowercaseWord.startsWith("https://") || lowercaseWord.startsWith("http://") || lowercaseWord.startsWith("www.")) && word.indexOf(".", 4) != -1) {
+                textSnippets.add(new TextSnippet(linkStartIndex, linkStartIndex + word.length(),
+                        new TextNode(word, Reference.webLink(lowercaseWord.charAt(0) == 'w' ? "https://" + word : word))
+                ));
+            }
+            linkStartIndex += word.length() + 1; // + 1 for removed space
+        }
 
         // --- build text node list ---
 

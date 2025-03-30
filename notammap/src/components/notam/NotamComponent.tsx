@@ -141,6 +141,12 @@ function FormattedNotamText({ textNodes }: { textNodes: TextNode[] }) {
             {textNodes.map((node) => {
                 if (node.reference?.coordinatesList) {
                     return <a href="javascript:alert('TODO')">view on map</a>;
+                } else if (node.reference?.webLink) {
+                    return (
+                        <a href={node.reference.webLink} target="_blank">
+                            {node.text}
+                        </a>
+                    );
                 } else if (node.reference?.abbreviation) {
                     return node.text; // TODO: long form
                 } else {
