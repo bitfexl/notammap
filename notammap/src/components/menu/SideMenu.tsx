@@ -9,6 +9,7 @@ import { boxShadowStyle } from "../componentConstants";
 
 import filterIcon from "../../assets/icons/filter.svg?raw";
 import menuIcon from "../../assets/icons/menu.svg?raw";
+import globeIcon from "../../assets/icons/globe.svg?raw";
 // import closeIcon from "../../assets/icons/x.svg?raw";
 
 export interface SideMenuProps {
@@ -55,7 +56,7 @@ export function SideMenu({ filter, country, onCountryChange, onFilterChange, men
             {menuOpen ? (
                 <div className="h-full flex flex-col gap-4">
                     <div className="p-4 rounded-md bg-white" style={boxShadowStyle} ref={headerRef}>
-                        <h2>Notammap {country}</h2>
+                        <h2>Notam Map {country}</h2>
                     </div>
                     <div
                         className="w-80 p-1 bg-white rounded-md"
@@ -78,7 +79,7 @@ export function SideMenu({ filter, country, onCountryChange, onFilterChange, men
             ) : (
                 <div className="flex flex-col gap-4">
                     <IconButton svgIcon={menuIcon} onClick={() => setMenuOpen(true)}></IconButton>
-                    <IconButton svgIcon={filterIcon} onClick={() => alert("filter")}></IconButton>
+                    <IconButton svgIcon={globeIcon} onClick={() => alert("country select")}></IconButton>
                     <IconButton svgIcon={filterIcon} onClick={() => alert("filter")}></IconButton>
                 </div>
             )}
