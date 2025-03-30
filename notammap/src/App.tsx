@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { NotamMap } from "./components/map/notammap/NotamMap";
 import { isSmallWidth } from "./utils/deviceUtils";
 
@@ -6,7 +6,7 @@ import { renderCoordinates, renderNotams } from "./components/map/notammap/notam
 import { SideMenu } from "./components/menu/SideMenu";
 
 import countryData from "./assets/CountryData.json";
-import { NotamData } from "./api/notams/notamextractor";
+import { CoordinatesList, DetailedNotam, NotamData } from "./api/notams/notamextractor";
 import { fetchNotamData } from "./api/notams/notamFetch";
 import { defaultFilterOptions, filterNotamData, NotamFilterOptions } from "./components/menu/filter/notamFilter";
 import { useLocalStorage } from "./hooks/useLocalStorage";
@@ -62,25 +62,30 @@ export default function App() {
         if (notamData != null) {
             setDisplayedNotamData(filterNotamData(notamData, filter));
         }
+        console.log("data or filter changed");
     }, [notamData, filter]);
+
+    const onCoordinatesClick = useCallback(function (c: CoordinatesList) {
+        setDisplayedNotamData((data) => ({
+            ...data,
+            coordinatesLists: data.coordinatesLists.filter((c2) => c2.hash != c.hash),
+        }));
+    }, []);
+
+    const onNotamsClick = useCallback(function (n: DetailedNotam[]) {
+        return true;
+    }, []);
 
     return (
         <>
             <div onClick={closeMenuSmallDevices} className="fixed top-0 left-0 w-[100vw] h-[100vh]">
-                <NotamMap
-                    notamData={displayedNotamData}
-                    notamRenderer={renderNotams}
-                    coordinatesRenderer={renderCoordinates}
+                <MemoMap
                     currentCords={currentCords}
                     currentZoom={currentZoom}
-                    onNotamsClick={() => true}
-                    onCooridnatesClick={(c) =>
-                        setDisplayedNotamData((data) => ({
-                            ...data,
-                            coordinatesLists: data.coordinatesLists.filter((c2) => c2.hash != c.hash),
-                        }))
-                    }
-                ></NotamMap>
+                    notamData={displayedNotamData}
+                    onCooridnatesClick={onCoordinatesClick}
+                    onNotamsClick={onNotamsClick}
+                ></MemoMap>
             </div>
 
             <div className="fixed top-4 left-4 h-[100vh] pb-8">
@@ -96,3 +101,29 @@ export default function App() {
         </>
     );
 }
+
+const MemoMap = memo(function ({
+    notamData,
+    currentCords,
+    currentZoom,
+    onNotamsClick,
+    onCooridnatesClick,
+}: {
+    notamData: NotamData;
+    currentCords: L.LatLngTuple;
+    currentZoom: number;
+    onNotamsClick: (notams: DetailedNotam[]) => boolean;
+    onCooridnatesClick: (coordinates: CoordinatesList) => void;
+}) {
+    return (
+        <NotamMap
+            notamData={notamData}
+            notamRenderer={renderNotams}
+            coordinatesRenderer={renderCoordinates}
+            currentCords={currentCords}
+            currentZoom={currentZoom}
+            onNotamsClick={onNotamsClick}
+            onCooridnatesClick={onCooridnatesClick}
+        ></NotamMap>
+    );
+});
