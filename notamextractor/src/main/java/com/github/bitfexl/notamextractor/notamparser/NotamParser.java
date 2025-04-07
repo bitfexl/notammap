@@ -62,7 +62,8 @@ public class NotamParser {
     }
 
     private void parseHeader(Notam.NotamBuilder notam, String header) {
-        String[] parts = header.split("[/ ]");
+        final String[] parts = Arrays.stream(header.split("[/ ]")).filter(p -> !p.isEmpty()).toArray(String[]::new);
+
         notam.series(parts[0].charAt(0));
         notam.number(Integer.parseInt(parts[0].substring(1)));
 

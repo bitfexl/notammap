@@ -13,6 +13,7 @@ import lombok.SneakyThrows;
 
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.Arrays;
 import java.util.List;
 
 public class Main {
@@ -25,10 +26,10 @@ public class Main {
 
         final List<ICAOLocation> allLocations = loadLocationJsonIndex();
 
-        for (String countryName : args) {
+        for (String countryName : Arrays.stream(args).map(c -> c.replace("_", " ")).toList()) {
             final List<ICAOLocation> filteredLocations = allLocations.stream().filter(loc -> loc.country().equalsIgnoreCase(countryName)).toList();
 
-            try (PrintStream file = new PrintStream(countryName + ".json")) {
+            try (PrintStream file = new PrintStream(countryName.replace(" ", "_") + ".json")) {
                 file.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(generateNotamsJson(filteredLocations)));
             }
         }
