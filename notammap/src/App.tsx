@@ -89,11 +89,11 @@ export default function App() {
                 ></MemoMap>
             </div>
 
-            <div className="fixed top-4 left-4 h-[100vh] pb-8 flex flex-col gap-4 w-80">
+            <div className="fixed top-4 left-4 h-full pb-8 flex flex-col gap-4 w-80">
                 <div className="p-4 rounded-md bg-white" style={boxShadowStyle}>
                     <h2>Notam Map {country}</h2>
                 </div>
-                <div className="border border-red-500">
+                <div className="border border-red-500 h-full">
                     <SideMenu
                         country={country}
                         filter={filter}

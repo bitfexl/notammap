@@ -51,8 +51,6 @@ type MenuType = "country" | "filter" | "notam" | "saved" | "tools";
 
 export function SideMenu({ filter, country, onCountryChange, onFilterChange, menuOpen, setMenuOpen }: SideMenuProps) {
     const [countries, setCountries] = useState<string[]>([]);
-    const headerRef = useRef<HTMLDivElement | null>(null);
-    const [headerHeight, setHeaderHeight] = useState(0);
 
     const [selectedMenu, _setSelectedMenu] = useLocalStorage<MenuType>("country", "menu");
 
@@ -67,14 +65,8 @@ export function SideMenu({ filter, country, onCountryChange, onFilterChange, men
         })();
     }, []);
 
-    useEffect(() => {
-        if (headerRef.current) {
-            setHeaderHeight(headerRef.current.getBoundingClientRect().height);
-        }
-    }, [menuOpen]);
-
     return (
-        <div className="flex flex-col border border-green-500 gap-2">
+        <div className="flex flex-col border border-green-500 gap-2 h-full">
             <div className={"flex gap-4" + (menuOpen ? "" : " flex-col")}>
                 {true && <IconButton svgIcon={menuOpen ? closeIcon : menuIcon} onClick={() => setMenuOpen(!menuOpen)}></IconButton>}
                 <IconButton
@@ -99,12 +91,9 @@ export function SideMenu({ filter, country, onCountryChange, onFilterChange, men
                 ></IconButton>
             </div>
             {menuOpen && (
-                <div
-                    className="p-1 bg-white rounded-md"
-                    style={{ ...boxShadowStyle, height: `calc(100% - ${headerHeight + 16 /* 16 px = p-4 padding*/}px` }}
-                >
+                <div className="p-1 bg-white rounded-md flex-1" style={boxShadowStyle}>
                     {/* change position of scrollbar, padding of parent for spacing around scrollbar */}
-                    <div className="overflow-auto h-full" style={{ direction: "rtl" }}>
+                    <div className="overflow-auto" style={{ direction: "rtl" }}>
                         <div className="p-4" style={{ direction: "initial" }}>
                             {selectedMenu == "country" ? (
                                 <CountryMenu country={country} countries={countries} onCountryChange={onCountryChange}></CountryMenu>
