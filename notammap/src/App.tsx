@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { NotamMap } from "./components/map/notammap/NotamMap";
 import { isSmallWidth } from "./utils/deviceUtils";
 
@@ -25,6 +25,15 @@ export default function App() {
 
     const [notamData, setNotamData] = useState<NotamData | null>(null);
     const [displayedNotamData, setDisplayedNotamData] = useState<NotamData>(EMPTY_NOTAM_DATA);
+
+    const sideMenuHeaderRef = useRef<HTMLDivElement | null>(null);
+    const [sideMenuHeigt, setSideMenuHeight] = useState(0);
+
+    useEffect(() => {
+        if (sideMenuHeaderRef.current) {
+            setSideMenuHeight(sideMenuHeaderRef.current.clientHeight + 32 * 3.25);
+        }
+    }, [country]);
 
     function closeMenuSmallDevices() {
         if (isSmallWidth()) {
@@ -89,11 +98,11 @@ export default function App() {
                 ></MemoMap>
             </div>
 
-            <div className="fixed top-4 left-4 h-full pb-8 flex flex-col gap-4 w-80">
-                <div className="p-4 rounded-md bg-white" style={boxShadowStyle}>
+            <div className="fixed top-4 left-4 flex flex-col gap-4 w-80">
+                <div className="p-4 rounded-md bg-white" style={boxShadowStyle} ref={sideMenuHeaderRef}>
                     <h2>Notam Map {country}</h2>
                 </div>
-                <div className="border border-red-500 h-full">
+                <div>
                     <SideMenu
                         country={country}
                         filter={filter}
@@ -101,6 +110,7 @@ export default function App() {
                         onFilterChange={setFilter}
                         menuOpen={menuOpen}
                         setMenuOpen={setMenuOpen}
+                        heightPx={sideMenuHeigt}
                     ></SideMenu>
                 </div>
             </div>
