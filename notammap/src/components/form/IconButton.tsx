@@ -4,7 +4,7 @@ import { SVGIcon } from "../icons/SVGIcon";
 export interface IconButtonProps {
     svgIcon: string;
     onClick: () => void;
-    connected?: "bottom" | "bottom-right" | "none";
+    connected?: "bottom" | "bottom-right" | "bottom-left" | "none";
 }
 
 // TODO: use this button also for map layer selection
@@ -21,13 +21,17 @@ export function IconButton({ svgIcon, onClick, connected = "none" }: IconButtonP
             <div className="p-2">
                 <SVGIcon svg={svgIcon}></SVGIcon>
             </div>
-            <div className={`${connected != "none" && "pb-4"} bg-white`}></div>
+            <div className={`${connected != "none" && "pb-2"} bg-white`}></div>
             {connected.startsWith("bottom") && (
                 <div
                     className="w-full h-[6px] bg-white"
-                    style={{
-                        boxShadow: "5px 0 0px white",
-                    }}
+                    style={
+                        connected != "bottom-left"
+                            ? {
+                                  boxShadow: "5px 0 0px white",
+                              }
+                            : {}
+                    }
                 >
                     {connected != "bottom-right" && (
                         <div

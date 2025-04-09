@@ -212,9 +212,14 @@ function LayerSelector({
     setOpen: (open: boolean) => void;
 }) {
     return (
-        <div className="flex flex-col gap-0">
+        <div className="flex flex-col gap-2">
             <div className="text-right z-10" style={{ lineHeight: "0" }}>
-                <button
+                <IconButton
+                    onClick={() => setOpen(!open)}
+                    svgIcon={open ? closeIcon : layersIcon}
+                    connected={open ? "bottom-left" : "none"}
+                ></IconButton>
+                {/* <button
                     className={`nostyle inline-block rounded-t-md w-10 h-10 bg-white ${!open && "rounded-b-md"}`}
                     style={boxShadowStyle}
                     onClick={() => setOpen(!open)}
@@ -230,10 +235,10 @@ function LayerSelector({
                             }}
                         ></div>
                     )}
-                </button>
+                </button> */}
             </div>
             {open && (
-                <div className="flex flex-col gap-2 bg-white rounded-md p-2 rounded-tr-none" style={boxShadowStyle}>
+                <div className="flex flex-col gap-2 bg-white rounded-md p-2 pt-4 rounded-tr-none" style={boxShadowStyle}>
                     {layers.map((layer, index) => (
                         <div key={layer.name} className="text-center flex flex-col">
                             <div>
