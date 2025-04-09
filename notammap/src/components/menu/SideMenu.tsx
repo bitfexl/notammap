@@ -11,9 +11,19 @@ import filterIcon from "../../assets/icons/filter.svg?raw";
 import menuIcon from "../../assets/icons/menu.svg?raw";
 import globeIcon from "../../assets/icons/globe.svg?raw";
 import closeIcon from "../../assets/icons/x.svg?raw";
+import bookmarkIcon from "../../assets/icons/bookmark.svg?raw";
+import toolIcon from "../../assets/icons/tool.svg?raw";
+
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import countryCodes from "../../assets/countryCodes.json";
-import { divIcon } from "leaflet";
+
+const reversedCountryCodes = (() => {
+    const object: any = {};
+    for (const code of Object.keys(countryCodes)) {
+        object[(countryCodes as any)[code]] = code;
+    }
+    return object;
+})();
 
 export interface SideMenuProps {
     filter: NotamFilterOptions;
@@ -37,16 +47,23 @@ export interface SideMenuProps {
     setMenuOpen: (open: boolean) => void;
 }
 
+type MenuType = "country" | "filter" | "notam" | "saved" | "tools";
+
 export function SideMenu({ filter, country, onCountryChange, onFilterChange, menuOpen, setMenuOpen }: SideMenuProps) {
     const [countries, setCountries] = useState<string[]>([]);
     const headerRef = useRef<HTMLDivElement | null>(null);
     const [headerHeight, setHeaderHeight] = useState(0);
 
-    const [selectedMenu, setSelectedMenu] = useLocalStorage<"country" | "filter" | "notam">("country", "menu");
+    const [selectedMenu, _setSelectedMenu] = useLocalStorage<MenuType>("country", "menu");
+
+    function setSelectedMenu(menu: MenuType) {
+        _setSelectedMenu(menu);
+        setMenuOpen(true);
+    }
 
     useEffect(() => {
         (async () => {
-            setCountries(await fetchCountries());
+            setCountries((await fetchCountries()).sort());
         })();
     }, []);
 
@@ -57,11 +74,29 @@ export function SideMenu({ filter, country, onCountryChange, onFilterChange, men
     }, [menuOpen]);
 
     return (
-        <div className="flex flex-col border border-green-500">
+        <div className="flex flex-col border border-green-500 gap-2">
             <div className={"flex gap-4" + (menuOpen ? "" : " flex-col")}>
                 {true && <IconButton svgIcon={menuOpen ? closeIcon : menuIcon} onClick={() => setMenuOpen(!menuOpen)}></IconButton>}
-                <IconButton svgIcon={globeIcon} onClick={() => setSelectedMenu("country")}></IconButton>
-                <IconButton svgIcon={filterIcon} onClick={() => setSelectedMenu("filter")}></IconButton>
+                <IconButton
+                    connected={menuOpen && selectedMenu == "country" ? "bottom" : "none"}
+                    svgIcon={globeIcon}
+                    onClick={() => setSelectedMenu("country")}
+                ></IconButton>
+                <IconButton
+                    connected={menuOpen && selectedMenu == "filter" ? "bottom" : "none"}
+                    svgIcon={filterIcon}
+                    onClick={() => setSelectedMenu("filter")}
+                ></IconButton>
+                <IconButton
+                    connected={menuOpen && selectedMenu == "saved" ? "bottom" : "none"}
+                    svgIcon={bookmarkIcon}
+                    onClick={() => setSelectedMenu("saved")}
+                ></IconButton>
+                <IconButton
+                    connected={menuOpen && selectedMenu == "tools" ? "bottom" : "none"}
+                    svgIcon={toolIcon}
+                    onClick={() => setSelectedMenu("tools")}
+                ></IconButton>
             </div>
             {menuOpen && (
                 <div
@@ -79,7 +114,7 @@ export function SideMenu({ filter, country, onCountryChange, onFilterChange, men
                                     <NotamFilterOptionsSelector options={filter} onChange={onFilterChange}></NotamFilterOptionsSelector>
                                 </div>
                             ) : (
-                                "No content"
+                                'No content for "' + selectedMenu + '"'
                             )}
                         </div>
                     </div>
@@ -136,12 +171,19 @@ function CountryMenu({
                     ))}
                 </select>
             </div>
-            <div>
-                {Object.keys(countryCodes).map((c) => (
-                    <div key={c}>
-                        <h3>{(countryCodes as any)[c]}</h3>
-                        <img src={"flags/" + c.toLowerCase() + ".svg"} alt="" />
-                    </div>
+            <div className="flex flex-col gap-2">
+                {countries.map((country) => (
+                    <button key={country} className="flex justify-between" onClick={() => onCountryChange(country)}>
+                        <h3>{country}</h3>
+                        <div>
+                            <img
+                                className="w-10 border border-black select-none"
+                                src={"flags/" + reversedCountryCodes[country]?.toLowerCase() + ".svg"}
+                                alt={country}
+                                draggable={false}
+                            />
+                        </div>
+                    </button>
                 ))}
             </div>
         </div>

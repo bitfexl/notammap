@@ -224,7 +224,7 @@ function LayerSelector({
                     </div>
                     {open && (
                         <div
-                            className="w-full h-[5px] bg-white"
+                            className="w-full h-[6px] bg-white"
                             style={{
                                 boxShadow: "-5px 0 0px white",
                             }}
