@@ -219,23 +219,6 @@ function LayerSelector({
                     svgIcon={open ? closeIcon : layersIcon}
                     connected={open ? "bottom-left" : "none"}
                 ></IconButton>
-                {/* <button
-                    className={`nostyle inline-block rounded-t-md w-10 h-10 bg-white ${!open && "rounded-b-md"}`}
-                    style={boxShadowStyle}
-                    onClick={() => setOpen(!open)}
-                >
-                    <div className="p-2">
-                        <SVGIcon svg={open ? closeIcon : layersIcon}></SVGIcon>
-                    </div>
-                    {open && (
-                        <div
-                            className="w-full h-[6px] bg-white"
-                            style={{
-                                boxShadow: "-5px 0 0px white",
-                            }}
-                        ></div>
-                    )}
-                </button> */}
             </div>
             {open && (
                 <div className="flex flex-col gap-2 bg-white rounded-md p-2 pt-4 rounded-tr-none" style={boxShadowStyle}>
