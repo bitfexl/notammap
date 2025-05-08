@@ -13,9 +13,11 @@ import globeIcon from "../../assets/icons/globe.svg?raw";
 import closeIcon from "../../assets/icons/x.svg?raw";
 import bookmarkIcon from "../../assets/icons/bookmark.svg?raw";
 import toolIcon from "../../assets/icons/tool.svg?raw";
+import searchIcon from "../../assets/icons/search.svg?raw";
 
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import countryCodes from "../../assets/countryCodes.json";
+import { SVGIcon } from "../icons/SVGIcon";
 
 const reversedCountryCodes = (() => {
     const object: any = {};
@@ -124,46 +126,61 @@ function CountryMenu({
     onCountryChange: (country: string) => void;
     countries: string[];
 }) {
-    const defaultValueId = useId();
+    const [searchContent, setSearchContent] = useState("");
+
+    // TODO: optimize
+    const lowercaseSearchContent = searchContent.toLowerCase();
+    const filteredCountries = countries
+        .filter((c) => c.toLowerCase().includes(lowercaseSearchContent) || lowercaseSearchContent.includes(c.toLowerCase()))
+        .sort();
 
     return (
         <div className="flex flex-col gap-4">
             <h2>Select Country</h2>
-            <div className="flex gap-4">
-                {country && (countryData as any)[country]?.AIPLinks.allProducts && (
-                    <a href={(countryData as any)[country].AIPLinks.allProducts} target="_blank">
-                        Online AIM
-                    </a>
-                )}
-                {country && (countryData as any)[country]?.AIPLinks.aipDirect && (
-                    <a href={(countryData as any)[country].AIPLinks.aipDirect} target="_blank">
-                        Online AIP
-                    </a>
-                )}
-                {country && !(countryData as any)[country] && (
-                    <a href="https://www.ead.eurocontrol.int/cms-eadbasic/opencms/en/login/ead-basic/" target="_blank">
-                        Eurocontrol EAD (Online AIP)
-                    </a>
+            <div className="my-2">
+                {country ? (
+                    <>
+                        <b>{country}</b>
+                        <div className="flex gap-4">
+                            {country && (countryData as any)[country]?.AIPLinks.allProducts && (
+                                <a href={(countryData as any)[country].AIPLinks.allProducts} target="_blank">
+                                    Online AIM
+                                </a>
+                            )}
+                            {country && (countryData as any)[country]?.AIPLinks.aipDirect && (
+                                <a href={(countryData as any)[country].AIPLinks.aipDirect} target="_blank">
+                                    Online AIP
+                                </a>
+                            )}
+                            {country && !(countryData as any)[country] && (
+                                <a href="https://www.ead.eurocontrol.int/cms-eadbasic/opencms/en/login/ead-basic/" target="_blank">
+                                    Eurocontrol EAD (Online AIP)
+                                </a>
+                            )}
+                        </div>
+                    </>
+                ) : (
+                    <p>Select a country below for more information.</p>
                 )}
             </div>
             <div>
-                <select
-                    value={country ?? defaultValueId}
-                    onChange={(e) => onCountryChange(e.target.value)}
-                    className="w-60 border border-black p-1"
-                >
-                    <option value={defaultValueId} disabled={true}>
-                        Select a country
-                    </option>
-                    {countries.map((country) => (
-                        <option key={country} value={country}>
-                            {country}
-                        </option>
-                    ))}
-                </select>
+                <label className="flex flex-row">
+                    <SVGIcon svg={searchIcon} inline></SVGIcon>
+                    <input
+                        type="text"
+                        placeholder="Search..."
+                        className="ml-2 w-full border-b-2 border-gray-400 outline-none focus:border-gray-700"
+                        value={searchContent}
+                        onChange={(e) => setSearchContent(e.target.value)}
+                    />
+                </label>
+            </div>
+            <div>
+                {filteredCountries.length} {filteredCountries.length == 1 ? "country" : "countries"}{" "}
+                {filteredCountries.length == countries.length ? "available" : "found"}
             </div>
             <div className="flex flex-col gap-2">
-                {countries.map((country) => (
+                {filteredCountries.map((country) => (
                     <button key={country} className="flex justify-between" onClick={() => onCountryChange(country)}>
                         <h3>{country}</h3>
                         <div>
