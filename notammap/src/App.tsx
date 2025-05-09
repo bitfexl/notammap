@@ -83,7 +83,7 @@ export default function App() {
     }, []);
 
     const onNotamsClick = useCallback(function (n: DetailedNotam[]) {
-        return true;
+        return true || n;
     }, []);
 
     return (

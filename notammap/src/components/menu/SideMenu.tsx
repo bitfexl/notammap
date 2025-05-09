@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { NotamFilterOptionsSelector } from "./filter/NotamFilterOptionsSelector";
 import countryData from "../../assets/CountryData.json";

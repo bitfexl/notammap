@@ -1,7 +1,6 @@
 import "leaflet/dist/leaflet.css";
 import * as L from "leaflet";
 import { useEffect, useRef, useState } from "react";
-import { SVGIcon } from "../icons/SVGIcon";
 import layersIcon from "../../assets/icons/layers.svg?raw";
 import closeIcon from "../../assets/icons/x.svg?raw";
 import zoomOutIcon from "../../assets/icons/zoom-out.svg?raw";
@@ -166,6 +165,10 @@ export function LeafletMap({ onInit, currentCords, currentZoom, layers }: Leafle
         }
     }, [currentCords, currentZoom]);
 
+    function locate() {
+        navigator.geolocation.getCurrentPosition(console.log, console.error);
+    }
+
     return (
         <>
             <div className="w-full h-full -z-[9999]" ref={containerRef}></div>
@@ -173,7 +176,7 @@ export function LeafletMap({ onInit, currentCords, currentZoom, layers }: Leafle
                 <div className="fixed top-4 right-8 flex flex-col gap-4">
                     <MapButton svgIcon={zoomInIcon} onClick={() => mapRef.current?.zoomIn()}></MapButton>
                     <MapButton svgIcon={zoomOutIcon} onClick={() => mapRef.current?.zoomOut()}></MapButton>
-                    <MapButton svgIcon={gpsLocateIcon} onClick={() => alert("not yet implemented")}></MapButton>
+                    {"geolocation" in navigator && <MapButton svgIcon={gpsLocateIcon} onClick={locate}></MapButton>}
                     <LayerSelector
                         layers={layers}
                         layerStatus={layerStatus}
