@@ -11,12 +11,25 @@ import { fetchNotamData } from "./api/notams/notamFetch";
 import { defaultFilterOptions, filterNotamData, NotamFilterOptions } from "./components/menu/filter/notamFilter";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 import { boxShadowStyle } from "./components/componentConstants";
+import { LEAFLET_MAP_EVENT, LeafletMapEvent } from "./components/map/LeafletMap";
+
+// add event listener to update cords and zoom if user changed it
+addEventListener(LEAFLET_MAP_EVENT, (event: LeafletMapEvent) => {
+    // TODO: add map id check
+    localStorage.setItem("map coordinates", JSON.stringify(event.latLng));
+    localStorage.setItem("map zoom", JSON.stringify(event.zoom));
+    console.log(event);
+});
 
 const EMPTY_NOTAM_DATA = { version: "0.0", notams: [], coordinatesLists: [] };
 
 export default function App() {
-    const [currentCords, setCurrentCords] = useState<L.LatLngTuple>([49, 12]);
-    const [currentZoom, setCurrentZoom] = useState<number>(5);
+    // current cords and current zoom only to update map (fly to) does not necessarily represent the actual current cords or zoom (user changed it)
+    // persistence is achieved with the leaflet map event the contents of which are directly written to local storage for availability after reload
+    // see above event listener
+    // TODO: country change useEffect is triggered immediately after load so position is overwritten
+    const [currentCords, setCurrentCords] = useLocalStorage<L.LatLngTuple>([49, 12], "map coordinates");
+    const [currentZoom, setCurrentZoom] = useLocalStorage<number>(5, "map zoom");
 
     const [menuOpen, setMenuOpen] = useState(!isSmallWidth());
 

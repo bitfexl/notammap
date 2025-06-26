@@ -9,6 +9,36 @@ import gpsLocateIcon from "../../assets/icons/gps-locate.svg?raw";
 import { boxShadowStyle } from "../componentConstants";
 import { IconButton } from "../form/IconButton";
 
+/**
+ * The name of the leaflet map event which is always dispatched on the window.
+ */
+export const LEAFLET_MAP_EVENT = "LeafletMapEvent";
+
+/**
+ * The leaflet map event when zoom or position changes on a map.
+ * Map ID is currently not implemented.
+ */
+export class LeafletMapEvent extends Event {
+    readonly mapId: string;
+
+    readonly latLng: L.LatLngTuple;
+
+    readonly zoom: number;
+
+    constructor(mapId: string, latLng: L.LatLngTuple, zoom: number) {
+        super(LEAFLET_MAP_EVENT);
+        this.mapId = mapId;
+        this.latLng = latLng;
+        this.zoom = zoom;
+    }
+}
+
+declare global {
+    interface WindowEventMap {
+        [LEAFLET_MAP_EVENT]: LeafletMapEvent;
+    }
+}
+
 export interface Layer {
     /**
      * The name of the layer.
@@ -147,6 +177,8 @@ export function LeafletMap({ onInit, currentCords, currentZoom, layers }: Leafle
             onInit(map);
 
             function mapChangeEventListener() {
+                const pos = map.getCenter();
+                dispatchEvent(new LeafletMapEvent("MAP_ID_HERE", [pos.lat, pos.lng], map.getZoom()));
                 setLayerSelectorOpen(false);
             }
 
@@ -166,7 +198,18 @@ export function LeafletMap({ onInit, currentCords, currentZoom, layers }: Leafle
     }, [currentCords, currentZoom]);
 
     function locate() {
-        navigator.geolocation.getCurrentPosition(console.log, console.error);
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                mapRef.current?.flyTo([position.coords.latitude, position.coords.longitude], 10);
+            },
+            (error) => {
+                if (error.code == GeolocationPositionError.PERMISSION_DENIED) {
+                    alert("You must allow geolocation access to determine your current location.");
+                } else {
+                    alert("Unable to determine your current location.");
+                }
+            }
+        );
     }
 
     return (
