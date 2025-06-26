@@ -15,14 +15,14 @@ export interface NotamMapProps {
     notamRenderer: NotamRenderer;
     coordinatesRenderer: CoordinatesRenderer;
     /**
-     * The current/initial cords. Changing this causes the map to switch to these coordinates.
+     * The new/initial cords. Changing this causes the map to switch to these coordinates. Does not reflect cords if user moves the map.
      */
-    currentCords: L.LatLngTuple;
+    newCords: L.LatLngTuple;
 
     /**
-     * The current/initial zoom. Changing this causes the map to switch to this zoom level.
+     * The new/initial zoom. Changing this causes the map to switch to this zoom level. Does not reflect zoom if user zooms the map.
      */
-    currentZoom: number;
+    newZoom: number;
 
     /**
      * Executed when a notams marker is clicked.
@@ -42,8 +42,8 @@ export function NotamMap({
     notamData,
     notamRenderer,
     coordinatesRenderer,
-    currentCords,
-    currentZoom,
+    newCords,
+    newZoom,
     onNotamsClick,
     onCooridnatesClick,
 }: NotamMapProps) {
@@ -78,7 +78,7 @@ export function NotamMap({
 
     return (
         <>
-            <LeafletMap onInit={initMap} currentCords={currentCords} currentZoom={currentZoom} layers={LAYERS}></LeafletMap>
+            <LeafletMap onInit={initMap} newCords={newCords} newZoom={newZoom} layers={LAYERS}></LeafletMap>
             {portal}
         </>
     );

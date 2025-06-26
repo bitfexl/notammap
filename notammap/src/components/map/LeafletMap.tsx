@@ -87,14 +87,14 @@ export interface LeafletMapProps {
     onInit: (map: L.Map) => void;
 
     /**
-     * The current/initial cords. Changing this causes the map to switch to these coordinates.
+     * The new/initial cords. Changing this causes the map to switch to these coordinates. Does not reflect cords if user moves the map.
      */
-    currentCords: L.LatLngTuple;
+    newCords: L.LatLngTuple;
 
     /**
-     * The current/initial zoom. Changing this causes the map to switch to this zoom level.
+     * The new/initial zoom. Changing this causes the map to switch to this zoom level. Does not reflect zoom if user zooms the map.
      */
-    currentZoom: number;
+    newZoom: number;
 
     /**
      * The layers of the map. Should not change.
@@ -102,7 +102,7 @@ export interface LeafletMapProps {
     layers: Layer[];
 }
 
-export function LeafletMap({ onInit, currentCords, currentZoom, layers }: LeafletMapProps) {
+export function LeafletMap({ onInit, newCords, newZoom, layers }: LeafletMapProps) {
     const containerRef = useRef(null);
     const mapRef = useRef<L.Map | null>(null);
     const leafletLayers = useRef<L.TileLayer[]>([]);
@@ -153,7 +153,7 @@ export function LeafletMap({ onInit, currentCords, currentZoom, layers }: Leafle
             const map = createMap(containerRef.current);
             mapRef.current = map;
 
-            map.setView(currentCords, currentZoom);
+            map.setView(newCords, newZoom);
 
             leafletLayers.current = [];
 
@@ -193,9 +193,9 @@ export function LeafletMap({ onInit, currentCords, currentZoom, layers }: Leafle
 
     useEffect(() => {
         if (mapRef.current != null) {
-            mapRef.current.flyTo(currentCords, currentZoom);
+            mapRef.current.flyTo(newCords, newZoom);
         }
-    }, [currentCords, currentZoom]);
+    }, [newCords, newZoom]);
 
     function locate() {
         navigator.geolocation.getCurrentPosition(

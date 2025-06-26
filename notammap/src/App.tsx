@@ -104,8 +104,8 @@ export default function App() {
         <>
             <div onClick={closeMenuSmallDevices} className="fixed top-0 left-0 w-[100vw] h-[100vh]">
                 <MemoMap
-                    currentCords={_mapCordsAndZoom.cords}
-                    currentZoom={_mapCordsAndZoom.zoom}
+                    newCords={_mapCordsAndZoom.cords}
+                    newZoom={_mapCordsAndZoom.zoom}
                     notamData={displayedNotamData}
                     onCooridnatesClick={onCoordinatesClick}
                     onNotamsClick={onNotamsClick}
@@ -134,14 +134,14 @@ export default function App() {
 
 const MemoMap = memo(function ({
     notamData,
-    currentCords,
-    currentZoom,
+    newCords,
+    newZoom,
     onNotamsClick,
     onCooridnatesClick,
 }: {
     notamData: NotamData;
-    currentCords: L.LatLngTuple;
-    currentZoom: number;
+    newCords: L.LatLngTuple;
+    newZoom: number;
     onNotamsClick: (notams: DetailedNotam[]) => boolean;
     onCooridnatesClick: (coordinates: CoordinatesList) => void;
 }) {
@@ -150,8 +150,8 @@ const MemoMap = memo(function ({
             notamData={notamData}
             notamRenderer={renderNotams}
             coordinatesRenderer={renderCoordinates}
-            currentCords={currentCords}
-            currentZoom={currentZoom}
+            newCords={newCords}
+            newZoom={newZoom}
             onNotamsClick={onNotamsClick}
             onCooridnatesClick={onCooridnatesClick}
         ></NotamMap>
