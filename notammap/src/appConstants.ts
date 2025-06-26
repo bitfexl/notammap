@@ -1,5 +1,7 @@
 import { LatLngTuple } from "leaflet";
 
+export const MAIN_MAP_ID = "main_map";
+
 export namespace LocalStorage {
     export namespace Keys {
         const baseKey = "notammap.config.";

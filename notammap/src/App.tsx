@@ -12,11 +12,14 @@ import { defaultFilterOptions, filterNotamData, NotamFilterOptions } from "./com
 import { useLocalStorage } from "./hooks/useLocalStorage";
 import { boxShadowStyle } from "./components/componentConstants";
 import { LEAFLET_MAP_EVENT, LeafletMapEvent } from "./components/map/LeafletMap";
-import { LocalStorage } from "./appConstants";
+import { LocalStorage, MAIN_MAP_ID } from "./appConstants";
 
 // add event listener to update cords and zoom if user changed it
 addEventListener(LEAFLET_MAP_EVENT, (event: LeafletMapEvent) => {
-    // TODO: add map id check
+    if (event.mapId != MAIN_MAP_ID) {
+        return;
+    }
+
     const cordsAndZoom: LocalStorage.Types.MapCordsAndZoom = { cords: event.latLng, zoom: event.zoom };
     localStorage.setItem(LocalStorage.Keys.MAP_CORDS_AND_ZOOM, JSON.stringify(cordsAndZoom));
 });
@@ -104,6 +107,7 @@ export default function App() {
         <>
             <div onClick={closeMenuSmallDevices} className="fixed top-0 left-0 w-[100vw] h-[100vh]">
                 <MemoMap
+                    mapId={MAIN_MAP_ID}
                     newCords={_mapCordsAndZoom.cords}
                     newZoom={_mapCordsAndZoom.zoom}
                     notamData={displayedNotamData}
@@ -133,12 +137,14 @@ export default function App() {
 }
 
 const MemoMap = memo(function ({
+    mapId,
     notamData,
     newCords,
     newZoom,
     onNotamsClick,
     onCooridnatesClick,
 }: {
+    mapId: string;
     notamData: NotamData;
     newCords: L.LatLngTuple;
     newZoom: number;
@@ -147,6 +153,7 @@ const MemoMap = memo(function ({
 }) {
     return (
         <NotamMap
+            mapId={mapId}
             notamData={notamData}
             notamRenderer={renderNotams}
             coordinatesRenderer={renderCoordinates}

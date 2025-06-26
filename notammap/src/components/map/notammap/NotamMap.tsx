@@ -15,6 +15,11 @@ export interface NotamMapProps {
     notamRenderer: NotamRenderer;
     coordinatesRenderer: CoordinatesRenderer;
     /**
+     * Unique map id for events.
+     */
+    mapId: string;
+
+    /**
      * The new/initial cords. Changing this causes the map to switch to these coordinates. Does not reflect cords if user moves the map.
      */
     newCords: L.LatLngTuple;
@@ -46,6 +51,7 @@ export function NotamMap({
     newZoom,
     onNotamsClick,
     onCooridnatesClick,
+    mapId,
 }: NotamMapProps) {
     // set portal for the currently displayed notam
     const [portal, setPortal] = useState<ReactPortal>();
@@ -78,7 +84,7 @@ export function NotamMap({
 
     return (
         <>
-            <LeafletMap onInit={initMap} newCords={newCords} newZoom={newZoom} layers={LAYERS}></LeafletMap>
+            <LeafletMap mapId={mapId} onInit={initMap} newCords={newCords} newZoom={newZoom} layers={LAYERS}></LeafletMap>
             {portal}
         </>
     );

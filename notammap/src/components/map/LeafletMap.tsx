@@ -80,6 +80,11 @@ export interface Layer {
 
 export interface LeafletMapProps {
     /**
+     * Unique map id for events.
+     */
+    mapId: string;
+
+    /**
      * Called once when the map is initialized. Add layers and stuff here.
      * A reference to the map can also be saved.
      * @param map The leaflet map created.
@@ -102,7 +107,7 @@ export interface LeafletMapProps {
     layers: Layer[];
 }
 
-export function LeafletMap({ onInit, newCords, newZoom, layers }: LeafletMapProps) {
+export function LeafletMap({ onInit, newCords, newZoom, layers, mapId }: LeafletMapProps) {
     const containerRef = useRef(null);
     const mapRef = useRef<L.Map | null>(null);
     const leafletLayers = useRef<L.TileLayer[]>([]);
@@ -178,7 +183,7 @@ export function LeafletMap({ onInit, newCords, newZoom, layers }: LeafletMapProp
 
             function mapChangeEventListener() {
                 const pos = map.getCenter();
-                dispatchEvent(new LeafletMapEvent("MAP_ID_HERE", [pos.lat, pos.lng], map.getZoom()));
+                dispatchEvent(new LeafletMapEvent(mapId, [pos.lat, pos.lng], map.getZoom()));
                 setLayerSelectorOpen(false);
             }
 
