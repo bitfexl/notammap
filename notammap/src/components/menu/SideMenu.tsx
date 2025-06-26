@@ -18,6 +18,7 @@ import searchIcon from "../../assets/icons/search.svg?raw";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import countryCodes from "../../assets/countryCodes.json";
 import { SVGIcon } from "../icons/SVGIcon";
+import { LocalStorage } from "../../appConstants";
 
 const reversedCountryCodes = (() => {
     const object: any = {};
@@ -56,7 +57,7 @@ type MenuType = "country" | "filter" | "notam" | "saved" | "tools";
 export function SideMenu({ filter, country, onCountryChange, onFilterChange, menuOpen, setMenuOpen, heightPx }: SideMenuProps) {
     const [countries, setCountries] = useState<string[]>([]);
 
-    const [selectedMenu, _setSelectedMenu] = useLocalStorage<MenuType>("country", "menu");
+    const [selectedMenu, _setSelectedMenu] = useLocalStorage<MenuType>("country", LocalStorage.Keys.MENU_SELECTED);
 
     function setSelectedMenu(menu: MenuType) {
         _setSelectedMenu(menu);

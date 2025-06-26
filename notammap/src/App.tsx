@@ -12,32 +12,34 @@ import { defaultFilterOptions, filterNotamData, NotamFilterOptions } from "./com
 import { useLocalStorage } from "./hooks/useLocalStorage";
 import { boxShadowStyle } from "./components/componentConstants";
 import { LEAFLET_MAP_EVENT, LeafletMapEvent } from "./components/map/LeafletMap";
+import { LocalStorage } from "./appConstants";
 
 // add event listener to update cords and zoom if user changed it
 addEventListener(LEAFLET_MAP_EVENT, (event: LeafletMapEvent) => {
     // TODO: add map id check
-    localStorage.setItem("map coordinates", JSON.stringify(event.latLng));
-    localStorage.setItem("map zoom", JSON.stringify(event.zoom));
-    console.log(event);
+    const cordsAndZoom: LocalStorage.Types.MapCordsAndZoom = { cords: event.latLng, zoom: event.zoom };
+    localStorage.setItem(LocalStorage.Keys.MAP_CORDS_AND_ZOOM, JSON.stringify(cordsAndZoom));
 });
 
 const EMPTY_NOTAM_DATA = { version: "0.0", notams: [], coordinatesLists: [] };
 
 export default function App() {
-    // current cords and current zoom only to update map (fly to) does not necessarily represent the actual current cords or zoom (user changed it)
+    // cords and zoom only to update map (fly to) does not necessarily represent the actual current cords or zoom (user changed it)
     // persistence is achieved with the leaflet map event the contents of which are directly written to local storage for availability after reload
     // see above event listener
     // TODO: country change useEffect is triggered immediately after load so position is overwritten
-    const [currentCords, setCurrentCords] = useLocalStorage<L.LatLngTuple>([49, 12], "map coordinates");
-    const [currentZoom, setCurrentZoom] = useLocalStorage<number>(5, "map zoom");
+    const [_mapCordsAndZoom, setMapCordsAndZoom] = useLocalStorage<LocalStorage.Types.MapCordsAndZoom>(
+        { cords: [49, 12], zoom: 5 },
+        LocalStorage.Keys.MAP_CORDS_AND_ZOOM
+    );
 
-    const [menuOpen, setMenuOpen] = useState(!isSmallWidth());
-
-    const [country, setCountry] = useLocalStorage<string | null>(null, "country");
-    const [filter, setFilter] = useLocalStorage<NotamFilterOptions>(defaultFilterOptions, "filter");
+    const [country, setCountry] = useLocalStorage<string | null>(null, LocalStorage.Keys.DATA_COUNTRY);
+    const [filter, setFilter] = useLocalStorage<NotamFilterOptions>(defaultFilterOptions, LocalStorage.Keys.DATA_FILTER);
 
     const [notamData, setNotamData] = useState<NotamData | null>(null);
     const [displayedNotamData, setDisplayedNotamData] = useState<NotamData>(EMPTY_NOTAM_DATA);
+
+    const [menuOpen, setMenuOpen] = useState(!isSmallWidth());
 
     const sideMenuHeaderRef = useRef<HTMLDivElement | null>(null);
     const [sideMenuHeigt, setSideMenuHeight] = useState(0);
@@ -61,8 +63,7 @@ export default function App() {
             }
 
             if ((countryCenterData as any)[country]) {
-                setCurrentCords((countryCenterData as any)[country]);
-                setCurrentZoom(7);
+                setMapCordsAndZoom({ cords: (countryCenterData as any)[country], zoom: 7 });
             }
 
             const newNotamData = await fetchNotamData(country);
@@ -103,8 +104,8 @@ export default function App() {
         <>
             <div onClick={closeMenuSmallDevices} className="fixed top-0 left-0 w-[100vw] h-[100vh]">
                 <MemoMap
-                    currentCords={currentCords}
-                    currentZoom={currentZoom}
+                    currentCords={_mapCordsAndZoom.cords}
+                    currentZoom={_mapCordsAndZoom.zoom}
                     notamData={displayedNotamData}
                     onCooridnatesClick={onCoordinatesClick}
                     onNotamsClick={onNotamsClick}
