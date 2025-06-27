@@ -315,7 +315,15 @@ function getPreviewSrc(tmsUrl: string, map: L.Map) {
 }
 
 function createMap(container: HTMLDivElement) {
-    const map = L.map(container, { zoomControl: false });
+    const map = L.map(container, {
+        zoomControl: false,
+        maxBounds: [
+            [90, 99999],
+            [-90, -99999],
+        ],
+        maxBoundsViscosity: 1,
+        worldCopyJump: true,
+    });
     return map;
 }
 
