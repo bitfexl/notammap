@@ -74,8 +74,12 @@ export function NotamComponent({ detailedNotam }: NotamComponentProps) {
         ) : notam.qLower == 0 && notam.qUpper == 999 ? (
             <>No vertical limits specified</>
         ) : (
+            // TODO: icao doc 8126:
+            // The lower and upper limits are expressed in thousands of feet below the transition altitude and flight levels (FL) above it.
+            // ???
             <>
-                From <span className="font-mono">FL{notam.qLower}</span> to <span className="font-mono">FL{notam.qUpper}</span>
+                From <span className="font-mono">{notam.qLower == 0 ? "GND" : "FL" + notam.qLower}</span> to{" "}
+                <span className="font-mono">FL{notam.qUpper}</span>
             </>
         );
 

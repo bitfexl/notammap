@@ -12,7 +12,8 @@ import java.util.stream.Stream;
 public class DetailedNotamParser {
     private static final String NOTAM_DATA_VERSION = "1.0";
     private static final byte ID_VERSION = 1;
-    private static final Pattern COORDINATES_PATTERN = Pattern.compile("(?:\\d{6}[NS]\\s*\\d{7}[EW](?:\\s*-?\\s*)?)+");
+    // some latitudes are incorrectly represented without the leading 0 hence 6,7 for latitude matching
+    private static final Pattern COORDINATES_PATTERN = Pattern.compile("(?:\\d{6}[NS]\\s*\\d{6,7}[EW](?:\\s*[-/]?\\s*)?)+");
 
     /**
      * Generate notam data with details for a number of notams.
@@ -124,7 +125,7 @@ public class DetailedNotamParser {
     }
 
     private CoordinatesList parseCoordinatesList(String rawCoordinatesList) {
-        final List<String> rawCoordinates = Arrays.stream(rawCoordinatesList.split("[\\s-]"))
+        final List<String> rawCoordinates = Arrays.stream(rawCoordinatesList.split("[\\s-/]"))
                 .flatMap(
                         (Function<String, Stream<String>>) s -> // parse different coordinate notations
                                 s.length() == 7 || s.length() == 8 ? Stream.of(s) : // "123456N" or "1234567E" if notated as "123456N 1234567E"
@@ -153,7 +154,11 @@ public class DetailedNotamParser {
         double cord = Double.parseDouble(cordPart.substring(0, 2 + offset));
         cord += (Double.parseDouble(cordPart.substring(2 + offset, 4 + offset)) / 60);
         cord += (Double.parseDouble(cordPart.substring(4 + offset, 6 + offset)) / 3600);
-        cord *= (cordPart.charAt(6 + offset) == (offset == 0 ? 'S' : 'W') ? -1 : 1);
+        // some longitudes are incorrectly represented without the leading "0"
+        final char c = Character.toLowerCase(cordPart.charAt(6 + offset));
+        if (c == 's' || c == 'w') {
+            cord *= -1;
+        }
         return cord;
     }
 
