@@ -1,0 +1,69 @@
+[
+    {
+        "name": "ATM Airspace Organization",
+        "codes": ["AA", "AC", "AD", "AE", "AF", "AH", "AL", "AN", "AO", "AP", "AR", "AT", "AU", "AV", "AX", "AZ"]
+    },
+    {
+        "name": "CNS Communications and Surveillance Facilities",
+        "codes": ["CA", "CB", "CC", "CD", "CE", "CG", "CL", "CM", "CP", "CR", "CS", "CT"]
+    },
+    {
+        "name": "AGA Facilities and Services",
+        "codes": ["FA", "FB", "FC", "FD", "FE", "FF", "FG", "FH", "FI", "FJ", "FL", "FM", "FO", "FP", "FS", "FT", "FU", "FW", "FZ"]
+    },
+    { "name": "CNS GNSS Services", "codes": ["GA", "GW"] },
+    {
+        "name": "CNS Instrument and Microwave Landing System",
+        "codes": ["IC", "ID", "IG", "II", "IL", "IM", "IN", "IO", "IS", "IT", "IU", "IW", "IX", "IY"]
+    },
+    {
+        "name": "AGA Lighting Facilities",
+        "codes": [
+            "LA",
+            "LB",
+            "LC",
+            "LD",
+            "LE",
+            "LF",
+            "LG",
+            "LH",
+            "LI",
+            "LJ",
+            "LK",
+            "LL",
+            "LM",
+            "LP",
+            "LR",
+            "LS",
+            "LT",
+            "LU",
+            "LV",
+            "LW",
+            "LX",
+            "LY",
+            "LZ"
+        ]
+    },
+    {
+        "name": "AGA Movement and Landing Area",
+        "codes": ["MA", "MB", "MC", "MD", "MG", "MH", "MK", "MM", "MN", "MO", "MP", "MR", "MS", "MT", "MU", "MW", "MX", "MY"]
+    },
+    {
+        "name": "COM Terminal and En Route Navigation Facilities",
+        "codes": ["NA", "NB", "NC", "ND", "NF", "NL", "NM", "NN", "NO", "NT", "NV"]
+    },
+    { "name": "Other Information", "codes": ["OA", "OB", "OE", "OL", "OR"] },
+    {
+        "name": "ATM Air Traffic Procedures",
+        "codes": ["PA", "PB", "PC", "PD", "PE", "PF", "PH", "PI", "PK", "PL", "PM", "PN", "PO", "PR", "PT", "PU", "PX", "PZ"]
+    },
+    { "name": "Navigation Warnings: Airspace Restrictions", "codes": ["RA", "RD", "RM", "RO", "RP", "RR", "RT"] },
+    {
+        "name": "ATM Air Traffic and VOLMET Services",
+        "codes": ["SA", "SB", "SC", "SE", "SF", "SL", "SO", "SP", "SS", "ST", "SU", "SV", "SY"]
+    },
+    {
+        "name": "Navigation Warnings: Warnings",
+        "codes": ["WA", "WB", "WC", "WD", "WE", "WF", "WG", "WH", "WJ", "WL", "WM", "WP", "WR", "WS", "WT", "WU", "WV", "WW", "WY", "WZ"]
+    }
+]
