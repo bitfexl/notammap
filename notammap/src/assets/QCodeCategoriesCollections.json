@@ -1,0 +1,22 @@
+[
+    {
+        "id": "ATM",
+        "name": "Air Traffic Management"
+    },
+    {
+        "id": "CNS",
+        "name": "Communications, Navigation and Surveillance"
+    },
+    {
+        "id": "AGA",
+        "name": "Aerodrome and Ground Aids"
+    },
+    {
+        "id": "COM",
+        "name": "Communication"
+    },
+    {
+        "id": "Navigation Warnings:",
+        "name": "Navigation Warnings"
+    }
+]
