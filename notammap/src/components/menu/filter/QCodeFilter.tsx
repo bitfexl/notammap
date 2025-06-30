@@ -2,6 +2,9 @@ import categoriesCollections from "../../../assets/QCodeCategoriesCollections.js
 import categories from "../../../assets/QCodeCategories.json";
 import { firstTablesTable } from "../../../assets/QCodeTables.json";
 import { ReactNode, useState } from "react";
+import detailsClosedIcon from "../../../assets/icons/chevron-right.svg?raw";
+import detailsOpenIcon from "../../../assets/icons/chevron-down.svg?raw";
+import { SVGIcon } from "../../icons/SVGIcon";
 
 interface Category {
     name: string;
@@ -58,7 +61,7 @@ export function QCodeFilter({ codes: selectedCodes, onCodesChange: setSelectedCo
         <div className="flex flex-col">
             {categoriesCollectionWithCategories.map((cc) => (
                 <CategoryCollectionComponent
-                    name={cc.name}
+                    name={cc.id.length == 3 ? `(${cc.id}) ${cc.name}` : cc.name}
                     categories={cc.categories}
                     selectedCodes={selectedCodes}
                     updateCodes={updateCodes}
@@ -83,13 +86,16 @@ function CategoryCollectionComponent({
     selectedCodes: string[];
     updateCodes: (codes: string[], selected: boolean) => void;
 }) {
+    const [detailsOpen, setDetailsOpen] = useState(false);
+
     const codesInCategoryCollection = categories.flatMap((c) => c.codes);
     const selectedCodesInCategoryCollection = selectedCodes.filter((c) => codesInCategoryCollection.includes(c));
 
     return (
         <div>
-            <details>
-                <summary className="cursor-pointer">
+            <Details
+                open={detailsOpen}
+                header={
                     <span className="flex gap-2">
                         <Checkbox
                             onChange={(checked) => updateCodes(codesInCategoryCollection, checked)}
@@ -101,9 +107,13 @@ function CategoryCollectionComponent({
                                     : "partial"
                             }
                         ></Checkbox>
-                        <b>{name}</b>
+                        <button className="nostyle text-left inline-flex" onClick={() => setDetailsOpen(!detailsOpen)}>
+                            <SVGIcon svg={detailsOpen ? detailsOpenIcon : detailsClosedIcon} inline></SVGIcon>
+                            <span className="underline">{name}</span>
+                        </button>
                     </span>
-                </summary>
+                }
+            >
                 <div className="flex flex-col">
                     {categories.map((c) => (
                         <div className="pl-[21px]">
@@ -116,7 +126,7 @@ function CategoryCollectionComponent({
                         </div>
                     ))}
                 </div>
-            </details>
+            </Details>
         </div>
     );
 }
@@ -130,13 +140,16 @@ function CategoryComponent({
     selectedCodes: string[];
     updateCodes: (codes: string[], selected: boolean) => void;
 }) {
+    const [detailsOpen, setDetailsOpen] = useState(false);
+
     const codesInCategory = category.codes;
     const selectedCodesInCategory = selectedCodes.filter((c) => codesInCategory.includes(c));
 
     return (
         <div>
-            <details>
-                <summary className="cursor-pointer">
+            <Details
+                open={detailsOpen}
+                header={
                     <span className="flex gap-2">
                         <Checkbox
                             onChange={(checked) => updateCodes(codesInCategory, checked)}
@@ -148,9 +161,14 @@ function CategoryComponent({
                                     : "partial"
                             }
                         ></Checkbox>
-                        <b>{category.name}</b>
+
+                        <button className="nostyle text-left inline-flex" onClick={() => setDetailsOpen(!detailsOpen)}>
+                            <SVGIcon svg={detailsOpen ? detailsOpenIcon : detailsClosedIcon} inline></SVGIcon>
+                            <span className="underline">{category.name}</span>
+                        </button>
                     </span>
-                </summary>
+                }
+            >
                 <ul className="pl-[21px]">
                     {category.codes.map((c) => (
                         <li key={c}>
@@ -168,7 +186,7 @@ function CategoryComponent({
                         </li>
                     ))}
                 </ul>
-            </details>
+            </Details>
         </div>
     );
 }
@@ -191,7 +209,7 @@ function Details({ open, header, children }: { open: boolean; header: ReactNode;
     return (
         <div>
             {header}
-            {open && children}
+            {open && <div className="pb-2">{children}</div>}
         </div>
     );
 }

@@ -43,6 +43,10 @@
         @apply select-none;
     }
 
+    input[type="checkbox"]:hover {
+        @apply cursor-pointer;
+    }
+
     button:not(.linklike, .nostyle) {
         @apply p-1 bg-gray-100 border border-gray-200;
     }
