@@ -1,7 +1,7 @@
 import categoriesCollections from "../../../assets/QCodeCategoriesCollections.json";
 import categories from "../../../assets/QCodeCategories.json";
 import { firstTablesTable } from "../../../assets/QCodeTables.json";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 
 interface Category {
     name: string;
@@ -25,11 +25,20 @@ for (const category of categories) {
     }
 }
 
-export interface QCodeFilterProps {}
+export interface QCodeFilterProps {
+    /**
+     * The qcodes currently displayed (active). (first and second letter)
+     */
+    codes: string[];
 
-export function QCodeFilter({}: QCodeFilterProps) {
-    const [selectedCodes, setSelectedCodes] = useState<string[]>([]);
+    /**
+     * User changed the codes/filter.
+     * @param codes The new codes (all active codes).
+     */
+    onCodesChange: (codes: string[]) => void;
+}
 
+export function QCodeFilter({ codes: selectedCodes, onCodesChange: setSelectedCodes }: QCodeFilterProps) {
     function updateCodes(codes: string[], selected: boolean) {
         let newCodes;
         if (selected) {
@@ -46,7 +55,7 @@ export function QCodeFilter({}: QCodeFilterProps) {
     }
 
     return (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col">
             {categoriesCollectionWithCategories.map((cc) => (
                 <CategoryCollectionComponent
                     name={cc.name}
@@ -81,7 +90,7 @@ function CategoryCollectionComponent({
         <div>
             <details>
                 <summary className="cursor-pointer">
-                    <span>
+                    <span className="flex gap-2">
                         <Checkbox
                             onChange={(checked) => updateCodes(codesInCategoryCollection, checked)}
                             state={
@@ -91,13 +100,13 @@ function CategoryCollectionComponent({
                                     ? "all"
                                     : "partial"
                             }
-                        ></Checkbox>{" "}
+                        ></Checkbox>
                         <b>{name}</b>
                     </span>
                 </summary>
-                <div className="flex flex-col gap-2 pt-2">
+                <div className="flex flex-col">
                     {categories.map((c) => (
-                        <div className="pl-4">
+                        <div className="pl-[21px]">
                             <CategoryComponent
                                 category={c}
                                 selectedCodes={selectedCodes}
@@ -128,7 +137,7 @@ function CategoryComponent({
         <div>
             <details>
                 <summary className="cursor-pointer">
-                    <span>
+                    <span className="flex gap-2">
                         <Checkbox
                             onChange={(checked) => updateCodes(codesInCategory, checked)}
                             state={
@@ -138,20 +147,23 @@ function CategoryComponent({
                                     ? "all"
                                     : "partial"
                             }
-                        ></Checkbox>{" "}
+                        ></Checkbox>
                         <b>{category.name}</b>
                     </span>
                 </summary>
-                <ul className="pl-4">
+                <ul className="pl-[21px]">
                     {category.codes.map((c) => (
                         <li key={c}>
-                            <label>
+                            <label className="flex gap-2">
                                 <input
                                     onChange={(e) => updateCodes([c], e.target.checked)}
                                     checked={selectedCodesInCategory.includes(c)}
                                     type="checkbox"
-                                />{" "}
-                                (<code>{c}</code>) {(firstTablesTable as any)[c]}
+                                    className="self-start h-6"
+                                />
+                                <span>
+                                    (<code>{c}</code>) {(firstTablesTable as any)[c]}
+                                </span>
                             </label>
                         </li>
                     ))}
@@ -170,6 +182,16 @@ function Checkbox({ state, onChange }: { state: "all" | "none" | "partial"; onCh
                 if (r) r.indeterminate = state == "partial";
             }}
             type="checkbox"
+            className="self-start h-6"
         />
+    );
+}
+
+function Details({ open, header, children }: { open: boolean; header: ReactNode; children: ReactNode }) {
+    return (
+        <div>
+            {header}
+            {open && children}
+        </div>
     );
 }

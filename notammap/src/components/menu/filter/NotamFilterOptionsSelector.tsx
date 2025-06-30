@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { CheckBoxInputs } from "../../form/CheckBoxInputs";
 import { NotamFilterOptions } from "./notamFilter";
+import { QCodeFilter } from "./QCodeFilter";
 
 export interface NotamFilterOptionsSelectorProps {
     /**
@@ -15,6 +17,8 @@ export interface NotamFilterOptionsSelectorProps {
 }
 
 export function NotamFilterOptionsSelector({ onChange, options }: NotamFilterOptionsSelectorProps) {
+    const [qCodes, setQCodes] = useState<string[]>([]);
+
     function update(updater: (options: NotamFilterOptions) => any) {
         let clone = structuredClone(options);
         updater(clone);
@@ -74,6 +78,8 @@ export function NotamFilterOptionsSelector({ onChange, options }: NotamFilterOpt
                 ]}
                 onChange={(key, val) => update((o) => ((o.PURPOSE as any)[key] = val))}
             ></CheckBoxInputs>
+
+            <QCodeFilter codes={qCodes} onCodesChange={setQCodes}></QCodeFilter>
 
             <CheckBoxInputs
                 label="Q-Code"
