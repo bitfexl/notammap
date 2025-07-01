@@ -5,6 +5,11 @@ import qcodeTables from "../../assets/QCodeTables.json";
  * @param qcode The five letter q code, with additional text if provided.
  */
 export function toText(qcode: string) {
+    // notam is checklist
+    if (qcode == "QKKKK") {
+        return "Checklist";
+    }
+
     const code1 = qcode.substring(1, 3);
     const code2 = qcode.substring(3, 5);
 

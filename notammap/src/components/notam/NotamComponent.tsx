@@ -77,6 +77,7 @@ export function NotamComponent({ detailedNotam }: NotamComponentProps) {
             // TODO: icao doc 8126:
             // The lower and upper limits are expressed in thousands of feet below the transition altitude and flight levels (FL) above it.
             // ???
+            // TODO: if undefined
             <>
                 From <span className="font-mono">{notam.qLower == 0 ? "GND" : "FL" + notam.qLower}</span> to{" "}
                 <span className="font-mono">FL{notam.qUpper}</span>
@@ -93,6 +94,8 @@ export function NotamComponent({ detailedNotam }: NotamComponentProps) {
             {notam.isEstimation && " (estimation)"}
         </>
     );
+
+    const isChecklist = notam.notamCode == "QKKKK";
 
     return (
         <div className="flex flex-col gap-2">
@@ -119,10 +122,12 @@ export function NotamComponent({ detailedNotam }: NotamComponentProps) {
                 <div>{dateInformation}</div>
             </div>
 
-            <div className="flex flex-col">
-                <b>Affected Traffic</b>
-                <span className="font-mono">{notam.traffic.join(", ")}</span>
-            </div>
+            {!isChecklist && (
+                <div className="flex flex-col">
+                    <b>Affected Traffic</b>
+                    <span className="font-mono">{notam.traffic.join(", ")}</span>
+                </div>
+            )}
 
             <div className="flex flex-col gap-1">
                 <b>NOTAM text</b>
@@ -131,10 +136,12 @@ export function NotamComponent({ detailedNotam }: NotamComponentProps) {
                 </div>
             </div>
 
-            <div className="flex flex-col gap-1">
-                <b>Vertical limits</b>
-                <div>{heightInformation}</div>
-            </div>
+            {!isChecklist && (
+                <div className="flex flex-col gap-1">
+                    <b>Vertical limits</b>
+                    <div>{heightInformation}</div>
+                </div>
+            )}
         </div>
     );
 }
