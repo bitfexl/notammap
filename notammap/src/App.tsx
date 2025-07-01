@@ -119,6 +119,9 @@ export default function App() {
             <div className="fixed top-4 left-4 flex flex-col gap-4 w-80">
                 <div className="p-4 rounded-md bg-white" style={boxShadowStyle} ref={sideMenuHeaderRef}>
                     <h2>Notam Map {country}</h2>
+                    <p>
+                        NOTAMS: {displayedNotamData.notams.length} / {notamData?.notams.length}
+                    </p>
                 </div>
                 <div>
                     <SideMenu

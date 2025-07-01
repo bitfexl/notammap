@@ -1,4 +1,5 @@
 import { DetailedNotam, NotamData } from "../../../api/notams/notamextractor";
+import { firstTablesTable } from "../../../assets/QCodeTables.json";
 
 /**
  * Should return true if a notam should be displayed false if hidden.
@@ -9,6 +10,7 @@ export interface NotamFilterOptions {
     TRAFFIC: {
         VFR: boolean;
         IFR: boolean;
+        CHECKLIST: true; // checklist filtered by SCOPE
     };
 
     PURPOSE: {
@@ -16,16 +18,16 @@ export interface NotamFilterOptions {
         BULLETIN: boolean;
         OPERATIONS: boolean;
         MISCELLANEOUS: boolean;
+        CHECKLIST: true; // checklist filtered by SCOPE
     };
 
-    QCODES: {
-        OBSTACLES: boolean;
-        AIRSPACE_RESTRICTIONS: boolean;
-        WARNINGS: boolean;
-        ATM: boolean;
-        CNS: boolean;
-        AGA: boolean;
-        COM: boolean;
+    QCODES: string[];
+
+    SCOPE: {
+        AERODROME: boolean;
+        ENROUTE: boolean;
+        NAV_WARNING: boolean;
+        CHECKLIST: boolean;
     };
 
     FROM: string;
@@ -37,21 +39,21 @@ export const defaultFilterOptions: NotamFilterOptions = {
     TRAFFIC: {
         VFR: true,
         IFR: true,
+        CHECKLIST: true,
     },
     PURPOSE: {
         IMMEDIATE_ATTENTION: true,
         BULLETIN: true,
         OPERATIONS: true,
         MISCELLANEOUS: true,
+        CHECKLIST: true,
     },
-    QCODES: {
-        OBSTACLES: true,
-        AIRSPACE_RESTRICTIONS: true,
-        WARNINGS: true,
-        ATM: true,
-        CNS: true,
-        AGA: true,
-        COM: true,
+    QCODES: Object.keys(firstTablesTable),
+    SCOPE: {
+        AERODROME: true,
+        ENROUTE: true,
+        NAV_WARNING: true,
+        CHECKLIST: true,
     },
     FROM: "",
     TO: "",
@@ -83,36 +85,28 @@ export function createFilter(options: NotamFilterOptions): NotamFilter {
     return function (detailedNoatm: DetailedNotam) {
         const notam = detailedNoatm.notam;
 
-        // Trafic
+        // Traffic
         if (!anyMatch(options.TRAFFIC, notam.traffic)) {
+            console.log("No match: Traffic", notam);
             return false;
         }
 
         // Purpose
         if (!anyMatch(options.PURPOSE, notam.purposes)) {
+            console.log("No match: Purpose", notam);
             return false;
         }
 
-        // Q-codes
-        if (!options.QCODES.OBSTACLES && startsWithAny(notam.notamCode, ["QOB", "QOL"])) {
+        // Scope
+        if (!anyMatch(options.SCOPE, notam.scopes)) {
+            console.log("No match: Scope", notam);
             return false;
         }
-        if (!options.QCODES.AIRSPACE_RESTRICTIONS && startsWithAny(notam.notamCode, ["QR"])) {
-            return false;
-        }
-        if (!options.QCODES.WARNINGS && startsWithAny(notam.notamCode, ["QW"])) {
-            return false;
-        }
-        if (!options.QCODES.ATM && startsWithAny(notam.notamCode, ["QA", "QP", "QS"])) {
-            return false;
-        }
-        if (!options.QCODES.CNS && startsWithAny(notam.notamCode, ["QC", "QG", "QI"])) {
-            return false;
-        }
-        if (!options.QCODES.AGA && startsWithAny(notam.notamCode, ["QF", "QL", "QM"])) {
-            return false;
-        }
-        if (!options.QCODES.COM && startsWithAny(notam.notamCode, ["QN"])) {
+
+        // Q-Code
+        // K... checklist filtered by scope, TODO: better for X use only first letter
+        if (!["K", "X"].includes(notam.notamCode[2]) && !startsWithAny(notam.notamCode.substring(1, 3), options.QCODES)) {
+            console.log("No match: QCode", notam);
             return false;
         }
 
@@ -132,7 +126,7 @@ function startsWithAny(s: string, values: string[]) {
 
 function anyMatch(filter: { [key: string]: boolean }, values: string[]) {
     for (const [key, value] of Object.entries(filter)) {
-        if (value && values.includes(key as any)) {
+        if (value && values.includes(key)) {
             return true;
         }
     }

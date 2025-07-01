@@ -1,7 +1,7 @@
-import { useState } from "react";
 import { CheckBoxInputs } from "../../form/CheckBoxInputs";
 import { NotamFilterOptions } from "./notamFilter";
 import { QCodeFilter } from "./QCodeFilter";
+import { Help } from "../../form/Help";
 
 export interface NotamFilterOptionsSelectorProps {
     /**
@@ -17,8 +17,6 @@ export interface NotamFilterOptionsSelectorProps {
 }
 
 export function NotamFilterOptionsSelector({ onChange, options }: NotamFilterOptionsSelectorProps) {
-    const [qCodes, setQCodes] = useState<string[]>([]);
-
     function update(updater: (options: NotamFilterOptions) => any) {
         let clone = structuredClone(options);
         updater(clone);
@@ -79,63 +77,49 @@ export function NotamFilterOptionsSelector({ onChange, options }: NotamFilterOpt
                 onChange={(key, val) => update((o) => ((o.PURPOSE as any)[key] = val))}
             ></CheckBoxInputs>
 
-            <QCodeFilter codes={qCodes} onCodesChange={setQCodes}></QCodeFilter>
-
             <CheckBoxInputs
-                label="Q-Code"
-                help={
-                    <>
+                label="Scope"
+                help={<>The Scope of the NOTAM subject.</>}
+                checkBoxes={[
+                    {
+                        label: "Aerodrome",
+                        key: "AERODROME",
+                        help: <>I am help.</>,
+                        checked: options.SCOPE.AERODROME,
+                    },
+                    {
+                        label: "En-route",
+                        key: "ENROUTE",
+                        help: <>I am help.</>,
+                        checked: options.SCOPE.ENROUTE,
+                    },
+                    {
+                        label: "Nav warning",
+                        key: "NAV_WARNING",
+                        help: <>I am help.</>,
+                        checked: options.SCOPE.NAV_WARNING,
+                    },
+                    {
+                        label: "NOTAM Checklist",
+                        key: "CHECKLIST",
+                        help: <>I am help.</>,
+                        checked: options.SCOPE.CHECKLIST,
+                    },
+                ]}
+                onChange={(key, val) => update((o) => ((o.SCOPE as any)[key] = val))}
+            ></CheckBoxInputs>
+
+            <div>
+                <div className="flex flex-row justify-between gap-4">
+                    <b>Q-Code</b>
+                    <Help>
                         The subject being reported.
                         <br />
                         See: <a href="https://www.faa.gov/air_traffic/publications/atpubs/notam_html/appendix_b.html">Q-Code Tables</a>
-                    </>
-                }
-                checkBoxes={[
-                    {
-                        label: "Obstacles",
-                        key: "OBSTACLES",
-                        help: <>Obstacle NOTAMs (QOBXX, QOLXX).</>,
-                        checked: options.QCODES.OBSTACLES,
-                    },
-                    {
-                        label: "Airspace Restrictions",
-                        key: "AIRSPACE_RESTRICTIONS",
-                        help: <>Navigation Warnings: Airspace Restrictions (QRXXX).</>,
-                        checked: options.QCODES.AIRSPACE_RESTRICTIONS,
-                    },
-                    {
-                        label: "Warnings",
-                        key: "WARNINGS",
-                        help: <>Navigation Warnings: Warnings (QWXXX).</>,
-                        checked: options.QCODES.WARNINGS,
-                    },
-                    {
-                        label: "ATM",
-                        key: "ATM",
-                        help: <>Air Traffic Management (QAXXX, QPXXX, QSXXX).</>,
-                        checked: options.QCODES.ATM,
-                    },
-                    {
-                        label: "CNS",
-                        key: "CNS",
-                        help: <>Communication, Navigation, Surveillance (QCXXX, QGXXX, QIXXX).</>,
-                        checked: options.QCODES.CNS,
-                    },
-                    {
-                        label: "AGA",
-                        key: "AGA",
-                        help: <>Aerodromes and Ground Aids (QFXXX, QLXXX, QMXXX).</>,
-                        checked: options.QCODES.AGA,
-                    },
-                    {
-                        label: "COM",
-                        key: "COM",
-                        help: <>Communication (QNXXX).</>,
-                        checked: options.QCODES.COM,
-                    },
-                ]}
-                onChange={(key, val) => update((o) => ((o.QCODES as any)[key] = val))}
-            ></CheckBoxInputs>
+                    </Help>
+                </div>
+                <QCodeFilter codes={options.QCODES} onCodesChange={(c) => update((o) => (o.QCODES = c))}></QCodeFilter>
+            </div>
 
             <div>
                 <b>Date (not yet implemented)</b>
