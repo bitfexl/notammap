@@ -324,6 +324,7 @@ function createMap(container: HTMLDivElement) {
         maxBoundsViscosity: 1,
         worldCopyJump: true,
     });
+    L.control.scale({ imperial: false, position: "bottomright" }).addTo(map);
     return map;
 }
 
