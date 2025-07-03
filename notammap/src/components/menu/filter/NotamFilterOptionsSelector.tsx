@@ -2,6 +2,7 @@ import { CheckBoxInputs } from "../../form/CheckBoxInputs";
 import { NotamFilterOptions } from "./notamFilter";
 import { QCodeFilter } from "./QCodeFilter";
 import { Help } from "../../form/Help";
+import { useEffect } from "react";
 
 export interface NotamFilterOptionsSelectorProps {
     /**
@@ -21,6 +22,42 @@ export function NotamFilterOptionsSelector({ onChange, options }: NotamFilterOpt
         let clone = structuredClone(options);
         updater(clone);
         onChange(clone);
+    }
+
+    // update date on init if no custom selection has been made
+    useEffect(() => {
+        if (options.DATE.DAYS != -1) {
+            updateDate(options.DATE.DAYS, null, null);
+        }
+    }, []);
+
+    function updateDate(days: number | null, from: string | null, to: string | null) {
+        if (days != null) {
+            if (days == -1) {
+                // only set to custom, custom date can be changed via inputs (from, to)
+                update((o) => (o.DATE.DAYS = -1));
+            } else {
+                // update period and from, to inputs
+                update((o) => {
+                    const today = new Date();
+                    const end = new Date();
+                    end.setDate(end.getDate() + days - 1);
+                    o.DATE.DAYS = days;
+                    o.DATE.FROM = today.toISOString().split("T")[0];
+                    o.DATE.TO = end.toISOString().split("T")[0];
+                });
+            }
+        } else if (from != null) {
+            update((o) => {
+                o.DATE.FROM = from;
+                o.DATE.DAYS = -1;
+            });
+        } else if (to != null) {
+            update((o) => {
+                o.DATE.TO = to;
+                o.DATE.DAYS = -1;
+            });
+        }
     }
 
     return (
@@ -123,14 +160,21 @@ export function NotamFilterOptionsSelector({ onChange, options }: NotamFilterOpt
 
             <div>
                 <b>Date (not yet implemented)</b>
+                <select value={options.DATE.DAYS} onChange={(d) => updateDate(parseInt(d.target.value), null, null)}>
+                    <option value={1}>Today</option>
+                    <option value={7}>Next 7 days</option>
+                    <option value={14}>Next 14 days</option>
+                    <option value={30}>Next 30 days</option>
+                    <option value={-1}>Custom</option>
+                </select>
                 <div>
                     <label>
                         From
-                        <input type="date" />
+                        <input type="date" value={options.DATE.FROM} onChange={(f) => updateDate(null, f.target.value, null)} />
                     </label>
                     <label>
                         To
-                        <input type="date" />
+                        <input type="date" value={options.DATE.TO} onChange={(t) => updateDate(null, null, t.target.value)} />
                     </label>
                 </div>
             </div>

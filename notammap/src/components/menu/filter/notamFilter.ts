@@ -30,9 +30,11 @@ export interface NotamFilterOptions {
         CHECKLIST: boolean;
     };
 
-    FROM: string;
-
-    TO: string;
+    DATE: {
+        DAYS: number;
+        FROM: string;
+        TO: string;
+    };
 }
 
 export const defaultFilterOptions: NotamFilterOptions = {
@@ -55,8 +57,11 @@ export const defaultFilterOptions: NotamFilterOptions = {
         NAV_WARNING: true,
         CHECKLIST: true,
     },
-    FROM: "",
-    TO: "",
+    DATE: {
+        DAYS: 7,
+        FROM: "",
+        TO: "",
+    },
 };
 
 export function filterNotamData(notamData: NotamData, filterOrOptions: NotamFilterOptions | NotamFilter): NotamData {
