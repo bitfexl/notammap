@@ -158,25 +158,38 @@ export function NotamFilterOptionsSelector({ onChange, options }: NotamFilterOpt
                 <QCodeFilter codes={options.QCODES} onCodesChange={(c) => update((o) => (o.QCODES = c))}></QCodeFilter>
             </div>
 
-            <div>
+            <div className="flex flex-col gap-2">
                 <b>Date (not yet implemented)</b>
-                <select value={options.DATE.DAYS} onChange={(d) => updateDate(parseInt(d.target.value), null, null)}>
+                <select
+                    value={options.DATE.DAYS}
+                    onChange={(d) => updateDate(parseInt(d.target.value), null, null)}
+                    className="rounded-md border-2 border-gray-700 h-8 p-1"
+                >
                     <option value={1}>Today</option>
                     <option value={7}>Next 7 days</option>
                     <option value={14}>Next 14 days</option>
                     <option value={30}>Next 30 days</option>
                     <option value={-1}>Custom</option>
                 </select>
-                <div>
-                    <label>
-                        From
-                        <input type="date" value={options.DATE.FROM} onChange={(f) => updateDate(null, f.target.value, null)} />
-                    </label>
-                    <label>
-                        To
-                        <input type="date" value={options.DATE.TO} onChange={(t) => updateDate(null, null, t.target.value)} />
-                    </label>
-                </div>
+
+                <label className="flex">
+                    <span className="w-12">From</span>
+                    <input
+                        type="date"
+                        value={options.DATE.FROM}
+                        onChange={(f) => updateDate(null, f.target.value, null)}
+                        className="rounded-md border-2 border-gray-700 h-8 p-1"
+                    />
+                </label>
+                <label className="flex">
+                    <span className="w-12">To</span>
+                    <input
+                        type="date"
+                        value={options.DATE.TO}
+                        onChange={(t) => updateDate(null, null, t.target.value)}
+                        className="rounded-md border-2 border-gray-700 h-8 p-1"
+                    />
+                </label>
             </div>
         </div>
     );
