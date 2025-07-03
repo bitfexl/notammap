@@ -43,6 +43,10 @@
         @apply select-none;
     }
 
+    input[type="checkbox"] {
+        @apply scale-[1.15];
+    }
+
     input[type="checkbox"]:hover {
         @apply cursor-pointer;
     }
