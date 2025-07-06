@@ -35,6 +35,7 @@ export default function App() {
     }, []);
 
     if (!appData) {
+        // load data
         return <AppDataLayer onDataChange={setAppData}></AppDataLayer>;
     }
 
