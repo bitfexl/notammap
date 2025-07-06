@@ -116,7 +116,7 @@ function CategoryCollectionComponent({
             >
                 <div className="flex flex-col">
                     {categories.map((c) => (
-                        <div className="pl-[21px]">
+                        <div className="pl-[21px]" key={c.name}>
                             <CategoryComponent
                                 category={c}
                                 selectedCodes={selectedCodes}
