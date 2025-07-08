@@ -96,4 +96,8 @@
     *::-webkit-scrollbar-thumb:active {
         background: rgba(0, 0, 0, 0.6);
     }
+
+    .test-br {
+        @apply border border-red-500;
+    }
 }

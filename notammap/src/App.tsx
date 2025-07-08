@@ -7,6 +7,7 @@ import { CoordinatesList, DetailedNotam, NotamData } from "./api/notams/notamext
 import { boxShadowStyle } from "./components/componentConstants";
 import { MAIN_MAP_ID } from "./appConstants";
 import { AppData, AppDataLayer } from "./AppDataLayer";
+import { AppLayout } from "./AppLayout";
 
 export default function App() {
     const [appData, setAppData] = useState<AppData | null>(null);
@@ -41,36 +42,43 @@ export default function App() {
 
     return (
         <>
-            <AppDataLayer onDataChange={setAppData}></AppDataLayer>;
-            <div onClick={closeMenuSmallDevices} className="fixed top-0 left-0 w-[100vw] h-[100vh]">
-                <MemoMap
-                    mapId={MAIN_MAP_ID}
-                    newCords={appData.mapCordsAndZoom.cords}
-                    newZoom={appData.mapCordsAndZoom.zoom}
-                    notamData={appData.displayedNotamData}
-                    onCooridnatesClick={onCoordinatesClick}
-                    onNotamsClick={onNotamsClick}
-                ></MemoMap>
-            </div>
-            <div className="fixed top-4 left-4 flex flex-col gap-4 w-80">
-                <div className="p-4 rounded-md bg-white" style={boxShadowStyle} ref={sideMenuHeaderRef}>
-                    <h2>Notam Map {appData.country}</h2>
-                    <p>
-                        NOTAMS: {appData.displayedNotamData.notams.length} / {appData.loadedNotams}
-                    </p>
-                </div>
-                <div>
-                    <SideMenu
-                        country={appData.country}
-                        filter={appData.filterOptions}
-                        onCountryChange={appData.setCountry}
-                        onFilterChange={appData.setFilterOptions}
-                        menuOpen={menuOpen}
-                        setMenuOpen={setMenuOpen}
-                        heightPx={sideMenuHeigt}
-                    ></SideMenu>
-                </div>
-            </div>
+            <AppDataLayer onDataChange={setAppData}></AppDataLayer>
+            <AppLayout
+                map={
+                    <div onClick={closeMenuSmallDevices} className="w-full h-full">
+                        <MemoMap
+                            mapId={MAIN_MAP_ID}
+                            newCords={appData.mapCordsAndZoom.cords}
+                            newZoom={appData.mapCordsAndZoom.zoom}
+                            notamData={appData.displayedNotamData}
+                            onCooridnatesClick={onCoordinatesClick}
+                            onNotamsClick={onNotamsClick}
+                        ></MemoMap>
+                    </div>
+                }
+                header={
+                    <div className="p-4 rounded-md bg-white w-80" style={boxShadowStyle} ref={sideMenuHeaderRef}>
+                        <h2>Notam Map {appData.country}</h2>
+                        <p>
+                            NOTAMS: {appData.displayedNotamData.notams.length} / {appData.loadedNotams}
+                        </p>
+                    </div>
+                }
+                menu={
+                    <div className="flex gap-4 w-80">
+                        <SideMenu
+                            country={appData.country}
+                            filter={appData.filterOptions}
+                            onCountryChange={appData.setCountry}
+                            onFilterChange={appData.setFilterOptions}
+                            menuOpen={menuOpen}
+                            setMenuOpen={setMenuOpen}
+                            heightPx={sideMenuHeigt}
+                        ></SideMenu>
+                    </div>
+                }
+                panels={[<div className="bg-white rounded-md w-80" style={boxShadowStyle}></div>]}
+            ></AppLayout>
         </>
     );
 }

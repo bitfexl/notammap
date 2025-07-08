@@ -219,9 +219,9 @@ export function LeafletMap({ onInit, newCords, newZoom, layers, mapId }: Leaflet
 
     return (
         <>
-            <div className="w-full h-full -z-[9999]" ref={containerRef}></div>
+            <div className="w-full h-full" ref={containerRef}></div>
             {mapRef.current && (
-                <div className="fixed top-4 right-8 flex flex-col gap-4">
+                <div className="fixed top-4 right-8 flex flex-col gap-4 z-[999]">
                     <MapButton svgIcon={zoomInIcon} onClick={() => mapRef.current?.zoomIn()}></MapButton>
                     <MapButton svgIcon={zoomOutIcon} onClick={() => mapRef.current?.zoomOut()}></MapButton>
                     {"geolocation" in navigator && <MapButton svgIcon={gpsLocateIcon} onClick={locate}></MapButton>}
