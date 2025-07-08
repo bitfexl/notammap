@@ -107,7 +107,10 @@ export interface LeafletMapProps {
     layers: Layer[];
 }
 
-export function LeafletMap({ onInit, newCords, newZoom, layers, mapId }: LeafletMapProps) {
+export function LeafletMap({ onInit, newCords, newZoom, layers: rawLayers, mapId }: LeafletMapProps) {
+    // filter if tms url provided through env variable is not provided
+    const layers = rawLayers.filter((l) => l.tmsUrl != null);
+
     const containerRef = useRef(null);
     const mapRef = useRef<L.Map | null>(null);
     const leafletLayers = useRef<L.TileLayer[]>([]);
@@ -194,7 +197,7 @@ export function LeafletMap({ onInit, newCords, newZoom, layers, mapId }: Leaflet
                 map.remove();
             };
         }
-    }, [layers]);
+    }, [rawLayers]);
 
     useEffect(() => {
         if (mapRef.current != null) {
