@@ -8,7 +8,7 @@ import { boxShadowStyle } from "../componentConstants";
 import { MAIN_MAP_ID } from "./appConstants";
 import { AppData, AppDataLayer } from "./AppDataLayer";
 import { AppLayout } from "./AppLayout";
-import { NotamPanel } from "../panel/NotamPanel";
+// import { NotamPanel } from "../panel/NotamPanel";
 
 export default function App() {
     const [appData, setAppData] = useState<AppData | null>(null);
@@ -30,10 +30,13 @@ export default function App() {
         }
     }
 
-    const onCoordinatesClick = useCallback(function (c: CoordinatesList) {}, []);
+    const onCoordinatesClick = useCallback(function (c: CoordinatesList) {
+        console.log(c);
+    }, []);
 
     const onNotamsClick = useCallback(function (n: DetailedNotam[]) {
-        return true || n;
+        console.log(n);
+        return true;
     }, []);
 
     if (!appData) {
@@ -78,11 +81,14 @@ export default function App() {
                         ></SideMenu>
                     </div>
                 }
-                panels={[
-                    <div className="w-80">
-                        <NotamPanel height={`calc(100vh - ${headerHeight + 48 + 8}px)`}></NotamPanel>
-                    </div>,
-                ]}
+                panels={
+                    []
+                    // [
+                    //     <div className="w-80">
+                    //         <NotamPanel height={`calc(100vh - ${headerHeight + 48 + 8}px)`}></NotamPanel>
+                    //     </div>,
+                    // ]
+                }
             ></AppLayout>
         </>
     );
