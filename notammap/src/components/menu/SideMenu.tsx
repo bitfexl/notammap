@@ -185,7 +185,7 @@ function CountryMenu({
                             <img
                                 className="w-10 border border-black select-none"
                                 src={"flags/" + reversedCountryCodes[country]?.toLowerCase() + ".svg"}
-                                alt={country}
+                                alt="?"
                                 draggable={false}
                             />
                         </div>
