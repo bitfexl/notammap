@@ -96,7 +96,7 @@ export function SideMenu({ filter, country, onCountryChange, onFilterChange, men
                 ></IconButton>
             </div>
             {menuOpen && (
-                <div className="p-1 bg-white rounded-md" style={boxShadowStyle}>
+                <div className="p-1 bg-white rounded-md min-w-[320px]" style={boxShadowStyle}>
                     {/* change position of scrollbar, padding of parent for spacing around scrollbar */}
                     <div className="overflow-auto" style={{ direction: "rtl", height: `calc(100vh - ${heightPx}px)` }}>
                         <div className="p-4" style={{ direction: "initial" }}>

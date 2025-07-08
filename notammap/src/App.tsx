@@ -65,7 +65,7 @@ export default function App() {
                     </div>
                 }
                 menu={
-                    <div className="flex gap-4 w-80">
+                    <div className="flex gap-4 max-w-sm">
                         <SideMenu
                             country={appData.country}
                             filter={appData.filterOptions}
