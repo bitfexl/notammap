@@ -18,7 +18,7 @@ import searchIcon from "../../assets/icons/search.svg?raw";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import countryCodes from "../../assets/countryCodes.json";
 import { SVGIcon } from "../icons/SVGIcon";
-import { LocalStorage } from "../../appConstants";
+import { LocalStorage } from "../app/appConstants";
 
 const reversedCountryCodes = (() => {
     const object: any = {};

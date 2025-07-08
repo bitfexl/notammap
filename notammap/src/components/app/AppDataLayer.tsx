@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { LocalStorage, MAIN_MAP_ID } from "./appConstants";
-import { LEAFLET_MAP_EVENT, LeafletMapEvent } from "./components/map/LeafletMap";
-import { defaultFilterOptions, filterNotamData, NotamFilterOptions } from "./components/menu/filter/notamFilter";
-import { useLocalStorage } from "./hooks/useLocalStorage";
-import { NotamData } from "./api/notams/notamextractor";
-import { fetchNotamData } from "./api/notams/notamFetch";
-import countryCenterData from "./assets/countryCenterData.json";
+import { LEAFLET_MAP_EVENT, LeafletMapEvent } from "../map/LeafletMap";
+import { defaultFilterOptions, filterNotamData, NotamFilterOptions } from "../menu/filter/notamFilter";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { NotamData } from "../../api/notams/notamextractor";
+import { fetchNotamData } from "../../api/notams/notamFetch";
+import countryCenterData from "../../assets/countryCenterData.json";
 
 // add event listener to update cords and zoom if user changed it
 addEventListener(LEAFLET_MAP_EVENT, (event: LeafletMapEvent) => {

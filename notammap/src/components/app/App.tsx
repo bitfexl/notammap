@@ -1,10 +1,10 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
-import { NotamMap } from "./components/map/notammap/NotamMap";
-import { isSmallWidth } from "./utils/deviceUtils";
-import { renderCoordinates, renderNotams } from "./components/map/notammap/notamMapRenderers";
-import { SideMenu } from "./components/menu/SideMenu";
-import { CoordinatesList, DetailedNotam, NotamData } from "./api/notams/notamextractor";
-import { boxShadowStyle } from "./components/componentConstants";
+import { NotamMap } from "../map/notammap/NotamMap";
+import { isSmallWidth } from "../../utils/deviceUtils";
+import { renderCoordinates, renderNotams } from "../map/notammap/notamMapRenderers";
+import { SideMenu } from "../menu/SideMenu";
+import { CoordinatesList, DetailedNotam, NotamData } from "../../api/notams/notamextractor";
+import { boxShadowStyle } from "../componentConstants";
 import { MAIN_MAP_ID } from "./appConstants";
 import { AppData, AppDataLayer } from "./AppDataLayer";
 import { AppLayout } from "./AppLayout";
