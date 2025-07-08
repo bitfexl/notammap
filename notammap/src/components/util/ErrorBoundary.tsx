@@ -36,6 +36,7 @@ function Error() {
                 You can try clearing the website's data and cache. Click the button below to clear the data and reset the Notam Map. The
                 cache has to be cleared manually.
             </p>
+            <p>If the error persists, please contact the administrator.</p>
             <button onClick={clearWebsiteData}>Clear Data</button>
         </div>
     );
