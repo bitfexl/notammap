@@ -77,7 +77,7 @@ export default function App() {
                         ></SideMenu>
                     </div>
                 }
-                panels={[<div className="bg-white rounded-md w-80" style={boxShadowStyle}></div>]}
+                panels={[<div className="bg-white rounded-md w-80 h-full" style={boxShadowStyle}></div>]}
             ></AppLayout>
         </>
     );
