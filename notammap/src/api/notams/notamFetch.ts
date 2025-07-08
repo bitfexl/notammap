@@ -7,5 +7,5 @@ export async function fetchCountries(): Promise<string[]> {
 }
 
 export async function fetchNotamData(country: string): Promise<NotamData> {
-    return await (await fetch(NOTAM_DATA_BASE + country.replace(" ", "_") + ".json")).json();
+    return await (await fetch(NOTAM_DATA_BASE + country.replaceAll(" ", "_") + ".json")).json();
 }

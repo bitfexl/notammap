@@ -3,6 +3,7 @@ package com.github.bitfexl.notamextractor;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.github.bitfexl.notamextractor.dins.DinsQuery;
 import com.github.bitfexl.notamextractor.dins.ICAOLocation;
 import com.github.bitfexl.notamextractor.notamparser.Notam;
@@ -11,8 +12,8 @@ import com.github.bitfexl.notamextractor.notamparser.detailsparser.DetailedNotam
 import com.github.bitfexl.notamextractor.notamparser.detailsparser.data.NotamData;
 import lombok.SneakyThrows;
 
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,13 +27,25 @@ public class Main {
 
         final List<ICAOLocation> allLocations = loadLocationJsonIndex();
 
-        for (String countryName : Arrays.stream(args).map(c -> c.replace("_", " ")).toList()) {
+//        final List<String> countries = Arrays.stream(args).map(c -> c.replace("_", " ")).toList();
+        final List<String> countries = allLocations.stream().map(ICAOLocation::country).distinct().toList();
+        final List<String> successfulCountries = new ArrayList<>();
+
+        final ObjectWriter writer = objectMapper.writerWithDefaultPrettyPrinter();
+
+        for (String countryName : countries) {
             final List<ICAOLocation> filteredLocations = allLocations.stream().filter(loc -> loc.country().equalsIgnoreCase(countryName)).toList();
 
-            try (PrintStream file = new PrintStream(countryName.replace(" ", "_") + ".json")) {
-                file.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(generateNotamsJson(filteredLocations)));
+            try {
+                writer.writeValue(new File(countryName.replace(" ", "_") + ".json"), generateNotamsJson(filteredLocations));
+                successfulCountries.add(countryName);
+            } catch (Exception ex) {
+                System.err.println("Error querying notams for " + countryName + ".");
+                ex.printStackTrace();
             }
         }
+
+        writer.writeValue(new File("countries.json"), successfulCountries);
     }
 
     @SneakyThrows
@@ -47,6 +60,7 @@ public class Main {
             } catch (Exception ex) {
                 System.err.println("Error parsing notam.");
                 ex.printStackTrace();
+                // TODO: properly write these notams to file and load in frontend
                 return Notam.builder().raw(notam).build();
             }
         }).toList();
