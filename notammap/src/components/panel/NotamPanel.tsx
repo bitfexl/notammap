@@ -1,16 +1,22 @@
-export interface NotamPanelProps {}
+import { LeftSidePanel } from "./LeftSidePanel";
 
-export function NotamPanel({}: NotamPanelProps) {
+export interface NotamPanelProps {
+    height: string;
+}
+
+export function NotamPanel({ height }: NotamPanelProps) {
     return (
-        <div>
-            <h2>Notam</h2>
+        <LeftSidePanel height={height}>
+            <div>
+                <h2>Notam</h2>
 
-            {new Array(20).fill(
-                <div>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Sequi possimus aliquam, qui dolorem magnam doloribus ea eaque
-                    illum voluptate atque? Incidunt molestiae facere iusto quia! Ab fugit officiis illum repellendus.
-                </div>
-            )}
-        </div>
+                {new Array(20).fill(
+                    <div>
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Sequi possimus aliquam, qui dolorem magnam doloribus ea
+                        eaque illum voluptate atque? Incidunt molestiae facere iusto quia! Ab fugit officiis illum repellendus.
+                    </div>
+                )}
+            </div>
+        </LeftSidePanel>
     );
 }

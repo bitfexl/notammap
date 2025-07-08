@@ -74,16 +74,13 @@ export default function App() {
                             onFilterChange={appData.setFilterOptions}
                             menuOpen={menuOpen}
                             setMenuOpen={setMenuOpen}
-                            height={`calc(100vh - ${headerHeight + 32 * 3.25}px)`}
+                            height={`calc(100vh - ${headerHeight + 32 * 3 + 8}px)`}
                         ></SideMenu>
                     </div>
                 }
                 panels={[
-                    <div
-                        className="bg-white rounded-md w-80 h-full p-4"
-                        style={{ ...boxShadowStyle, height: `calc(100vh - ${headerHeight + 48}px)` }}
-                    >
-                        <NotamPanel></NotamPanel>
+                    <div className="w-80">
+                        <NotamPanel height={`calc(100vh - ${headerHeight + 48 + 8}px)`}></NotamPanel>
                     </div>,
                 ]}
             ></AppLayout>

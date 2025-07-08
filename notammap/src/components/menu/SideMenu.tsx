@@ -5,7 +5,6 @@ import countryData from "../../assets/CountryData.json";
 import { NotamFilterOptions } from "./filter/notamFilter";
 import { fetchCountries } from "../../api/notams/notamFetch";
 import { IconButton } from "../form/IconButton";
-import { boxShadowStyle } from "../componentConstants";
 
 import filterIcon from "../../assets/icons/filter.svg?raw";
 import menuIcon from "../../assets/icons/menu.svg?raw";
@@ -19,6 +18,7 @@ import { useLocalStorage } from "../../hooks/useLocalStorage";
 import countryCodes from "../../assets/countryCodes.json";
 import { SVGIcon } from "../icons/SVGIcon";
 import { LocalStorage } from "../app/appConstants";
+import { LeftSidePanel } from "../panel/LeftSidePanel";
 
 const reversedCountryCodes = (() => {
     const object: any = {};
@@ -96,22 +96,19 @@ export function SideMenu({ filter, country, onCountryChange, onFilterChange, men
                 ></IconButton>
             </div>
             {menuOpen && (
-                <div className="p-1 bg-white rounded-md min-w-[320px]" style={boxShadowStyle}>
-                    {/* change position of scrollbar, padding of parent for spacing around scrollbar */}
-                    <div className="overflow-auto" style={{ direction: "rtl", height }}>
-                        <div className="p-4" style={{ direction: "initial" }}>
-                            {selectedMenu == "country" ? (
-                                <CountryMenu country={country} countries={countries} onCountryChange={onCountryChange}></CountryMenu>
-                            ) : selectedMenu == "filter" ? (
-                                <div className="flex flex-col gap-4">
-                                    <h2>Filter Notams</h2>
-                                    <NotamFilterOptionsSelector options={filter} onChange={onFilterChange}></NotamFilterOptionsSelector>
-                                </div>
-                            ) : (
-                                'No content for "' + selectedMenu + '"'
-                            )}
-                        </div>
-                    </div>
+                <div className="min-w-[320px]">
+                    <LeftSidePanel height={height}>
+                        {selectedMenu == "country" ? (
+                            <CountryMenu country={country} countries={countries} onCountryChange={onCountryChange}></CountryMenu>
+                        ) : selectedMenu == "filter" ? (
+                            <div className="flex flex-col gap-4">
+                                <h2>Filter Notams</h2>
+                                <NotamFilterOptionsSelector options={filter} onChange={onFilterChange}></NotamFilterOptionsSelector>
+                            </div>
+                        ) : (
+                            'No content for "' + selectedMenu + '"'
+                        )}
+                    </LeftSidePanel>
                 </div>
             )}
         </div>
