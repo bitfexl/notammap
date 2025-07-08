@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { BodyContent } from "../BodyContent";
+import { BodyContent } from "../util/BodyContent";
 
 /**
  * A inline help icon. Displays help (children) on hover.
