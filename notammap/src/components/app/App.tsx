@@ -8,6 +8,7 @@ import { boxShadowStyle } from "../componentConstants";
 import { MAIN_MAP_ID } from "./appConstants";
 import { AppData, AppDataLayer } from "./AppDataLayer";
 import { AppLayout } from "./AppLayout";
+import { NotamPanel } from "../panel/NotamPanel";
 
 export default function App() {
     const [appData, setAppData] = useState<AppData | null>(null);
@@ -15,11 +16,11 @@ export default function App() {
     const [menuOpen, setMenuOpen] = useState(!isSmallWidth());
 
     const sideMenuHeaderRef = useRef<HTMLDivElement | null>(null);
-    const [sideMenuHeigt, setSideMenuHeight] = useState(0);
+    const [headerHeight, setHeaderHeight] = useState(0);
 
     useEffect(() => {
         if (sideMenuHeaderRef.current) {
-            setSideMenuHeight(sideMenuHeaderRef.current.clientHeight + 32 * 3.25);
+            setHeaderHeight(sideMenuHeaderRef.current.clientHeight);
         }
     }, [appData]); // because of country name change, height changes
 
@@ -73,11 +74,18 @@ export default function App() {
                             onFilterChange={appData.setFilterOptions}
                             menuOpen={menuOpen}
                             setMenuOpen={setMenuOpen}
-                            heightPx={sideMenuHeigt}
+                            height={`calc(100vh - ${headerHeight + 32 * 3.25}px)`}
                         ></SideMenu>
                     </div>
                 }
-                panels={[<div className="bg-white rounded-md w-80 h-full" style={boxShadowStyle}></div>]}
+                panels={[
+                    <div
+                        className="bg-white rounded-md w-80 h-full p-4"
+                        style={{ ...boxShadowStyle, height: `calc(100vh - ${headerHeight + 48}px)` }}
+                    >
+                        <NotamPanel></NotamPanel>
+                    </div>,
+                ]}
             ></AppLayout>
         </>
     );

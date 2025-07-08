@@ -49,12 +49,12 @@ export interface SideMenuProps {
 
     setMenuOpen: (open: boolean) => void;
 
-    heightPx: number;
+    height: string;
 }
 
 type MenuType = "country" | "filter" | "notam" | "saved" | "tools";
 
-export function SideMenu({ filter, country, onCountryChange, onFilterChange, menuOpen, setMenuOpen, heightPx }: SideMenuProps) {
+export function SideMenu({ filter, country, onCountryChange, onFilterChange, menuOpen, setMenuOpen, height }: SideMenuProps) {
     const [countries, setCountries] = useState<string[]>([]);
 
     const [selectedMenu, _setSelectedMenu] = useLocalStorage<MenuType>("country", LocalStorage.Keys.MENU_SELECTED);
@@ -98,7 +98,7 @@ export function SideMenu({ filter, country, onCountryChange, onFilterChange, men
             {menuOpen && (
                 <div className="p-1 bg-white rounded-md min-w-[320px]" style={boxShadowStyle}>
                     {/* change position of scrollbar, padding of parent for spacing around scrollbar */}
-                    <div className="overflow-auto" style={{ direction: "rtl", height: `calc(100vh - ${heightPx}px)` }}>
+                    <div className="overflow-auto" style={{ direction: "rtl", height }}>
                         <div className="p-4" style={{ direction: "initial" }}>
                             {selectedMenu == "country" ? (
                                 <CountryMenu country={country} countries={countries} onCountryChange={onCountryChange}></CountryMenu>
