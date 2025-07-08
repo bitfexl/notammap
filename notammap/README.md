@@ -38,7 +38,7 @@ Builds without config (e.g. tms url for openaip).
 **Run (powershell)**
 
 ```
-docker run -i --rm -p 8080:80 -v ${PWD}/public/notamdata:/usr/local/apache2/htdocs/notamdata notam-map
+docker run -it --rm -p 8080:80 -v ${PWD}/public/notamdata:/usr/local/apache2/htdocs/notamdata notam-map
 ```
 
 Runs with local notam data from `public` directory. Apache httpd sometimes crashes when using `-it`. Try multiple times.
