@@ -1,23 +1,37 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { BodyContent } from "../BodyContent";
 
 /**
  * A inline help icon. Displays help (children) on hover.
  */
 export function Help({ children }: any) {
     const [showHelp, setShowHelp] = useState(false);
+    const icon = useRef<HTMLElement | null>(null);
 
     // TODO: support for mobile
 
+    function getPosition() {
+        const bounds = icon.current!.getBoundingClientRect();
+        return {
+            top: bounds.top,
+            left: bounds.left + bounds.width / 2,
+        };
+    }
+
     return (
-        <span className="relative z-[99999] opacity-100" onPointerEnter={() => setShowHelp(true)} onPointerLeave={() => setShowHelp(false)}>
-            <span className="select-none">(?)</span>
+        <span className="relative" onPointerEnter={() => setShowHelp(true)} onPointerLeave={() => setShowHelp(false)}>
+            <span className="select-none" ref={icon}>
+                (?)
+            </span>
             {showHelp ? (
-                <div className="absolute top-1 pb-4 left-1/2 -translate-x-1/2 -translate-y-full">
-                    <div className="relative bg-white shadow-lg rounded-sm border border-gray-300 w-max">
-                        <div className="w-4 h-4 absolute -bottom-2 left-1/2 -translate-x-1/2 rotate-45 bg-white border-gray-300 border-r border-b"></div>
-                        <div className="p-2 relative">{children}</div>
+                <BodyContent>
+                    <div className="fixed z-[9999] -translate-x-1/2 -translate-y-full pb-4" style={getPosition()}>
+                        <div className="relative bg-white shadow-lg rounded-sm border border-gray-300 w-max">
+                            <div className="w-4 h-4 absolute -bottom-2 left-1/2 -translate-x-1/2 rotate-45 bg-white border-gray-300 border-r border-b"></div>
+                            <div className="p-2 relative">{children}</div>
+                        </div>
                     </div>
-                </div>
+                </BodyContent>
             ) : null}
         </span>
     );
