@@ -1,6 +1,7 @@
 import { toText } from "../../api/notams/QCodes";
 import { DetailedNotam, TextNode } from "../../api/notams/notamextractor";
 import { useState } from "react";
+import { plural } from "../../utils/textUtils";
 
 export interface NotamComponentProps {
     /**
@@ -62,7 +63,7 @@ export function NotamComponent({ detailedNotam }: NotamComponentProps) {
 
     const locationInformation = (
         <div className="flex flex-col gap-1">
-            <b>Location{(notam.locationIndicators?.length ?? 0) > 1 ? "s" : ""}</b>
+            <b>{plural("Location", notam.locationIndicators?.length ?? 0)}</b>
             {notam.locationIndicators ? (
                 <div>
                     <span className="font-mono font-semibold">{notam.locationIndicators.join(", ")}</span>
