@@ -19,6 +19,7 @@ import countryCodes from "../../assets/countryCodes.json";
 import { SVGIcon } from "../icons/SVGIcon";
 import { LocalStorage } from "../app/appConstants";
 import { LeftSidePanel } from "../panel/LeftSidePanel";
+import { NotamData } from "../../api/notams/notamextractor";
 
 const reversedCountryCodes = (() => {
     const object: any = {};
@@ -45,6 +46,8 @@ export interface SideMenuProps {
      */
     onCountryChange: (country: string) => void;
 
+    fullNotamData: NotamData | null;
+
     menuOpen: boolean;
 
     setMenuOpen: (open: boolean) => void;
@@ -54,7 +57,16 @@ export interface SideMenuProps {
 
 type MenuType = "country" | "filter" | "notam" | "saved" | "tools";
 
-export function SideMenu({ filter, country, onCountryChange, onFilterChange, menuOpen, setMenuOpen, height }: SideMenuProps) {
+export function SideMenu({
+    filter,
+    country,
+    onCountryChange,
+    onFilterChange,
+    menuOpen,
+    setMenuOpen,
+    height,
+    fullNotamData,
+}: SideMenuProps) {
     const [countries, setCountries] = useState<string[]>([]);
 
     const [selectedMenu, _setSelectedMenu] = useLocalStorage<MenuType>("country", LocalStorage.Keys.MENU_SELECTED);
@@ -99,7 +111,12 @@ export function SideMenu({ filter, country, onCountryChange, onFilterChange, men
                 <div className="min-w-[320px]">
                     <LeftSidePanel height={height}>
                         {selectedMenu == "country" ? (
-                            <CountryMenu country={country} countries={countries} onCountryChange={onCountryChange}></CountryMenu>
+                            <CountryMenu
+                                country={country}
+                                countries={countries}
+                                onCountryChange={onCountryChange}
+                                fullNotamData={fullNotamData}
+                            ></CountryMenu>
                         ) : selectedMenu == "filter" ? (
                             <div className="flex flex-col gap-4">
                                 <h2>Filter Notams</h2>
@@ -119,10 +136,12 @@ function CountryMenu({
     country,
     onCountryChange,
     countries,
+    fullNotamData,
 }: {
     country: string | null;
     onCountryChange: (country: string) => void;
     countries: string[];
+    fullNotamData: NotamData | null;
 }) {
     const [searchContent, setSearchContent] = useState("");
 
@@ -137,8 +156,18 @@ function CountryMenu({
             <h2>Select Country</h2>
             <div className="my-2">
                 {country ? (
-                    <>
-                        <b>{country}</b>
+                    <div className="flex flex-col gap-2">
+                        <h3 className="flex justify-between">
+                            {country}
+                            <div>
+                                <img
+                                    className="w-10 border border-black select-none"
+                                    src={"flags/" + reversedCountryCodes[country]?.toLowerCase() + ".svg"}
+                                    alt="?"
+                                    draggable={false}
+                                />
+                            </div>
+                        </h3>
                         <div className="flex gap-4">
                             {country && (countryData as any)[country]?.AIPLinks.allProducts && (
                                 <a href={(countryData as any)[country].AIPLinks.allProducts} target="_blank">
@@ -150,13 +179,24 @@ function CountryMenu({
                                     Online AIP
                                 </a>
                             )}
-                            {country && !(countryData as any)[country] && (
-                                <a href="https://www.ead.eurocontrol.int/cms-eadbasic/opencms/en/login/ead-basic/" target="_blank">
-                                    Eurocontrol EAD (Online AIP)
-                                </a>
-                            )}
                         </div>
-                    </>
+                        <div>
+                            <table>
+                                <tr>
+                                    <td className="border border-gray-700 px-2">Last Updated</td>
+                                    <td className="border border-gray-700 px-2">{fullNotamData?.version}</td>
+                                </tr>
+                                <tr>
+                                    <td className="border border-gray-700 px-2">NOTAMs</td>
+                                    <td className="border border-gray-700 px-2">{fullNotamData?.notams.length}</td>
+                                </tr>
+                                <tr>
+                                    <td className="border border-gray-700 px-2">Parsed Coordinates</td>
+                                    <td className="border border-gray-700 px-2">{fullNotamData?.coordinatesLists.length}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
                 ) : (
                     <p>Select a country below for more information.</p>
                 )}

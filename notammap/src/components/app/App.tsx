@@ -64,7 +64,7 @@ export default function App() {
                     <div className="p-4 rounded-md bg-white w-80" style={boxShadowStyle} ref={sideMenuHeaderRef}>
                         <h2>Notam Map {appData.country}</h2>
                         <p>
-                            NOTAMS: {appData.displayedNotamData.notams.length} / {appData.loadedNotams}
+                            NOTAMS: {appData.displayedNotamData.notams.length} / {appData.loadedNotamData?.notams.length ?? 0}
                         </p>
                     </div>
                 }
@@ -78,6 +78,7 @@ export default function App() {
                             menuOpen={menuOpen}
                             setMenuOpen={setMenuOpen}
                             height={`calc(100vh - ${headerHeight + 32 * 3 + 8}px)`}
+                            fullNotamData={appData.loadedNotamData}
                         ></SideMenu>
                     </div>
                 }

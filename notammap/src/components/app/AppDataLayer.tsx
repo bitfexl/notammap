@@ -21,8 +21,8 @@ const EMPTY_NOTAM_DATA = { version: "0.0", notams: [], coordinatesLists: [] };
 
 export interface AppData {
     country: string | null;
+    loadedNotamData: NotamData | null;
     displayedNotamData: NotamData;
-    loadedNotams: number;
     mapCordsAndZoom: LocalStorage.Types.MapCordsAndZoom;
     filterOptions: NotamFilterOptions;
     setCountry: (country: string) => void;
@@ -83,7 +83,7 @@ export function AppDataLayer({ onDataChange }: AppDataLayerProps) {
         console.log("Updating app data...");
         onDataChange({
             country,
-            loadedNotams: notamData?.notams.length ?? 0,
+            loadedNotamData: notamData,
             displayedNotamData,
             mapCordsAndZoom,
             setCountry: onCountryChange,
