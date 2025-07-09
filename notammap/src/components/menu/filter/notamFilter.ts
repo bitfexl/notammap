@@ -87,23 +87,28 @@ function filterWithFilter(notamData: NotamData, notamFilter: NotamFilter): Notam
 }
 
 export function createFilter(options: NotamFilterOptions): NotamFilter {
+    // TODO: filter should only filter out items which are known to NOT be relevant, if information is missing for filtering then the notam should be included
     return function (detailedNoatm: DetailedNotam) {
         const notam = detailedNoatm.notam;
 
+        if (notam.traffic == null) {
+            console.log(notam);
+        }
+
         // Traffic
-        if (!anyMatch(options.TRAFFIC, notam.traffic)) {
+        if (!anyMatch(options.TRAFFIC, notam.traffic ?? [])) {
             console.log("No match: Traffic", notam);
             return false;
         }
 
         // Purpose
-        if (!anyMatch(options.PURPOSE, notam.purposes)) {
+        if (!anyMatch(options.PURPOSE, notam.purposes ?? [])) {
             console.log("No match: Purpose", notam);
             return false;
         }
 
         // Scope
-        if (!anyMatch(options.SCOPE, notam.scopes)) {
+        if (!anyMatch(options.SCOPE, notam.scopes ?? [])) {
             console.log("No match: Scope", notam);
             return false;
         }

@@ -19,9 +19,9 @@ export interface Coordinates {
 export interface DetailedNotam {
     notam: Notam;
     id: number;
-    previousNotamId: number;
-    textNodes: TextNode[];
-    activePeriods: Period[];
+    previousNotamId?: number;
+    textNodes?: TextNode[];
+    activePeriods?: Period[];
 }
 
 export interface Period {}
@@ -40,32 +40,32 @@ export interface Reference {
 
 export interface Notam {
     raw: string;
-    series: string;
-    number: string;
-    year: number;
-    type: NotamType;
-    previousNotam: Notam;
-    fir: string;
-    notamCode: string;
-    traffic: Traffic[];
-    purposes: NotamPurpose[];
-    scopes: NotamScope[];
-    qLower: number;
-    qUpper: number;
-    latitude: number;
-    longitude: number;
-    radius: number;
-    locationIndicators: string[];
-    from: string;
-    to: string;
-    isPermanent: boolean;
-    isEstimation: boolean;
-    schedule: string;
-    notamText: string;
-    lowerLimit: string;
-    upperLimit: string;
-    created: string;
-    source: string;
+    series?: string;
+    number?: string;
+    year?: number;
+    type?: NotamType;
+    previousNotam?: Notam;
+    fir?: string;
+    notamCode?: string;
+    traffic?: Traffic[];
+    purposes?: NotamPurpose[];
+    scopes?: NotamScope[];
+    qLower?: number;
+    qUpper?: number;
+    latitude?: number;
+    longitude?: number;
+    radius?: number;
+    locationIndicators?: string[];
+    from?: string;
+    to?: string;
+    isPermanent?: boolean;
+    isEstimation?: boolean;
+    schedule?: string;
+    notamText?: string;
+    lowerLimit?: string;
+    upperLimit?: string;
+    created?: string;
+    source?: string;
 }
 
 export type NotamType = "NEW" | "REPLACE" | "CANCEL";
