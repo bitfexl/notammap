@@ -37,7 +37,11 @@ public class Main {
             final List<ICAOLocation> filteredLocations = allLocations.stream().filter(loc -> loc.country().equalsIgnoreCase(countryName)).toList();
 
             try {
-                writer.writeValue(new File(countryName.replace(" ", "_") + ".json"), generateNotamsJson(filteredLocations));
+                final NotamData data = generateNotamsJson(filteredLocations);
+                if (data.notams().isEmpty()) {
+                    continue;
+                }
+                writer.writeValue(new File(countryName.replace(" ", "_") + ".json"), data);
                 successfulCountries.add(countryName);
             } catch (Exception ex) {
                 System.err.println("Error querying notams for " + countryName + ".");

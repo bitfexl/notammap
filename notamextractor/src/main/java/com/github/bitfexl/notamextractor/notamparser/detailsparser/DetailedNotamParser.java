@@ -9,6 +9,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+// todo: add date of query
+
 public class DetailedNotamParser {
     private static final String NOTAM_DATA_VERSION = "1.0";
     private static final byte ID_VERSION = 1;
