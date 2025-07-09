@@ -163,7 +163,7 @@ export function NotamFilterOptionsSelector({ onChange, options }: NotamFilterOpt
                 <select
                     value={options.DATE.DAYS}
                     onChange={(d) => updateDate(parseInt(d.target.value), null, null)}
-                    className="rounded-md border-2 border-gray-700 h-8 p-1"
+                    className="rounded-md border border-gray-700 h-8 p-1"
                 >
                     <option value={1}>Today</option>
                     <option value={7}>Next 7 days</option>
@@ -178,7 +178,7 @@ export function NotamFilterOptionsSelector({ onChange, options }: NotamFilterOpt
                         type="date"
                         value={options.DATE.FROM}
                         onChange={(f) => updateDate(null, f.target.value, null)}
-                        className="rounded-md border-2 border-gray-700 h-8 p-1"
+                        className="rounded-md border border-gray-700 h-8 p-1"
                     />
                 </label>
                 <label className="flex">
@@ -187,7 +187,7 @@ export function NotamFilterOptionsSelector({ onChange, options }: NotamFilterOpt
                         type="date"
                         value={options.DATE.TO}
                         onChange={(t) => updateDate(null, null, t.target.value)}
-                        className="rounded-md border-2 border-gray-700 h-8 p-1"
+                        className="rounded-md border border-gray-700 h-8 p-1"
                     />
                 </label>
             </div>
