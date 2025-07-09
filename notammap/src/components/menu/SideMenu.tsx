@@ -222,10 +222,10 @@ function CountryMenu({
             <div className="flex flex-col gap-2">
                 {filteredCountries.map((country) => (
                     <button key={country} className="flex justify-between" onClick={() => onCountryChange(country)}>
-                        <h3>{country}</h3>
+                        <h3 className="pl-2">{country}</h3>
                         <div>
                             <img
-                                className="w-10 border border-black select-none"
+                                className="w-10 border border-black select-none mr-1"
                                 src={"flags/" + reversedCountryCodes[country]?.toLowerCase() + ".svg"}
                                 alt="?"
                                 draggable={false}
