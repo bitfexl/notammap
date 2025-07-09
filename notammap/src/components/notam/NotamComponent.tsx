@@ -60,21 +60,25 @@ export function NotamComponent({ detailedNotam }: NotamComponentProps) {
             <>{notamIdText}</>
         );
 
-    const locationInformation = notam.locationIndicators ? (
-        <>
-            Location{notam.locationIndicators.length > 1 ? "s" : ""}:{" "}
-            <span className="font-mono font-semibold">{notam.locationIndicators.join(", ")}</span>
-            {notam.locationIndicators.includes(notam.fir ?? "NOT_A_VALID_FIR") ? (
-                <> (FIR)</>
+    const locationInformation = (
+        <div className="flex flex-col gap-1">
+            <b>Location{(notam.locationIndicators?.length ?? 0) > 1 ? "s" : ""}</b>
+            {notam.locationIndicators ? (
+                <div>
+                    <span className="font-mono font-semibold">{notam.locationIndicators.join(", ")}</span>
+                    {notam.locationIndicators.includes(notam.fir ?? "NOT_A_VALID_FIR") ? (
+                        <> (FIR)</>
+                    ) : (
+                        <>
+                            <span className="pl-4"></span>
+                            FIR: <span className="font-mono">{notam.fir}</span>
+                        </>
+                    )}
+                </div>
             ) : (
-                <>
-                    <span className="pl-4"></span>
-                    FIR: <span className="font-mono">{notam.fir}</span>
-                </>
+                <>{dataMissingText}</>
             )}
-        </>
-    ) : (
-        <>Location {dataMissingText}</>
+        </div>
     );
 
     const heightInformation =
