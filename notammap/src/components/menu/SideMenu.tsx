@@ -182,18 +182,20 @@ function CountryMenu({
                         </div>
                         <div>
                             <table>
-                                <tr>
-                                    <td className="border border-gray-700 px-2">Last Updated</td>
-                                    <td className="border border-gray-700 px-2">{fullNotamData?.version}</td>
-                                </tr>
-                                <tr>
-                                    <td className="border border-gray-700 px-2">NOTAMs</td>
-                                    <td className="border border-gray-700 px-2">{fullNotamData?.notams.length}</td>
-                                </tr>
-                                <tr>
-                                    <td className="border border-gray-700 px-2">Parsed Coordinates</td>
-                                    <td className="border border-gray-700 px-2">{fullNotamData?.coordinatesLists.length}</td>
-                                </tr>
+                                <tbody>
+                                    <tr>
+                                        <td className="border border-gray-700 px-2">Last Updated</td>
+                                        <td className="border border-gray-700 px-2">{fullNotamData?.version}</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="border border-gray-700 px-2">NOTAMs</td>
+                                        <td className="border border-gray-700 px-2">{fullNotamData?.notams.length}</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="border border-gray-700 px-2">Parsed Coordinates</td>
+                                        <td className="border border-gray-700 px-2">{fullNotamData?.coordinatesLists.length}</td>
+                                    </tr>
+                                </tbody>
                             </table>
                         </div>
                     </div>
