@@ -140,21 +140,24 @@ function updateNotams(
     //                          lat         lng     notams
     const notamGroups = new Map<number, Map<number, DetailedNotam[]>>();
 
+    // TODO: properly handle when latitude or longitude are missing (display to user)
+    // DOES HAPPEN e.g. with some notams in canada
+
     for (const detailedNotam of notams) {
         const notam = detailedNotam.notam;
 
-        let lngMap = notamGroups.get(notam.latitude);
+        let lngMap = notamGroups.get(notam.latitude ?? 0);
 
         if (lngMap == null) {
             lngMap = new Map();
-            notamGroups.set(notam.latitude, lngMap);
+            notamGroups.set(notam.latitude ?? 0, lngMap);
         }
 
-        let filteredNotams = lngMap.get(notam.longitude);
+        let filteredNotams = lngMap.get(notam.longitude ?? 0);
 
         if (filteredNotams == null) {
             filteredNotams = [];
-            lngMap.set(notam.longitude, filteredNotams);
+            lngMap.set(notam.longitude ?? 0, filteredNotams);
         }
 
         filteredNotams.push(detailedNotam);

@@ -35,8 +35,9 @@ export const renderCoordinates: CoordinatesRenderer = function (cooridnatesList:
 };
 
 export const renderNotams: NotamRenderer = function (detailedNotams: DetailedNotam[], onClick: () => void): L.Layer {
-    const latlng: L.LatLngTuple = [detailedNotams[0].notam.latitude, detailedNotams[0].notam.longitude];
-    const radius = detailedNotams[0].notam.radius * NM_TO_M; // TODO: use max radius of all notams
+    // TODO: properly handle when radius or latitude/longitude are missing, display to user
+    const latlng: L.LatLngTuple = [detailedNotams[0].notam.latitude ?? 0, detailedNotams[0].notam.longitude ?? 0];
+    const radius = (detailedNotams[0].notam.radius ?? 0) * NM_TO_M; // TODO: use max radius of all notams
 
     const marker = L.marker(latlng, {
         icon: renderIcon("lightgray", "" + detailedNotams.length),

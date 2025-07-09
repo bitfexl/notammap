@@ -9,6 +9,8 @@ export interface NotamComponentProps {
     detailedNotam: DetailedNotam;
 }
 
+const dataMissingText = "not specified";
+
 export function NotamComponent({ detailedNotam }: NotamComponentProps) {
     const [showRaw, setShowRaw] = useState(false);
 
@@ -33,17 +35,24 @@ export function NotamComponent({ detailedNotam }: NotamComponentProps) {
         );
     }
 
-    const notamId = notam.series + notam.number + "/" + (notam.year - 2000);
-    const notamIdText = <span className="font-mono text-sm">{notamId}</span>;
+    let notamIdText = <span className="font-mono text-sm">Notam id {dataMissingText}</span>;
+    try {
+        const notamId = notam.series! + notam.number + "/" + (notam.year! - 2000);
+        notamIdText = <span className="font-mono text-sm">{notamId}</span>;
+    } catch {}
 
     const headerInformation =
         notam.type == "REPLACE" ? (
             <>
                 {notamIdText} replaces{" "}
-                <span className="font-mono text-sm">
-                    {notam.previousNotam.series}
-                    {notam.previousNotam.number}/{notam.previousNotam.year - 2000}
-                </span>
+                {notam.previousNotam ? (
+                    <span className="font-mono text-sm">
+                        {notam.previousNotam.series}
+                        {notam.previousNotam.number}/{(notam.previousNotam.year ?? 2000) - 2000}
+                    </span>
+                ) : (
+                    dataMissingText
+                )}
             </>
         ) : notam.type == "CANCEL" ? (
             <>Cancels {notamIdText}</>
@@ -51,11 +60,11 @@ export function NotamComponent({ detailedNotam }: NotamComponentProps) {
             <>{notamIdText}</>
         );
 
-    const locationInformation = (
+    const locationInformation = notam.locationIndicators ? (
         <>
             Location{notam.locationIndicators.length > 1 ? "s" : ""}:{" "}
             <span className="font-mono font-semibold">{notam.locationIndicators.join(", ")}</span>
-            {notam.locationIndicators.includes(notam.fir) ? (
+            {notam.locationIndicators.includes(notam.fir ?? "NOT_A_VALID_FIR") ? (
                 <> (FIR)</>
             ) : (
                 <>
@@ -64,6 +73,8 @@ export function NotamComponent({ detailedNotam }: NotamComponentProps) {
                 </>
             )}
         </>
+    ) : (
+        <>Location {dataMissingText}</>
     );
 
     const heightInformation =
@@ -88,9 +99,9 @@ export function NotamComponent({ detailedNotam }: NotamComponentProps) {
         <>Permanent</>
     ) : (
         <>
-            From {new Date(notam.from).toLocaleString()}
+            From {notam.from ? new Date(notam.from).toLocaleString() : dataMissingText}
             <br />
-            To {new Date(notam.to).toLocaleString()} local time
+            To {notam.to ? new Date(notam.to).toLocaleString() : dataMissingText} local time
             {notam.isEstimation && " (estimation)"}
         </>
     );
@@ -101,7 +112,7 @@ export function NotamComponent({ detailedNotam }: NotamComponentProps) {
         <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-1">
                 <div className="flex justify-between">
-                    <b>{toText(notam.notamCode)}</b>
+                    <b>{notam.notamCode ? toText(notam.notamCode) : "NOTAM code " + dataMissingText}</b>
                     <button
                         className="linklike pr-2"
                         onClick={(e) => {
@@ -125,14 +136,18 @@ export function NotamComponent({ detailedNotam }: NotamComponentProps) {
             {!isChecklist && (
                 <div className="flex flex-col">
                     <b>Affected Traffic</b>
-                    <span className="font-mono">{notam.traffic.join(", ")}</span>
+                    <span className="font-mono">{notam.traffic ? notam.traffic.join(", ") : dataMissingText}</span>
                 </div>
             )}
 
             <div className="flex flex-col gap-1">
                 <b>NOTAM text</b>
                 <div>
-                    <FormattedNotamText textNodes={detailedNotam.textNodes}></FormattedNotamText>
+                    {detailedNotam.textNodes ? (
+                        <FormattedNotamText textNodes={detailedNotam.textNodes}></FormattedNotamText>
+                    ) : (
+                        notam.notamText ?? dataMissingText
+                    )}
                 </div>
             </div>
 

@@ -76,8 +76,8 @@ function filterWithFilter(notamData: NotamData, notamFilter: NotamFilter): Notam
 
     const containedHashes = notams
         .flatMap((n) => n.textNodes)
-        .filter((t) => t.reference?.coordinatesList != null)
-        .map((cr) => cr.reference?.coordinatesList);
+        .filter((t) => t && t.reference?.coordinatesList != null)
+        .map((cr) => cr && cr.reference?.coordinatesList);
 
     return {
         version: notamData.version,
@@ -115,7 +115,11 @@ export function createFilter(options: NotamFilterOptions): NotamFilter {
 
         // Q-Code
         // K... checklist filtered by scope, TODO: better for X use only first letter
-        if (!["K", "X"].includes(notam.notamCode[2]) && !startsWithAny(notam.notamCode.substring(1, 3), options.QCODES)) {
+        if (
+            notam.notamCode &&
+            !["K", "X"].includes(notam.notamCode[2]) &&
+            !startsWithAny(notam.notamCode.substring(1, 3), options.QCODES)
+        ) {
             console.log("No match: QCode", notam);
             return false;
         }
