@@ -1,0 +1,8 @@
+name: notam-map
+
+services:
+  webserver:
+    build: ./notammap
+    ports:
+      - "8080:80"
+
