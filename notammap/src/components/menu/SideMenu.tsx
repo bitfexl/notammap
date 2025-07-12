@@ -110,21 +110,34 @@ export function SideMenu({
             {menuOpen && (
                 <div className="min-w-[320px]">
                     <LeftSidePanel height={height}>
-                        {selectedMenu == "country" ? (
-                            <CountryMenu
-                                country={country}
-                                countries={countries}
-                                onCountryChange={onCountryChange}
-                                fullNotamData={fullNotamData}
-                            ></CountryMenu>
-                        ) : selectedMenu == "filter" ? (
-                            <div className="flex flex-col gap-4">
-                                <h2>Filter Notams</h2>
-                                <NotamFilterOptionsSelector options={filter} onChange={onFilterChange}></NotamFilterOptionsSelector>
+                        <div className="h-full flex flex-col justify-between gap-6">
+                            <div>
+                                {selectedMenu == "country" ? (
+                                    <CountryMenu
+                                        country={country}
+                                        countries={countries}
+                                        onCountryChange={onCountryChange}
+                                        fullNotamData={fullNotamData}
+                                    ></CountryMenu>
+                                ) : selectedMenu == "filter" ? (
+                                    <div className="flex flex-col gap-4">
+                                        <h2>Filter Notams</h2>
+                                        <NotamFilterOptionsSelector options={filter} onChange={onFilterChange}></NotamFilterOptionsSelector>
+                                    </div>
+                                ) : (
+                                    'No content for "' + selectedMenu + '"'
+                                )}
                             </div>
-                        ) : (
-                            'No content for "' + selectedMenu + '"'
-                        )}
+
+                            <div className="text-center p-2">
+                                <hr />
+                                <div className="pt-4">
+                                    <a href="about.html">about</a>
+                                    <span className="px-2 select-none">•</span>
+                                    <a href="#">link 2</a>
+                                </div>
+                            </div>
+                        </div>
                     </LeftSidePanel>
                 </div>
             )}
