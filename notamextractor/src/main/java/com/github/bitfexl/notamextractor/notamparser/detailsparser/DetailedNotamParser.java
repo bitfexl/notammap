@@ -3,6 +3,7 @@ package com.github.bitfexl.notamextractor.notamparser.detailsparser;
 import com.github.bitfexl.notamextractor.notamparser.Notam;
 import com.github.bitfexl.notamextractor.notamparser.detailsparser.data.*;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -42,6 +43,7 @@ public class DetailedNotamParser {
 
         return new NotamData(
                 NOTAM_DATA_VERSION,
+                Instant.now().toString(),
                 detailedNotams.values().stream().toList(),
                 coordinates.values().stream().toList()
         );
