@@ -1,5 +1,7 @@
 FROM maven:3-eclipse-temurin-21 AS build-app
 WORKDIR /build
+COPY pom.xml .
+RUN mvn dependency:go-offline
 COPY . .
 RUN mvn package
 RUN mv /build/target/notamextractor.jar /app.jar
@@ -8,8 +10,9 @@ RUN mv /build/target/notamextractor.jar /app.jar
 FROM eclipse-temurin:21 AS build-jre
 WORKDIR /build
 COPY --from=build-app /app.jar .
+# jdk.crypto.ec module for ssl https://stackoverflow.com/a/55517159/30915739
 RUN $JAVA_HOME/bin/jlink \
-         --add-modules $($JAVA_HOME/bin/jdeps --ignore-missing-deps --print-module-deps app.jar) \
+         --add-modules jdk.crypto.ec,$($JAVA_HOME/bin/jdeps --ignore-missing-deps --print-module-deps app.jar) \
          --strip-debug \
          --no-man-pages \
          --no-header-files \
@@ -18,7 +21,8 @@ RUN $JAVA_HOME/bin/jlink \
 
 FROM debian:12-slim
 WORKDIR /
-RUN apt update -y && apt install ca-certificates -y
 COPY --from=build-jre /javaruntime /javaruntime
 COPY --from=build-app /app.jar .
-CMD ["/javaruntime/bin/java", "-jar", "app.jar"]
+WORKDIR /data
+VOLUME /data
+CMD ["/javaruntime/bin/java", "-jar", "/app.jar"]
