@@ -14,7 +14,6 @@ import lombok.SneakyThrows;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Main {
@@ -28,7 +27,8 @@ public class Main {
         final List<ICAOLocation> allLocations = loadLocationJsonIndex();
 
 //        final List<String> countries = Arrays.stream(args).map(c -> c.replace("_", " ")).toList();
-        final List<String> countries = allLocations.stream().map(ICAOLocation::country).distinct().toList();
+        // ignore united states countries as us notam format currently is not supported
+        final List<String> countries = allLocations.stream().map(ICAOLocation::country).distinct().filter(c -> !c.startsWith("United States")).toList();
         final List<String> successfulCountries = new ArrayList<>();
 
         final ObjectWriter writer = objectMapper.writerWithDefaultPrettyPrinter();
