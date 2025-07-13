@@ -5,4 +5,18 @@ services:
     build: ./notammap
     ports:
       - "8080:80"
+    volumes:
+      - type: volume
+        source: notamdata
+        target: /usr/local/apache2/htdocs/notamdata
+        read_only: true
+        volume:
+          nocopy: true
 
+  extractor:
+    build: ./notamextractor
+    volumes:
+      - notamdata:/data
+
+volumes:
+  notamdata:
