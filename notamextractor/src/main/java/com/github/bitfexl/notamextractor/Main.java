@@ -16,6 +16,8 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+// TODO: do not write files with special characters (if country name contains some)
+
 public class Main {
     private static final DinsQuery dinsQuery = new DinsQuery();
     private static final ObjectMapper objectMapper = new ObjectMapper().setSerializationInclusion(Include.NON_NULL);
