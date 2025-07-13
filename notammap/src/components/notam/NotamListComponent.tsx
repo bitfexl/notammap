@@ -9,6 +9,8 @@ export interface NotamListComponentProps {
     detailedNotams: DetailedNotam[];
 }
 
+// TODO: show if notam has been replaced by new one (link to new notam)
+
 export function NotamListComponent({ detailedNotams }: NotamListComponentProps) {
     const [notamIndex, setNotamIndex] = useState(0);
 
