@@ -17,7 +17,7 @@ addEventListener(LEAFLET_MAP_EVENT, (event: LeafletMapEvent) => {
     localStorage.setItem(LocalStorage.Keys.MAP_CORDS_AND_ZOOM, JSON.stringify(cordsAndZoom));
 });
 
-const EMPTY_NOTAM_DATA = { version: "0.0", notams: [], coordinatesLists: [] };
+const EMPTY_NOTAM_DATA = { version: "0.0", notams: [], coordinatesLists: [], date: "" };
 
 export interface AppData {
     /**

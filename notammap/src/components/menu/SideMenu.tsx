@@ -189,15 +189,19 @@ function CountryMenu({
                                 <tbody>
                                     <tr>
                                         <td className="border border-gray-700 px-2">Last Updated</td>
-                                        <td className="border border-gray-700 px-2">{fullNotamData?.version}</td>
+                                        <td className="border border-gray-700 px-2">
+                                            {!fullNotamData?.date || fullNotamData?.date.length == 0
+                                                ? "?"
+                                                : new Date(fullNotamData?.date).toLocaleDateString()}
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td className="border border-gray-700 px-2">NOTAMs</td>
-                                        <td className="border border-gray-700 px-2">{fullNotamData?.notams.length}</td>
+                                        <td className="border border-gray-700 px-2">{fullNotamData?.notams.length ?? "?"}</td>
                                     </tr>
                                     <tr>
                                         <td className="border border-gray-700 px-2">Parsed Coordinates</td>
-                                        <td className="border border-gray-700 px-2">{fullNotamData?.coordinatesLists.length}</td>
+                                        <td className="border border-gray-700 px-2">{fullNotamData?.coordinatesLists.length ?? "?"}</td>
                                     </tr>
                                 </tbody>
                             </table>

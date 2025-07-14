@@ -4,6 +4,7 @@ export interface NotamData {
     version: "1.0" | string;
     notams: DetailedNotam[];
     coordinatesLists: CoordinatesList[];
+    date: string;
 }
 
 export interface CoordinatesList {

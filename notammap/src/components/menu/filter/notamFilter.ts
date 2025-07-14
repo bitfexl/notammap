@@ -83,6 +83,7 @@ function filterWithFilter(notamData: NotamData, notamFilter: NotamFilter): Notam
         version: notamData.version,
         notams,
         coordinatesLists: notamData.coordinatesLists.filter((cl) => containedHashes.includes(cl.hash)),
+        date: notamData.date,
     };
 }
 
