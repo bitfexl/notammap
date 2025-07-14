@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import { NotamListComponent } from "../../notam/NotamListComponent";
 import { CoordinatesRenderer, NotamRenderer } from "./notamMapRenderers";
 import countryCenterData from "../../../assets/countryCenterData.json";
+import { reversedCountryCodes } from "../../../assets/computedAssets";
 
 export interface NotamMapProps {
     /**
@@ -231,7 +232,12 @@ function createSelectCountryLayer(countries: string[], currentCountry: string | 
         if (!center) {
             continue;
         }
-        const marker = L.marker(center);
+        const marker = L.marker(center, {
+            icon: L.icon({
+                iconUrl: "flags/" + reversedCountryCodes[country]?.toLowerCase() + ".svg",
+                iconSize: [32, null!],
+            }),
+        });
         marker.on("click", () => onClick(country));
         layer.addLayer(marker);
     }

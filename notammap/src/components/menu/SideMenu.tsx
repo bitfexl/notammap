@@ -14,19 +14,11 @@ import toolIcon from "../../assets/icons/tool.svg?raw";
 import searchIcon from "../../assets/icons/search.svg?raw";
 
 import { useLocalStorage } from "../../hooks/useLocalStorage";
-import countryCodes from "../../assets/countryCodes.json";
 import { SVGIcon } from "../icons/SVGIcon";
 import { LocalStorage } from "../app/appConstants";
 import { LeftSidePanel } from "../panel/LeftSidePanel";
 import { NotamData } from "../../api/notams/notamextractor";
-
-const reversedCountryCodes = (() => {
-    const object: any = {};
-    for (const code of Object.keys(countryCodes)) {
-        object[(countryCodes as any)[code]] = code;
-    }
-    return object;
-})();
+import { reversedCountryCodes } from "../../assets/computedAssets";
 
 export interface SideMenuProps {
     filter: NotamFilterOptions;
@@ -154,6 +146,8 @@ function CountryMenu({
     fullNotamData: NotamData | null;
 }) {
     const [searchContent, setSearchContent] = useState("");
+
+    // TODO: add favorites
 
     // TODO: optimize
     const lowercaseSearchContent = searchContent.toLowerCase();
