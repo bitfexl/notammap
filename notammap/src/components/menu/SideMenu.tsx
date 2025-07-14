@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { NotamFilterOptionsSelector } from "./filter/NotamFilterOptionsSelector";
 import countryData from "../../assets/CountryData.json";
 import { NotamFilterOptions } from "./filter/notamFilter";
-import { fetchCountries } from "../../api/notams/notamFetch";
 import { IconButton } from "../form/IconButton";
 
 import filterIcon from "../../assets/icons/filter.svg?raw";
@@ -53,6 +52,11 @@ export interface SideMenuProps {
     setMenuOpen: (open: boolean) => void;
 
     height: string;
+
+    /**
+     * Available countries to select.
+     */
+    countries: string[];
 }
 
 type MenuType = "country" | "filter" | "notam" | "saved" | "tools";
@@ -66,21 +70,14 @@ export function SideMenu({
     setMenuOpen,
     height,
     fullNotamData,
+    countries,
 }: SideMenuProps) {
-    const [countries, setCountries] = useState<string[]>([]);
-
     const [selectedMenu, _setSelectedMenu] = useLocalStorage<MenuType>("country", LocalStorage.Keys.MENU_SELECTED);
 
     function setSelectedMenu(menu: MenuType) {
         _setSelectedMenu(menu);
         setMenuOpen(true);
     }
-
-    useEffect(() => {
-        (async () => {
-            setCountries((await fetchCountries()).sort());
-        })();
-    }, []);
 
     return (
         <div className="flex flex-col gap-2 w-full">

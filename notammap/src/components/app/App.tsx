@@ -57,6 +57,9 @@ export default function App() {
                             notamData={appData.displayedNotamData}
                             onCooridnatesClick={onCoordinatesClick}
                             onNotamsClick={onNotamsClick}
+                            countries={appData.countries}
+                            onCountryClick={appData.setCountry}
+                            currentCountry={appData.country}
                         ></MemoMap>
                     </div>
                 }
@@ -79,6 +82,7 @@ export default function App() {
                             setMenuOpen={setMenuOpen}
                             height={`calc(100vh - ${headerHeight + 32 * 3 + 8}px)`}
                             fullNotamData={appData.loadedNotamData}
+                            countries={appData.countries}
                         ></SideMenu>
                     </div>
                 }
@@ -102,6 +106,9 @@ const MemoMap = memo(function ({
     newZoom,
     onNotamsClick,
     onCooridnatesClick,
+    countries,
+    onCountryClick,
+    currentCountry,
 }: {
     mapId: string;
     notamData: NotamData;
@@ -109,6 +116,9 @@ const MemoMap = memo(function ({
     newZoom: number;
     onNotamsClick: (notams: DetailedNotam[]) => boolean;
     onCooridnatesClick: (coordinates: CoordinatesList) => void;
+    countries: string[];
+    onCountryClick: (country: string) => void;
+    currentCountry: string | null;
 }) {
     return (
         <NotamMap
@@ -120,6 +130,9 @@ const MemoMap = memo(function ({
             newZoom={newZoom}
             onNotamsClick={onNotamsClick}
             onCooridnatesClick={onCooridnatesClick}
+            countries={countries}
+            onCountryClick={onCountryClick}
+            currentCountry={currentCountry}
         ></NotamMap>
     );
 });

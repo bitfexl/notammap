@@ -4,7 +4,7 @@ import { LEAFLET_MAP_EVENT, LeafletMapEvent } from "../map/LeafletMap";
 import { defaultFilterOptions, filterNotamData, NotamFilterOptions } from "../menu/filter/notamFilter";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { NotamData } from "../../api/notams/notamextractor";
-import { fetchNotamData } from "../../api/notams/notamFetch";
+import { fetchCountries, fetchNotamData } from "../../api/notams/notamFetch";
 import countryCenterData from "../../assets/countryCenterData.json";
 
 // add event listener to update cords and zoom if user changed it
@@ -20,12 +20,37 @@ addEventListener(LEAFLET_MAP_EVENT, (event: LeafletMapEvent) => {
 const EMPTY_NOTAM_DATA = { version: "0.0", notams: [], coordinatesLists: [] };
 
 export interface AppData {
+    /**
+     * Available countries.
+     */
+    countries: string[];
+    /**
+     * Selected country.
+     */
     country: string | null;
+    /**
+     * Notamdata for selected country.
+     */
     loadedNotamData: NotamData | null;
+    /**
+     * Filtered notamdata for selected country.
+     */
     displayedNotamData: NotamData;
+    /**
+     * Map coordinates if changed for zoom to country.
+     */
     mapCordsAndZoom: LocalStorage.Types.MapCordsAndZoom;
+    /**
+     * Current filter options.
+     */
     filterOptions: NotamFilterOptions;
+    /**
+     * Change current country.
+     */
     setCountry: (country: string) => void;
+    /**
+     * Change current filter options.
+     */
     setFilterOptions: (filter: NotamFilterOptions) => void;
 }
 
@@ -34,6 +59,8 @@ export interface AppDataLayerProps {
 }
 
 export function AppDataLayer({ onDataChange }: AppDataLayerProps) {
+    const [countries, setCountries] = useState<string[]>([]);
+
     // cords and zoom only to update map (fly to) does not necessarily represent the actual current cords or zoom (user changed it)
     // persistence is achieved with the leaflet map event the contents of which are directly written to local storage for availability after reload
     // see above event listener
@@ -47,6 +74,38 @@ export function AppDataLayer({ onDataChange }: AppDataLayerProps) {
 
     const [notamData, setNotamData] = useState<NotamData | null>(null);
     const [displayedNotamData, setDisplayedNotamData] = useState<NotamData>(EMPTY_NOTAM_DATA);
+
+    useEffect(() => {
+        (async () => {
+            setCountries((await fetchCountries()).sort());
+        })();
+    }, []);
+
+    useEffect(() => {
+        if (country) {
+            onCountryChange(country, true);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (notamData != null) {
+            setDisplayedNotamData(filterNotamData(notamData, filter));
+        }
+    }, [notamData, filter]);
+
+    useEffect(() => {
+        console.log("Updating app data...");
+        onDataChange({
+            countries,
+            country,
+            loadedNotamData: notamData,
+            displayedNotamData,
+            mapCordsAndZoom,
+            setCountry: onCountryChange,
+            setFilterOptions: setFilter,
+            filterOptions: filter,
+        });
+    }, [country, displayedNotamData, mapCordsAndZoom, countries]);
 
     async function onCountryChange(country: string, isInitialChange = false) {
         const newNotamData = await fetchNotamData(country);
@@ -66,31 +125,6 @@ export function AppDataLayer({ onDataChange }: AppDataLayerProps) {
             );
         }
     }
-
-    useEffect(() => {
-        if (country) {
-            onCountryChange(country, true);
-        }
-    }, []);
-
-    useEffect(() => {
-        if (notamData != null) {
-            setDisplayedNotamData(filterNotamData(notamData, filter));
-        }
-    }, [notamData, filter]);
-
-    useEffect(() => {
-        console.log("Updating app data...");
-        onDataChange({
-            country,
-            loadedNotamData: notamData,
-            displayedNotamData,
-            mapCordsAndZoom,
-            setCountry: onCountryChange,
-            setFilterOptions: setFilter,
-            filterOptions: filter,
-        });
-    }, [country, displayedNotamData, mapCordsAndZoom]);
 
     return null;
 }

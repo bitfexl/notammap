@@ -5,6 +5,7 @@ import { CoordinatesList, DetailedNotam, NotamData } from "../../../api/notams/n
 import { createPortal } from "react-dom";
 import { NotamListComponent } from "../../notam/NotamListComponent";
 import { CoordinatesRenderer, NotamRenderer } from "./notamMapRenderers";
+import countryCenterData from "../../../assets/countryCenterData.json";
 
 export interface NotamMapProps {
     /**
@@ -41,6 +42,22 @@ export interface NotamMapProps {
      * @param coordinates The clicked coordinates.
      */
     onCooridnatesClick: (coordinates: CoordinatesList) => void;
+
+    /**
+     * Available countries.
+     */
+    countries: string[];
+
+    /**
+     * The currently selected country.
+     */
+    currentCountry: string | null;
+
+    /**
+     * Called when a country marker is clicked.
+     * @param country The newly selected country.
+     */
+    onCountryClick: (country: string) => void;
 }
 
 export function NotamMap({
@@ -52,6 +69,9 @@ export function NotamMap({
     onNotamsClick,
     onCooridnatesClick,
     mapId,
+    countries,
+    currentCountry,
+    onCountryClick,
 }: NotamMapProps) {
     // set portal for the currently displayed notam
     const [portal, setPortal] = useState<ReactPortal>();
@@ -63,6 +83,20 @@ export function NotamMap({
     function initMap(map: L.Map) {
         mapRef.current = map;
     }
+
+    useEffect(() => {
+        const layer = createSelectCountryLayer(countries, currentCountry, onCountryClick);
+
+        if (mapRef.current) {
+            mapRef.current.addLayer(layer);
+        }
+
+        return () => {
+            if (mapRef.current) {
+                mapRef.current.removeLayer(layer);
+            }
+        };
+    }, [countries, onCountryClick]);
 
     useEffect(() => {
         if (mapRef.current != null) {
@@ -185,6 +219,23 @@ function updateNotams(
             displayedNotams.add(layer);
         }
     }
+}
+
+function createSelectCountryLayer(countries: string[], currentCountry: string | null, onClick: (country: string) => void): L.Layer {
+    const layer = L.layerGroup();
+    for (const country of countries) {
+        if (country == currentCountry) {
+            continue; // do not show marker for current country
+        }
+        const center = (countryCenterData as any)[country];
+        if (!center) {
+            continue;
+        }
+        const marker = L.marker(center);
+        marker.on("click", () => onClick(country));
+        layer.addLayer(marker);
+    }
+    return layer;
 }
 
 const maxZoom = 14;
