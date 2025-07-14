@@ -36,6 +36,7 @@ public class DinsQuery {
         }
 
         final Document document = Jsoup.connect(QUERY_API_URL)
+                .timeout(120_000)
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .requestBody(
                         "reportType=Raw&retrieveLocId=" +

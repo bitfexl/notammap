@@ -167,11 +167,17 @@ public class DetailedNotamParser {
     }
 
     private long computeId(Notam notam, String fir) {
-        return computeId(notam.getYear(), notam.getSeries(), notam.getNumber(), fir);
+        if (notam.getYear() == null || notam.getSeries() == null || notam.getNumber() == null || fir == null) {
+            return 0;
+        }
+        return computeId(notam.getYear(), notam.getSeries(), notam.getNumber(), fir, true);
     }
 
     private long computeId(Notam notam) {
-        return computeId(notam.getYear(), notam.getSeries(), notam.getNumber(), notam.getFir());
+        if (notam.getYear() == null || notam.getSeries() == null || notam.getNumber() == null || notam.getFir() == null) {
+            return 0;
+        }
+        return computeId(notam.getYear(), notam.getSeries(), notam.getNumber(), notam.getFir(), true);
     }
 
     /**
@@ -182,7 +188,7 @@ public class DetailedNotamParser {
      * @param fir The fir the notam was published in.
      * @return A unique id, always positive.
      */
-    private long computeId(int year, char series, int number, String fir) {
+    private long computeId(int year, char series, int number, String fir, boolean ignoreFirErrors) {
         // 1 byte id version, first bit reserved to stay positive
         // 1 + 1/2 byte year (to 4095)
         // 2 + 1/2 byte series + number
@@ -209,6 +215,10 @@ public class DetailedNotamParser {
 
         id = id << 15;
         id |= (number & 0x7fff);
+
+        if (ignoreFirErrors && fir.length() < 4) {
+            fir = "X".repeat(4 - fir.length()) + fir;
+        }
 
         if (fir.length() != 4) {
             throw new IllegalArgumentException("FIR must be a four letter string (uppercase, A-Z), but got '" + fir + "'.");

@@ -18,6 +18,11 @@ public class NotamParser {
     public Notam parse(final String rawNotam) {
         final Notam.NotamBuilder notam = Notam.builder().raw(rawNotam);
 
+        // us domestic notam format, not yet supported, only return raw
+        if (rawNotam.startsWith("!")) {
+            return notam.build();
+        }
+
         final String[] lines = rawNotam.split("\n", 2);
 
         if (lines.length != 2) {
@@ -139,27 +144,47 @@ public class NotamParser {
     }
 
     private void parseItemQ(Notam.NotamBuilder notam, String itemQ) {
-        // 8 fields separated by a stroke
-        String[] parts = itemQ.split("/");
+        itemQ = itemQ.trim();
 
-        notam.fir(parts[0].trim());
-        notam.notamCode(parts[1]);
-        if (!parts[2].isEmpty()) {
+        // 8 fields separated by a stroke
+        String[] parts = itemQ.split("/", -1);
+
+        // sometimes the items are also separated by space (no technically correct)
+        if (parts.length < 7 /* 8 but coordinates are often missing */) {
+            System.err.println("Got less than the required parts in Q line for notam:\n" + notam.build().getRaw());
+//            parts = itemQ.split("[/ ]", -1);
+            // TODO: try something when separated by space, causes errors
+        }
+
+        for (int i = 0; i < parts.length; i++) {
+            parts[i] = parts[i].trim();
+        }
+
+        // sometimes only the Q code is given
+        if (parts.length == 1 && parts[0].length() == 5 && parts[0].startsWith("Q")) {
+            notam.notamCode(parts[0].trim());
+        } else if (parts.length >= 1) {
+            notam.fir(parts[0].trim());
+        }
+        if (parts.length > 1) {
+            notam.notamCode(parts[1].trim());
+        }
+        if (parts.length > 2 && !parts[2].isEmpty()) {
             notam.traffic(Traffic.parse(parts[2]));
         }
-        if (!parts[3].isEmpty()) {
+        if (parts.length > 3 && !parts[3].isEmpty()) {
             notam.purposes(NotamPurpose.parse(parts[3]));
         }
-        if (!parts[4].isEmpty()) {
+        if (parts.length > 4 && !parts[4].isEmpty()) {
             notam.scopes(NotamScope.parse(parts[4]));
         }
-        if (!parts[5].isEmpty()) {
+        if (parts.length > 5 && !parts[5].isEmpty()) {
             notam.qLower(Integer.parseInt(parts[5]));
         }
-        if (!parts[6].isEmpty()) {
+        if (parts.length > 6 && !parts[6].isEmpty()) {
             notam.qUpper(Integer.parseInt(parts[6]));
         }
-        if (!parts[7].isEmpty()) {
+        if (parts.length > 7 && !parts[7].isEmpty()) {
             parseCordsItemQ(notam, parts[7]);
         }
     }
@@ -169,16 +194,19 @@ public class NotamParser {
     }
 
     private void parseItemB(Notam.NotamBuilder notam, String itemB) {
-        notam.from(parseDateTimeGroup(itemB));
+        // TODO: "WIE" ???
+        notam.from(parseDateTimeGroup(itemB.trim()));
     }
 
     private void parseItemC(Notam.NotamBuilder notam, String itemC) {
-        if (itemC.equalsIgnoreCase("PERM")) {
+        if (itemC.trim().equalsIgnoreCase("PERM")) {
             notam.isPermanent(true);
         } else {
-            notam.to(parseDateTimeGroup(itemC));
+            notam.to(parseDateTimeGroup(itemC.trim()));
             notam.isEstimation(itemC.contains("EST"));
         }
+
+        // TODO: although explicitly forbidden some notams use "UFN"
     }
 
     private void parseItemD(Notam.NotamBuilder notam, String itemD) {
@@ -198,25 +226,40 @@ public class NotamParser {
     }
 
     private void parseCordsItemQ(Notam.NotamBuilder notam, String cords) {
-        // https://en.wikipedia.org/wiki/ISO_6709
+        cords = cords.toUpperCase();
 
-        // if missing/incorrect cords
-        if (cords.length() <= 3) {
-            notam.radius(Integer.parseInt(cords));
+        final String[] cordParts = cords.split("[NSEW]", -1);
+
+        if (cordParts.length != 3) {
+            System.err.println("Invalid coordinates in Q line for notam:\n" + notam.build().getRaw());
             return;
         }
+        for (int i = 0; i < cordParts.length; i++) {
+            cordParts[i] = cordParts[i].replace(" ", "");
+        }
 
-        double lat = Double.parseDouble(cords.substring(0, 2));
-        lat += (Double.parseDouble(cords.substring(2, 4)) / 60);
-        lat *= (cords.charAt(4) == 'S' || cords.charAt(4) == 's' ? -1 : 1);
+        double lat = parseCord(cordParts[0]);
+        lat *= cords.contains("S") ? -1 : 1;
         notam.latitude(lat);
 
-        double lng = Double.parseDouble(cords.substring(5, 8));
-        lng += (Double.parseDouble(cords.substring(8, 10)) / 60);
-        lng *= (cords.charAt(10) == 'W' || cords.charAt(10) == 'w' ? -1 : 1);
+        double lng = parseCord(cordParts[1]);
+        lng *= cords.contains("W") ? -1 : 1;
         notam.longitude(lng);
 
-        notam.radius(Integer.parseInt(cords.substring(11)));
+        if (!cordParts[2].isEmpty()) {
+            notam.radius(Integer.parseInt(cordParts[2]));
+        }
+    }
+
+    private double parseCord(String c) {
+        // https://en.wikipedia.org/wiki/ISO_6709
+        int offset = c.length() % 2;
+        double cord = Double.parseDouble(c.substring(0, 2 + offset));
+        cord += (Double.parseDouble(c.substring(2 + offset, 4 + offset)) / 60);
+        if (c.length() > 5) {
+            cord += (Double.parseDouble(c.substring(4 + offset, 6 + offset)) / 3600);
+        }
+        return cord;
     }
 
     /**
