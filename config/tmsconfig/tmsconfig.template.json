@@ -1,0 +1,28 @@
+{
+    "port": 80,
+    "caches": [
+        {
+            "name": "default-cache",
+            "directory": "/tile-cache"
+        }
+    ],
+    "tiles": [
+        {
+            "name": "openaip",
+            "cache": "default-cache",
+            "sources": ["https://api.tiles.openaip.net/api/data/openaip/{z}/{x}/{y}.png?apiKey="]
+        },
+        {
+            "name": "satellite",
+            "cache": "default-cache",
+            "sources": ["https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}?token="]
+        },
+        {
+            "name": "satellite-labels",
+            "cache": "default-cache",
+            "sources": [
+                "https://static-map-tiles-api.arcgis.com/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/oceans/labels/static/tile/{z}/{y}/{x}?token="
+            ]
+        }
+    ]
+}

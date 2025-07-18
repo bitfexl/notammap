@@ -247,6 +247,8 @@ function createSelectCountryLayer(countries: string[], currentCountry: string | 
 const maxZoom = 14;
 const minZoom = 0;
 
+// TODO: save currently selected layer in local storage
+
 const LAYERS: Layer[] = [
     {
         tmsUrl: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -300,7 +302,21 @@ const LAYERS: Layer[] = [
         ],
     },
     {
-        tmsUrl: import.meta.env.VITE_OPENAPI_TILE_LAYER_URL,
+        tmsUrl: import.meta.env.VITE_SATELLITE_TILE_LAYER_URL,
+        name: "Satellite",
+        type: "base",
+        maxZoom,
+        minZoom,
+        opacity: 0.6,
+        attributions: [
+            {
+                name: "Esri (Satellite Imagery)",
+                url: "https://www.esri.com/",
+            },
+        ],
+    },
+    {
+        tmsUrl: import.meta.env.VITE_OPENAIP_TILE_LAYER_URL,
         name: "Aeronautical Data",
         type: "annotation",
         defaultActive: true,
