@@ -5,14 +5,72 @@
         <link rel="icon" type="image/png" href="/icon.png" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Notam Map - About</title>
+        <style>
+            * {
+                font-family: Arial, Helvetica, sans-serif;
+            }
+
+            h1,
+            h2,
+            h3 {
+                font-weight: 500;
+            }
+
+            h1 {
+                font-size: 30px;
+                line-height: 36px;
+            }
+
+            h2 {
+                font-size: 24px;
+                line-height: 32px;
+            }
+
+            h3 {
+                font-size: 20px;
+                line-height: 28px;
+            }
+
+            li {
+                line-height: 24px;
+            }
+
+            body {
+                width: 80%;
+                margin-left: 10%;
+            }
+        </style>
     </head>
     <body>
         <h1>About Notam Map</h1>
-        <h2>Data Source</h2>
+        <h2>Data Sources</h2>
+        <p></p>
         <h3>NOTAMs</h3>
+        <p>
+            Current NOTAMs are collected daily from the
+            <a href="https://www.notams.faa.gov/dinsQueryWeb/" target="_blank" rel="noreferrer">Defense Internet NOTAM Service</a>.
+        </p>
         <h3>Map Tiles</h3>
+        <ul>
+            <li>
+                <b>Aeronautical Data</b>
+                <ul>
+                    <li><a href="https://www.openaip.net/" target="_blank" rel="noreferrer">OpenAIP</a></li>
+                </ul>
+            </li>
+            <li>
+                <b>Base Maps</b>
+                <ul>
+                    <li><a href="http://www.openstreetmap.org/" target="_blank" rel="noreferrer">OpenStreetMap</a></li>
+                    <li><a href="https://opentopomap.org/" target="_blank" rel="noreferrer">OpenTopoMap</a></li>
+                    <li><a href="https://www.esri.com/" target="_blank" rel="noreferrer">Esri (Satellite Imagery)</a></li>
+                </ul>
+            </li>
+        </ul>
         <h2>Open Source</h2>
+        <p>This project is open source. The source code can be viewed on GitHub.</p>
         <hr />
+        <br style="user-select: none" />
         <a href="/">Back to Notam Map</a>
     </body>
 </html>

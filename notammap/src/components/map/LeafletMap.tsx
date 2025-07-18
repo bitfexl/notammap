@@ -336,7 +336,7 @@ function createLayer(layer: Layer): L.TileLayer {
         maxZoom: layer.maxZoom,
         minZoom: layer.minZoom,
         opacity: layer.opacity,
-        attribution: layer.attributions.map((a) => `<a href="${a.url}">${a.name}</a>`).join(", "),
+        attribution: layer.attributions.map((a) => `<a href="${a.url}" target="_blank" rel="noreferrer">${a.name}</a>`).join(", "),
     });
 }
 
