@@ -26,7 +26,7 @@ curl https://raw.githubusercontent.com/bitfexl/notammap/refs/heads/master/instal
 
 After installation, inside the notammap directory, only the following config files have to be provided:
 
-- *config/tmsconfig/tmsconfig.json* tile service configuration for OpenAIP and Satellite images.
+- *config/tmsconfig/tmsconfig.json* tile service configuration for OpenAIP and Satellite images. See `tmsconfig.template.json` for details.
 
 Restart containers using:
 
