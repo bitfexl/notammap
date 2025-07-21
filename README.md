@@ -16,4 +16,22 @@ A web app which displays the extracted notams on a map. Written in TypeScript us
 
 A proxy/caching server for OpenAIP (https://www.openaip.net/) map tiles, which contain aeronautical data like airspaces and airports. Using Nginx in a container.
 
-change for update
+## Install
+
+To install the NOTAM Map server on Fedora 42 the following install script can be used:
+
+```shell
+curl https://raw.githubusercontent.com/bitfexl/notammap/refs/heads/master/installscript | sh
+```
+
+After installation, inside the notammap directory, only the following config files have to be provided:
+
+- *config/tmsconfig/tmsconfig.json* tile service configuration for OpenAIP and Satellite images.
+
+Restart containers using:
+
+```shell
+podman compose restart
+```
+
+The newly added tiles take some time to show up after restart because the caddy webserver (located in notammap frontend) needs time to correctly identify the proxy as up. Browser cache may needs to be cleared.
