@@ -1,3 +1,4 @@
+dnf update -y
 dnf install podman podman-compose git -y
 echo 'unqualified-search-registries = ["docker.io"]' > /etc/containers/registries.conf
 
