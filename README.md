@@ -39,3 +39,5 @@ The newly added tiles take some time to show up after restart because the caddy 
 ## Administration scripts
 
 TODO: force update/rebuild
+
+TODO: install cron job to run *podman compose start* after reboot
