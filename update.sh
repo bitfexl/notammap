@@ -15,7 +15,7 @@ else
     podman compose ps -f '{{.Names}}' | (
         while read name
         do
-            filename=$(date -I)-$name.log
+            filename=before-update-$(date -Iseconds)-$name.log
             podman compose logs -tn 2>&1 | grep --color=never $name > logs/$filename
             echo "saved logs/$filename"
         done
