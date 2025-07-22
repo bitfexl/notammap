@@ -35,3 +35,7 @@ podman compose restart
 ```
 
 The newly added tiles take some time to show up after restart because the caddy webserver (located in notammap frontend) needs time to correctly identify the proxy as up. Browser cache may needs to be cleared.
+
+## Administration scripts
+
+TODO: force update/rebuild

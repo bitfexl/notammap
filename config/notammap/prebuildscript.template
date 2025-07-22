@@ -1,0 +1,1 @@
+INJECT_HEAD='<script src="path_to_analytics_script.js"></script>'

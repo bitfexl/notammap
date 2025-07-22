@@ -17,7 +17,7 @@ Map tiles from:
 -   OpenStreetMap
 -   OpenAIP (https://www.openaip.net/)
 
-Design Notes:
+## Design Notes
 
 Normal element: rounded-md
 
@@ -40,3 +40,8 @@ Builds without config (e.g. tms url for openaip).
 ```
 docker run -it --rm -p 8080:80 -v ${PWD}/public/notamdata:/usr/share/caddy/notamdata notam-map
 ```
+
+## Development setup
+
+- Create *.env.local* file just like *.env-template* with api keys set.
+- Extract NOTAMS using notamextractor and place into *public/notamdata*.

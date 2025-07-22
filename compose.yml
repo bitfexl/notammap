@@ -2,7 +2,12 @@ name: notam-map
 
 services:
   webserver:
-    build: ./notammap
+    build:
+      context: ./notammap
+      args:
+        - OPENAIP_TILE_LAYER_URL=/tiles/openaip/{z}/{x}/{y}
+        - SATELLITE_TILE_LAYER_URL=/tiles/satellite/{z}/{x}/{y}
+        # - INJECT_HEAD="<script> /* TODO inject analytics script */ </script>"
     ports:
       - "8080:80"
     volumes:
