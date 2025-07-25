@@ -12,6 +12,10 @@ systemctl enable --now caddy
 */etc/caddy/Caddyfile*
 
 ```
+:80 {
+    redir https://www.notammap.org{uri}
+}
+
 notammap.org {
     redir https://www.notammap.org{uri}
 }
