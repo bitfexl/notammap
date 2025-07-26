@@ -78,43 +78,22 @@ export function NotamMap({
     const [portal, setPortal] = useState<ReactPortal>();
     const mapRef = useRef<L.Map | null>(null);
 
-    const displayedNotams = useRef(new Set<L.Layer>());
-    const displayedCoordinates = useRef(new Map<string, L.Layer>());
-
     function initMap(map: L.Map) {
         mapRef.current = map;
     }
 
     useEffect(() => {
-        const layer = createSelectCountryLayer(countries, currentCountry, onCountryClick);
-
-        if (mapRef.current) {
-            mapRef.current.addLayer(layer);
-        }
-
-        return () => {
-            if (mapRef.current) {
-                mapRef.current.removeLayer(layer);
-            }
-        };
+        return setLayer(mapRef, renderSelectCountryLayer(countries, currentCountry, onCountryClick));
     }, [countries, onCountryClick]);
 
     useEffect(() => {
         if (mapRef.current != null) {
-            updateNotams(mapRef.current, notamData.notams, displayedNotams.current, notamRenderer, setPortal, onNotamsClick);
+            return setLayer(mapRef, renderNotamsLayer(mapRef.current, notamData.notams, notamRenderer, setPortal, onNotamsClick));
         }
     }, [notamData, notamRenderer, onNotamsClick]);
 
     useEffect(() => {
-        if (mapRef.current != null) {
-            updateCoordinates(
-                mapRef.current,
-                notamData.coordinatesLists,
-                displayedCoordinates.current,
-                coordinatesRenderer,
-                onCooridnatesClick
-            );
-        }
+        return setLayer(mapRef, renderCoordinatesLayer(notamData.coordinatesLists, coordinatesRenderer, onCooridnatesClick));
     }, [notamData, coordinatesRenderer, onCooridnatesClick]);
 
     return (
@@ -125,52 +104,41 @@ export function NotamMap({
     );
 }
 
-function updateCoordinates(
-    map: L.Map,
+const leafletDataLayerRenderer = L.canvas({ padding: 1 });
+
+function renderCoordinatesLayer(
     coordinateLists: CoordinatesList[],
-    displayedCoordinatesList: Map<string, L.Layer>,
     coordinatesRenderer: CoordinatesRenderer,
     onCooridnatesClick: (coordinatesList: CoordinatesList) => void
 ) {
     console.log("Rendering " + coordinateLists.length + " coordinates...");
 
-    const remainingCoordiantes = new Map<string, CoordinatesList>();
-    for (const coordinatesList of coordinateLists) {
-        remainingCoordiantes.set(coordinatesList.hash, coordinatesList);
-    }
+    const finalLayer = L.layerGroup();
 
-    for (const displayedCoordinates of displayedCoordinatesList) {
-        if (!remainingCoordiantes.delete(displayedCoordinates[0])) {
-            map.removeLayer(displayedCoordinates[1]);
-            displayedCoordinatesList.delete(displayedCoordinates[0]);
-        }
-    }
-
-    for (const [hash, coordinates] of remainingCoordiantes) {
-        const layer = coordinatesRenderer(coordinates, () => {
-            onCooridnatesClick(coordinates);
-        });
+    for (const coordinates of coordinateLists) {
+        const layer = coordinatesRenderer(
+            coordinates,
+            () => {
+                onCooridnatesClick(coordinates);
+            },
+            leafletDataLayerRenderer
+        );
         if (layer != null) {
-            map.addLayer(layer);
-            displayedCoordinatesList.set(hash, layer);
+            finalLayer.addLayer(layer);
         }
     }
+
+    return finalLayer;
 }
 
-function updateNotams(
+function renderNotamsLayer(
     map: L.Map,
     notams: DetailedNotam[],
-    displayedNotams: Set<L.Layer>,
     notamRenderer: NotamRenderer,
     setPortal: (portal: ReactPortal) => void,
     onNoatmsClick: (notams: DetailedNotam[]) => boolean
 ) {
     console.log("Rendering " + notams.length + " notams...");
-
-    for (const layer of displayedNotams) {
-        map.removeLayer(layer);
-    }
-    displayedNotams.clear();
 
     //                          lat         lng     notams
     const notamGroups = new Map<number, Map<number, DetailedNotam[]>>();
@@ -198,31 +166,38 @@ function updateNotams(
         filteredNotams.push(detailedNotam);
     }
 
+    const finalLayer = L.layerGroup();
+
     for (const [lat, lngNotams] of notamGroups) {
         for (const [lng, notams] of lngNotams) {
-            const layer = notamRenderer(notams, () => {
-                if (onNoatmsClick(notams)) {
-                    const content = document.createElement("div");
-                    content.style.minWidth = "300px";
-                    L.popup().setLatLng([lat, lng]).setContent(content).openOn(map);
+            const layer = notamRenderer(
+                notams,
+                () => {
+                    if (onNoatmsClick(notams)) {
+                        const content = document.createElement("div");
+                        content.style.minWidth = "300px";
+                        L.popup().setLatLng([lat, lng]).setContent(content).openOn(map);
 
-                    const portal = createPortal(
-                        <div className="max-h-[80vh] overflow-auto ">
-                            <NotamListComponent detailedNotams={notams}></NotamListComponent>
-                        </div>,
-                        content
-                    );
-                    setPortal(portal);
-                }
-            });
+                        const portal = createPortal(
+                            <div className="max-h-[80vh] overflow-auto ">
+                                <NotamListComponent detailedNotams={notams}></NotamListComponent>
+                            </div>,
+                            content
+                        );
+                        setPortal(portal);
+                    }
+                },
+                leafletDataLayerRenderer
+            );
 
-            map.addLayer(layer);
-            displayedNotams.add(layer);
+            finalLayer.addLayer(layer);
         }
     }
+
+    return finalLayer;
 }
 
-function createSelectCountryLayer(countries: string[], currentCountry: string | null, onClick: (country: string) => void): L.Layer {
+function renderSelectCountryLayer(countries: string[], currentCountry: string | null, onClick: (country: string) => void): L.Layer {
     const layer = L.layerGroup();
     for (const country of countries) {
         if (country == currentCountry) {
@@ -242,6 +217,19 @@ function createSelectCountryLayer(countries: string[], currentCountry: string | 
         layer.addLayer(marker);
     }
     return layer;
+}
+
+// set updated layer inside use effect
+function setLayer(ref: { current: L.Map | null }, layer: L.Layer): () => void {
+    if (ref.current) {
+        ref.current.addLayer(layer);
+    }
+
+    return () => {
+        if (ref.current) {
+            ref.current.removeLayer(layer);
+        }
+    };
 }
 
 const maxZoom = 14;

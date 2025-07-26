@@ -12,20 +12,25 @@ export const NM_TO_M = 1852;
  * the same coordinates.
  * The onClick function should be called when the marker is clicked.
  */
-export type NotamRenderer = (detailedNotams: DetailedNotam[], onClick: () => void) => L.Layer;
+export type NotamRenderer = (detailedNotams: DetailedNotam[], onClick: () => void, leafletRenderer: L.Renderer) => L.Layer;
 
 /**
  * Render coordinates for display on the map, or return null if not to render.
  * The onClick function should be called when the marker is clicked.
  */
-export type CoordinatesRenderer = (coordinates: CoordinatesList, onClick: () => void) => L.Layer | null;
+export type CoordinatesRenderer = (coordinates: CoordinatesList, onClick: () => void, leafletRenderer: L.Renderer) => L.Layer | null;
 
-export const renderCoordinates: CoordinatesRenderer = function (cooridnatesList: CoordinatesList, onClick: () => void): L.Layer {
+export const renderCoordinates: CoordinatesRenderer = function (
+    cooridnatesList: CoordinatesList,
+    onClick: () => void,
+    leafletRenderer
+): L.Layer {
     const polygon = L.polygon(
         cooridnatesList.coordinates.map((c) => [c.latitude, c.longitude]),
         {
             color: "#ff0000",
             weight: cooridnatesList.coordinates.length == 1 ? 6 : 3,
+            renderer: leafletRenderer,
         }
     );
 
@@ -34,15 +39,16 @@ export const renderCoordinates: CoordinatesRenderer = function (cooridnatesList:
     return polygon;
 };
 
-export const renderNotams: NotamRenderer = function (detailedNotams: DetailedNotam[], onClick: () => void): L.Layer {
+export const renderNotams: NotamRenderer = function (detailedNotams: DetailedNotam[], onClick: () => void, leafletRenderer): L.Layer {
     // TODO: properly handle when radius or latitude/longitude are missing, display to user
     const latlng: L.LatLngTuple = [detailedNotams[0].notam.latitude ?? 0, detailedNotams[0].notam.longitude ?? 0];
     const radius = (detailedNotams[0].notam.radius ?? 0) * NM_TO_M; // TODO: use max radius of all notams
 
+    // TODO: render marker using renderer
     const marker = L.marker(latlng, {
         icon: renderIcon("lightgray", "" + detailedNotams.length),
     });
-    const circle = L.circle(latlng, { radius });
+    const circle = L.circle(latlng, { radius, renderer: leafletRenderer });
 
     const onHover = (hover: boolean) => {
         circle.setStyle({ color: hover ? "#00b894" : "#0984e3" });
@@ -57,7 +63,7 @@ export const renderNotams: NotamRenderer = function (detailedNotams: DetailedNot
     circle.on("click", onClick);
 
     const finalLayer = L.layerGroup();
-    finalLayer.addLayer(marker);
+    // finalLayer.addLayer(marker); // TODO: add back when rendered with custom renderer
 
     // do not show radius for notams with radius > 10km
     if (radius < 10000) {
