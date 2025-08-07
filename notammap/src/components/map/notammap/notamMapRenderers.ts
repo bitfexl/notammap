@@ -63,7 +63,7 @@ export const renderNotams: NotamRenderer = function (detailedNotams: DetailedNot
     circle.on("click", onClick);
 
     const finalLayer = L.layerGroup();
-    // finalLayer.addLayer(marker); // TODO: add back when rendered with custom renderer
+    finalLayer.addLayer(marker); // TODO: add back when rendered with custom renderer
 
     // do not show radius for notams with radius > 10km
     if (radius < 10000) {
@@ -84,13 +84,13 @@ export function renderIcon(color: string, text: string): L.DivIcon {
 
     const style = `
     background-color: ${color};
-    width: 1.5rem;
-    height: 1.5rem;
+    width: 24px;
+    height: 24px;
     display: block;
-    left: -0.75rem;
-    top: -0.75rem;
+    left: -12px;
+    top: -12px;
     position: relative;
-    border-radius: 1.5rem 1.5rem 0;
+    border-radius: 24px 24px 0;
     transform: rotate(45deg);
     border: 1px solid #FFFFFF`;
 
@@ -99,4 +99,6 @@ export function renderIcon(color: string, text: string): L.DivIcon {
         html: `<span style="${style}"><span style="display: block; transform: rotate(-45deg); text-align: center; font-size: 1rem; font-family: monospace;">${text}</span></span>`,
         className: "",
     });
+
+    // return L.icon;
 }
