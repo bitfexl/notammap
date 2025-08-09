@@ -1,5 +1,6 @@
 import { CoordinatesList, DetailedNotam } from "../../../api/notams/notamextractor";
 import * as L from "leaflet";
+import "./leafletCanvasMarker.js";
 
 /**
  * One nautical mile in meters.
@@ -44,10 +45,8 @@ export const renderNotams: NotamRenderer = function (detailedNotams: DetailedNot
     const latlng: L.LatLngTuple = [detailedNotams[0].notam.latitude ?? 0, detailedNotams[0].notam.longitude ?? 0];
     const radius = (detailedNotams[0].notam.radius ?? 0) * NM_TO_M; // TODO: use max radius of all notams
 
-    // TODO: render marker using renderer
-    const marker = L.marker(latlng, {
-        icon: renderIcon("lightgray", "" + detailedNotams.length),
-    });
+    // TODO: render markers above areas and circles
+    const marker: L.Layer = renderIcon("lightgray", "" + detailedNotams.length, latlng, leafletRenderer);
     const circle = L.circle(latlng, { radius, renderer: leafletRenderer });
 
     const onHover = (hover: boolean) => {
@@ -79,26 +78,25 @@ export const renderNotams: NotamRenderer = function (detailedNotams: DetailedNot
  * @param text The text at maximum 3 characters. Watch out for xss.
  * @returns A leaflet marker.
  */
-export function renderIcon(color: string, text: string): L.DivIcon {
-    text = text.substring(0, 3); // no xss in 3 chars?
+export function renderIcon(color: string, text: string, latlng: L.LatLngTuple, renderer: L.Renderer): L.Layer {
+    text = text.substring(0, 3);
 
-    const style = `
-    background-color: ${color};
-    width: 24px;
-    height: 24px;
-    display: block;
-    left: -12px;
-    top: -12px;
-    position: relative;
-    border-radius: 24px 24px 0;
-    transform: rotate(45deg);
-    border: 1px solid #FFFFFF`;
-
-    return L.divIcon({
-        iconAnchor: [0, 20],
-        html: `<span style="${style}"><span style="display: block; transform: rotate(-45deg); text-align: center; font-size: 1rem; font-family: monospace;">${text}</span></span>`,
-        className: "",
+    return (L as any).canvasMarker(latlng, {
+        renderer,
+        img: {
+            size: [30, 30],
+            offset: { x: 0, y: -15 },
+            url: "data:image/svg+xml;base64," + btoa(renderIconSvg(color, "gray", "black", text)),
+        },
     });
+}
 
-    // return L.icon;
+function renderIconSvg(color: string, borderColor: string, textColor: string, textContent: string) {
+    return `<svg width="30px" height="30px" viewBox="-4 0 36 36" version="1.1" xmlns="http://www.w3.org/2000/svg"><style>#text {
+font: 15px sans-serif;
+fill: ${textColor};
+stroke: none;
+user-select: none;
+}</style><g stroke="${borderColor}" stroke-width="1" fill="none" fill-rule="evenodd"><g transform="translate(-125.000000, -643.000000)"><g transform="translate(37.000000, 169.000000)"><g transform="translate(78.000000, 468.000000)"><g transform="translate(10.000000, 6.000000)"><path d="M14,0 C21.732,0 28,5.641 28,12.6 C28,23.963 14,36 14,36 C14,36 0,24.064 0,12.6 C0,5.641 6.268,0 14,0 Z" fill="${color}"/><text id="text" x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" dy="-2" dx="-4">
+${textContent}</text></g></g></g></g></g></svg>`;
 }
