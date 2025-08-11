@@ -8,12 +8,22 @@ import "./leafletCanvasMarker.js";
 export const NM_TO_M = 1852;
 
 /**
+ * The default radius in nautical miles for a notam.
+ */
+export const DEFAULT_RADIUS_NM = 5;
+
+/**
  * Generate a marker for one or more notams.
  * The notams will all have the same or approximately
  * the same coordinates.
  * The onClick function should be called when the marker is clicked.
+ * Returns the foreground and background marker or null if one does not exist.
  */
-export type NotamRenderer = (detailedNotams: DetailedNotam[], onClick: () => void, leafletRenderer: L.Renderer) => L.Layer;
+export type NotamRenderer = (
+    detailedNotams: DetailedNotam[],
+    onClick: () => void,
+    leafletRenderer: L.Renderer
+) => [L.Layer | null, L.Layer | null];
 
 /**
  * Render coordinates for display on the map, or return null if not to render.
@@ -40,14 +50,31 @@ export const renderCoordinates: CoordinatesRenderer = function (
     return polygon;
 };
 
-export const renderNotams: NotamRenderer = function (detailedNotams: DetailedNotam[], onClick: () => void, leafletRenderer): L.Layer {
+export const renderNotams: NotamRenderer = function (
+    detailedNotams: DetailedNotam[],
+    onClick: () => void,
+    leafletRenderer
+): [L.Layer | null, L.Layer | null] {
     // TODO: properly handle when radius or latitude/longitude are missing, display to user
     const latlng: L.LatLngTuple = [detailedNotams[0].notam.latitude ?? 0, detailedNotams[0].notam.longitude ?? 0];
-    const radius = (detailedNotams[0].notam.radius ?? 0) * NM_TO_M; // TODO: use max radius of all notams
+
+    // filter out the maximum non default (5NM) radius
+    const radiusNM = Math.max(...detailedNotams.map((n) => n.notam.radius ?? 0).filter((r) => r != 0 && r != DEFAULT_RADIUS_NM));
+    const radius = radiusNM * NM_TO_M;
 
     // TODO: render markers above areas and circles
     const marker: L.Layer = renderIcon("lightgray", "" + detailedNotams.length, latlng, leafletRenderer);
+
+    marker.on("click", onClick);
+
+    // do not show radius for notams with radius > 10km or only default radius
+    if (radius > 10000 || radius == -Infinity) {
+        return [marker, null];
+    }
+
     const circle = L.circle(latlng, { radius, renderer: leafletRenderer });
+
+    circle.on("click", onClick);
 
     const onHover = (hover: boolean) => {
         circle.setStyle({ color: hover ? "#00b894" : "#0984e3" });
@@ -58,18 +85,7 @@ export const renderNotams: NotamRenderer = function (detailedNotams: DetailedNot
     marker.on("mouseover", () => onHover(true));
     marker.on("mouseout", () => onHover(false));
 
-    marker.on("click", onClick);
-    circle.on("click", onClick);
-
-    const finalLayer = L.layerGroup();
-    finalLayer.addLayer(marker); // TODO: add back when rendered with custom renderer
-
-    // do not show radius for notams with radius > 10km
-    if (radius < 10000) {
-        finalLayer.addLayer(circle);
-    }
-
-    return finalLayer;
+    return [marker, circle];
 };
 
 /**

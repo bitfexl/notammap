@@ -82,19 +82,20 @@ export function NotamMap({
         mapRef.current = map;
     }
 
+    // TODO: also use canvasMarker to put in background
     useEffect(() => {
         return setLayer(mapRef, renderSelectCountryLayer(countries, currentCountry, onCountryClick));
     }, [countries, onCountryClick]);
+
+    useEffect(() => {
+        return setLayer(mapRef, renderCoordinatesLayer(notamData.coordinatesLists, coordinatesRenderer, onCooridnatesClick));
+    }, [notamData, coordinatesRenderer, onCooridnatesClick]);
 
     useEffect(() => {
         if (mapRef.current != null) {
             return setLayer(mapRef, renderNotamsLayer(mapRef.current, notamData.notams, notamRenderer, setPortal, onNotamsClick));
         }
     }, [notamData, notamRenderer, onNotamsClick]);
-
-    useEffect(() => {
-        return setLayer(mapRef, renderCoordinatesLayer(notamData.coordinatesLists, coordinatesRenderer, onCooridnatesClick));
-    }, [notamData, coordinatesRenderer, onCooridnatesClick]);
 
     return (
         <>
@@ -166,17 +167,19 @@ function renderNotamsLayer(
         filteredNotams.push(detailedNotam);
     }
 
-    const finalLayer = L.layerGroup();
+    const foregroundMarkers: [L.LatLngTuple, L.Layer][] = [];
+    const backgroundMarkers: [L.LatLngTuple, L.Layer][] = [];
 
     for (const [lat, lngNotams] of notamGroups) {
         for (const [lng, notams] of lngNotams) {
-            const layer = notamRenderer(
+            const latLng: L.LatLngTuple = [lat, lng];
+            const layers = notamRenderer(
                 notams,
                 () => {
                     if (onNoatmsClick(notams)) {
                         const content = document.createElement("div");
                         content.style.minWidth = "300px";
-                        L.popup().setLatLng([lat, lng]).setContent(content).openOn(map);
+                        L.popup().setLatLng(latLng).setContent(content).openOn(map);
 
                         const portal = createPortal(
                             <div className="max-h-[80vh] overflow-auto ">
@@ -190,9 +193,29 @@ function renderNotamsLayer(
                 leafletDataLayerRenderer
             );
 
-            finalLayer.addLayer(layer);
+            if (layers[0]) {
+                foregroundMarkers.push([latLng, layers[0]]);
+            }
+            if (layers[1]) {
+                backgroundMarkers.push([latLng, layers[1]]);
+            }
         }
     }
+
+    [foregroundMarkers, backgroundMarkers].forEach((ms) =>
+        ms.sort((a, b) => {
+            const x = b[0][0] - a[0][0];
+            if (x != 0) {
+                return x;
+            }
+            return b[0][1] - a[0][1];
+        })
+    );
+
+    const finalLayer = L.layerGroup();
+
+    backgroundMarkers.forEach((m) => finalLayer.addLayer(m[1]));
+    foregroundMarkers.forEach((m) => finalLayer.addLayer(m[1]));
 
     return finalLayer;
 }

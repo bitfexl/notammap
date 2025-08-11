@@ -4,6 +4,8 @@ import * as L from "leaflet";
 
 // https://github.com/lipton-ice-tea/leaflet-canvas-markers/blob/master/leaflet-canvas-markers.js
 
+// TODO: fix click hitbox for marker when offset is used
+
 L.Canvas.include({
     _updateImg(layer) {
         const { img } = layer.options;
