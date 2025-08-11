@@ -59,6 +59,7 @@ export const renderNotams: NotamRenderer = function (
     const latlng: L.LatLngTuple = [detailedNotams[0].notam.latitude ?? 0, detailedNotams[0].notam.longitude ?? 0];
 
     // filter out the maximum non default (5NM) radius
+    // TODO: make setting to show also default radius
     const radiusNM = Math.max(...detailedNotams.map((n) => n.notam.radius ?? 0).filter((r) => r != 0 && r != DEFAULT_RADIUS_NM));
     const radius = radiusNM * NM_TO_M;
 
