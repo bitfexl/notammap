@@ -63,6 +63,8 @@ export const renderNotams: NotamRenderer = function (
     const radiusNM = Math.max(...detailedNotams.map((n) => n.notam.radius ?? 0).filter((r) => r != 0 && r != DEFAULT_RADIUS_NM));
     const radius = radiusNM * NM_TO_M;
 
+    // TODO: show qcodes on hover (title only), like notaminfo
+
     // TODO: render markers above areas and circles
     const marker: L.Layer = renderIcon("lightgray", "" + detailedNotams.length, latlng, leafletRenderer);
 
