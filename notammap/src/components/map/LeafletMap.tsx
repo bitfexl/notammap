@@ -9,6 +9,9 @@ import gpsLocateIcon from "../../assets/icons/gps-locate.svg?raw";
 import { boxShadowStyle } from "../componentConstants";
 import { IconButton } from "../form/IconButton";
 
+// load leaflet plugins
+import "./plugins/pluginsIndex";
+
 /**
  * The name of the leaflet map event which is always dispatched on the window.
  */

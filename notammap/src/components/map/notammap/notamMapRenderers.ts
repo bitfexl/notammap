@@ -1,6 +1,5 @@
 import { CoordinatesList, DetailedNotam } from "../../../api/notams/notamextractor";
 import * as L from "leaflet";
-import "./leafletCanvasMarker.js";
 
 /**
  * One nautical mile in meters.
