@@ -7,6 +7,8 @@ const defaultImgOptions = {
 
 // TODO: flyto sometimes not correctly updates the markers
 
+// TODO: weird effect when hovering while zoomed out, possibly because of circle marker changing color
+
 const CanvasMarker: any = L.CircleMarker.extend({
     _updatePath() {
         if (!this.options.img || !this.options.img.url) return;
