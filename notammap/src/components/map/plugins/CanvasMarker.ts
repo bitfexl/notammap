@@ -1,33 +1,31 @@
-"use strict";
-
 import * as L from "leaflet";
 
 const defaultImgOptions = {
-    rotate: 0,
     size: [40, 40],
     offset: { x: 0, y: 0 },
 };
 
-const CanvasMarker = L.CircleMarker.extend({
+const CanvasMarker: any = L.CircleMarker.extend({
     _updatePath() {
         if (!this.options.img || !this.options.img.url) return;
         if (!this.options.img.el) {
             this.options.img = { ...defaultImgOptions, ...this.options.img };
+            // TODO: cache loaded images
             const img = document.createElement("img");
-            img.src = this.options.img.url;
-            this.options.img.el = img;
             img.onload = () => {
                 this.redraw();
             };
             img.onerror = () => {
                 this.options.img = null;
             };
+            img.src = this.options.img.url;
+            this.options.img.el = img;
         } else {
             this._updateImg(this._renderer._ctx);
         }
     },
 
-    _updateImg(ctx) {
+    _updateImg(ctx: CanvasRenderingContext2D) {
         const { img } = this.options;
         const p = this._point.round();
         p.x += img.offset.x;
@@ -36,7 +34,7 @@ const CanvasMarker = L.CircleMarker.extend({
         // this._containsPoint(null, true, ctx);
     },
 
-    _containsPoint(pc, draw = false, ctx) {
+    _containsPoint(pc: L.Point, draw = false, ctx: CanvasRenderingContext2D) {
         const p = this._point.round();
         const { img } = this.options;
         p.x += img.offset.x;
@@ -57,13 +55,14 @@ const CanvasMarker = L.CircleMarker.extend({
     },
 });
 
-L.canvasMarker = function (...opt) {
-    // try {
-    //     const i = opt.findIndex((o) => typeof o === "object" && o.img);
-    //     if (i + 1) {
-    //         if (!opt[i].radius && opt[i].img && opt[i].img.size) opt[i].radius = Math.ceil(Math.max(...opt[i].img.size) / 2);
-    //         if (opt[i].pane) delete opt[i].pane;
-    //     }
-    // } catch (e) {}
-    return new CanvasMarker(...opt);
-};
+interface CanvasMarkerOptions extends L.PathOptions {
+    img: {
+        size?: [number, number];
+        offset?: { x: number; y: number };
+        url: string;
+    };
+}
+
+export function canvasMarker(latLng: L.LatLngExpression, options: CanvasMarkerOptions): L.Layer {
+    return new CanvasMarker(latLng, options);
+}

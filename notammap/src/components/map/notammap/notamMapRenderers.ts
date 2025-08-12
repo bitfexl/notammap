@@ -1,5 +1,6 @@
 import { CoordinatesList, DetailedNotam } from "../../../api/notams/notamextractor";
 import * as L from "leaflet";
+import { canvasMarker } from "../plugins/CanvasMarker";
 
 /**
  * One nautical mile in meters.
@@ -99,7 +100,7 @@ export const renderNotams: NotamRenderer = function (
 export function renderIcon(color: string, text: string, latlng: L.LatLngTuple, renderer: L.Renderer): L.Layer {
     text = text.substring(0, 3);
 
-    return (L as any).canvasMarker(latlng, {
+    return canvasMarker(latlng, {
         renderer,
         img: {
             size: [30, 30],

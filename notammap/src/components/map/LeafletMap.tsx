@@ -9,9 +9,6 @@ import gpsLocateIcon from "../../assets/icons/gps-locate.svg?raw";
 import { boxShadowStyle } from "../componentConstants";
 import { IconButton } from "../form/IconButton";
 
-// load leaflet plugins
-import "./plugins/pluginsIndex";
-
 /**
  * The name of the leaflet map event which is always dispatched on the window.
  */
@@ -329,7 +326,7 @@ function createMap(container: HTMLDivElement) {
         ],
         maxBoundsViscosity: 1,
         worldCopyJump: true,
-        preferCanvas: true,
+        // preferCanvas: true,
     });
     L.control.scale({ imperial: false, position: "bottomright" }).addTo(map);
     return map;
