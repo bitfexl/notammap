@@ -5,6 +5,8 @@ const defaultImgOptions = {
     offset: { x: 0, y: 0 },
 };
 
+// TODO: flyto sometimes not correctly updates the markers
+
 const CanvasMarker: any = L.CircleMarker.extend({
     _updatePath() {
         if (!this.options.img || !this.options.img.url) return;
@@ -13,6 +15,10 @@ const CanvasMarker: any = L.CircleMarker.extend({
             // TODO: cache loaded images
             const img = document.createElement("img");
             img.onload = () => {
+                // autosize height if negative
+                if (this.options.img.size[1] < 0) {
+                    this.options.img.size[1] = img.height / (img.width / this.options.img.size[0]);
+                }
                 this.redraw();
             };
             img.onerror = () => {
@@ -37,6 +43,7 @@ const CanvasMarker: any = L.CircleMarker.extend({
     _containsPoint(pc: L.Point, draw = false, ctx: CanvasRenderingContext2D) {
         const p = this._point.round();
         const { img } = this.options;
+        if (!img) return false;
         p.x += img.offset.x;
         p.y += img.offset.y;
         const ct = this._clickTolerance();

@@ -7,6 +7,7 @@ import { NotamListComponent } from "../../notam/NotamListComponent";
 import { CoordinatesRenderer, NotamRenderer } from "./notamMapRenderers";
 import countryCenterData from "../../../assets/countryCenterData.json";
 import { reversedCountryCodes } from "../../../assets/computedAssets";
+import { canvasMarker } from "../plugins/CanvasMarker";
 
 export interface NotamMapProps {
     /**
@@ -82,7 +83,6 @@ export function NotamMap({
         mapRef.current = map;
     }
 
-    // TODO: also use canvasMarker to put in background
     useEffect(() => {
         return setLayer(mapRef, renderSelectCountryLayer(countries, currentCountry, onCountryClick));
     }, [countries, onCountryClick]);
@@ -105,6 +105,7 @@ export function NotamMap({
     );
 }
 
+// TODO: get rid of this, onclick does not work with default renderer
 const leafletDataLayerRenderer = L.canvas({ padding: 1 });
 
 function renderCoordinatesLayer(
@@ -230,11 +231,12 @@ function renderSelectCountryLayer(countries: string[], currentCountry: string | 
         if (!center) {
             continue;
         }
-        const marker = L.marker(center, {
-            icon: L.icon({
-                iconUrl: "flags/" + reversedCountryCodes[country]?.toLowerCase() + ".svg",
-                iconSize: [32, null!],
-            }),
+        const marker = canvasMarker(center, {
+            renderer: leafletDataLayerRenderer,
+            img: {
+                size: [32, -1],
+                url: "flags/" + reversedCountryCodes[country]?.toLowerCase() + ".svg",
+            },
         });
         marker.on("click", () => onClick(country));
         layer.addLayer(marker);
