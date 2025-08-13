@@ -1,6 +1,9 @@
 import { CoordinatesList, DetailedNotam } from "../../../api/notams/notamextractor";
 import * as L from "leaflet";
 import { canvasMarker } from "../plugins/CanvasMarker";
+import { toText } from "../../../api/notams/QCodes";
+
+// TODO: order notams in display on click and in tooltip on hover (qcode)
 
 /**
  * One nautical mile in meters.
@@ -70,6 +73,8 @@ export const renderNotams: NotamRenderer = function (
 
     marker.on("click", onClick);
 
+    marker.bindTooltip(extractQCodeListHtml(detailedNotams), { offset: [15, -15], opacity: 1 });
+
     // do not show radius for notams with radius > 10km or only default radius
     if (radius > 10000 || radius == -Infinity) {
         return [marker, null];
@@ -118,4 +123,29 @@ stroke: none;
 user-select: none;
 }</style><g stroke="${borderColor}" stroke-width="1" fill="none" fill-rule="evenodd"><g transform="translate(-125.000000, -643.000000)"><g transform="translate(37.000000, 169.000000)"><g transform="translate(78.000000, 468.000000)"><g transform="translate(10.000000, 6.000000)"><path d="M14,0 C21.732,0 28,5.641 28,12.6 C28,23.963 14,36 14,36 C14,36 0,24.064 0,12.6 C0,5.641 6.268,0 14,0 Z" fill="${color}"/><text id="text" x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" dy="-2" dx="-4">
 ${textContent}</text></g></g></g></g></g></svg>`;
+}
+
+function extractQCodeListHtml(detailedNotams: DetailedNotam[]) {
+    const qCodes = detailedNotams.map((dn) => dn.notam.notamCode?.substring(0, 3) + "XX");
+    const order: string[] = [];
+    const counts = new Map<string, number>();
+    for (const qCode of qCodes) {
+        if (counts.has(qCode)) {
+            counts.set(qCode, counts.get(qCode)! + 1);
+        } else {
+            counts.set(qCode, 1);
+            order.push(qCode);
+        }
+    }
+
+    return order
+        .map((q) => {
+            let text = toText(q);
+            const count = counts.get(q);
+            if (count != 1) {
+                text += " <b>(&times;" + count + ")</b>";
+            }
+            return text.trim();
+        })
+        .join("<br>");
 }
