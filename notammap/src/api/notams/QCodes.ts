@@ -6,7 +6,7 @@ import qcodeTables from "../../assets/QCodeTables.json";
  */
 export function toText(qcode: string) {
     // notam is checklist
-    if (qcode == "QKKKK") {
+    if (qcode == "QKKKK" || qcode == "QKKXX") {
         return "Checklist";
     }
 
