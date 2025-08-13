@@ -11,23 +11,25 @@ const defaultImgOptions = {
 
 const CanvasMarker: any = L.CircleMarker.extend({
     _updatePath() {
-        if (!this.options.img || !this.options.img.url) return;
-        if (!this.options.img.el) {
+        if (!this.options.img.element) {
             // TODO: cache loaded images
-            const img = document.createElement("img");
+            const img = new Image();
             img.onload = () => {
+                this.options.img.success = true;
                 // autosize height if negative
                 if (this.options.img.size[1] < 0) {
                     this.options.img.size[1] = img.height / (img.width / this.options.img.size[0]);
+                    this.options.img.halfSize[1] = this.options.img.size[1] / 2;
                 }
                 this.redraw();
             };
             img.onerror = () => {
-                this.options.img = null;
+                this.options.img.success = false;
+                this.options.img.element = null;
             };
             img.src = this.options.img.url;
-            this.options.img.el = img;
-        } else {
+            this.options.img.element = img;
+        } else if (this.options.img.success) {
             this._updateImg(this._renderer._ctx);
         }
     },
@@ -35,17 +37,16 @@ const CanvasMarker: any = L.CircleMarker.extend({
     _updateImg(ctx: CanvasRenderingContext2D) {
         const { img } = this.options;
         const p = this._point;
-        ctx.drawImage(img.el, p.x - img.size[0] / 2, p.y - img.size[1] / 2, img.size[0], img.size[1]);
+        ctx.drawImage(img.element, p.x - img.halfSize[0], p.y - img.halfSize[1], img.size[0], img.size[1]);
         // this._containsPoint(null, true, ctx);
     },
 
     _containsPoint(pc: L.Point, draw = false, ctx: CanvasRenderingContext2D) {
-        const p = this._point.round();
         const { img } = this.options;
-        if (!img) return false;
+        const p = this._point;
         const ct = this._clickTolerance();
-        const wh = img.size[0] / 2;
-        const hh = img.size[1] / 2;
+        const wh = img.halfSize[0];
+        const hh = img.halfSize[1];
         const minX = p.x - wh - ct;
         const maxX = p.x + wh + ct;
         const minY = p.y - hh - ct;
@@ -69,7 +70,6 @@ const CanvasMarker: any = L.CircleMarker.extend({
 
     _updateBounds() {
         const { img } = this.options;
-        if (!img) return;
         const p = this._point;
         const pOffset = img.halfSize;
         this._pxBounds = new L.Bounds(p.subtract(pOffset), p.add(pOffset));
@@ -92,10 +92,7 @@ export function canvasMarker(latLng: L.LatLngExpression, options: CanvasMarkerOp
     (options.img as any) = { ...defaultImgOptions, ...options.img };
     (options.img as any) = {
         ...options.img,
-        halfSize: [
-            (options.img as any).size[0] / 2,
-            (options.img as any).size[1] < 0 ? (options.img as any).size[0] * 2 : (options.img as any).size[1] / 2,
-        ],
+        halfSize: [(options.img as any).size[0] / 2, (options.img as any).size[1] < 0 ? 0 : (options.img as any).size[1] / 2],
     };
     return new CanvasMarker(latLng, options);
 }
