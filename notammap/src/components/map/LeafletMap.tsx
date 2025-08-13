@@ -9,6 +9,8 @@ import gpsLocateIcon from "../../assets/icons/gps-locate.svg?raw";
 import { boxShadowStyle } from "../componentConstants";
 import { IconButton } from "../form/IconButton";
 
+// TODO: canvas double buffering for updates
+
 /**
  * The name of the leaflet map event which is always dispatched on the window.
  */

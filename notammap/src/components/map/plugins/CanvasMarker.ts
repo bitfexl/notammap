@@ -7,13 +7,12 @@ const defaultImgOptions = {
 
 // TODO: flyto sometimes not correctly updates the markers
 
-// TODO: weird effect when hovering while zoomed out, possibly because of circle marker changing color
+// TODO: optimize lag (flags)
 
 const CanvasMarker: any = L.CircleMarker.extend({
     _updatePath() {
         if (!this.options.img || !this.options.img.url) return;
         if (!this.options.img.el) {
-            this.options.img = { ...defaultImgOptions, ...this.options.img };
             // TODO: cache loaded images
             const img = document.createElement("img");
             img.onload = () => {
@@ -35,9 +34,7 @@ const CanvasMarker: any = L.CircleMarker.extend({
 
     _updateImg(ctx: CanvasRenderingContext2D) {
         const { img } = this.options;
-        const p = this._point.round();
-        p.x += img.offset.x;
-        p.y += img.offset.y;
+        const p = this._point;
         ctx.drawImage(img.el, p.x - img.size[0] / 2, p.y - img.size[1] / 2, img.size[0], img.size[1]);
         // this._containsPoint(null, true, ctx);
     },
@@ -46,8 +43,6 @@ const CanvasMarker: any = L.CircleMarker.extend({
         const p = this._point.round();
         const { img } = this.options;
         if (!img) return false;
-        p.x += img.offset.x;
-        p.y += img.offset.y;
         const ct = this._clickTolerance();
         const wh = img.size[0] / 2;
         const hh = img.size[1] / 2;
@@ -62,6 +57,27 @@ const CanvasMarker: any = L.CircleMarker.extend({
             return pc.x >= minX && pc.x <= maxX && pc.y >= minY && pc.y <= maxY;
         }
     },
+
+    _project() {
+        const { img } = this.options;
+        if (!img) return;
+        this._point = this._map.latLngToLayerPoint(this._latlng);
+        this._point.x += img.offset.x;
+        this._point.y += img.offset.y;
+        this._updateBounds();
+    },
+
+    _updateBounds() {
+        const { img } = this.options;
+        if (!img) return;
+        const p = this._point;
+        const pOffset = img.halfSize;
+        this._pxBounds = new L.Bounds(p.subtract(pOffset), p.add(pOffset));
+    },
+
+    _empty() {
+        return !this._renderer._bounds.intersects(this._pxBounds);
+    },
 });
 
 interface CanvasMarkerOptions extends L.PathOptions {
@@ -73,5 +89,13 @@ interface CanvasMarkerOptions extends L.PathOptions {
 }
 
 export function canvasMarker(latLng: L.LatLngExpression, options: CanvasMarkerOptions): L.Layer {
+    (options.img as any) = { ...defaultImgOptions, ...options.img };
+    (options.img as any) = {
+        ...options.img,
+        halfSize: [
+            (options.img as any).size[0] / 2,
+            (options.img as any).size[1] < 0 ? (options.img as any).size[0] * 2 : (options.img as any).size[1] / 2,
+        ],
+    };
     return new CanvasMarker(latLng, options);
 }
