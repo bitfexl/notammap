@@ -1,4 +1,5 @@
 import * as L from "leaflet";
+import { MapCache } from "../../util/MapCache";
 
 const defaultImgOptions = {
     size: [40, 40],
@@ -9,26 +10,59 @@ const defaultImgOptions = {
 
 // TODO: optimize lag (flags)
 
+const imageCache = new MapCache<string, HTMLImageElement>();
+
 const CanvasMarker: any = L.CircleMarker.extend({
     _updatePath() {
         if (!this.options.img.element) {
-            // TODO: cache loaded images
-            const img = new Image();
-            img.onload = () => {
+            const imgOnload = () => {
                 this.options.img.success = true;
                 // autosize height if negative
                 if (this.options.img.size[1] < 0) {
-                    this.options.img.size[1] = img.height / (img.width / this.options.img.size[0]);
+                    this.options.img.size[1] =
+                        this.options.img.element.height / (this.options.img.element.width / this.options.img.size[0]);
                     this.options.img.halfSize[1] = this.options.img.size[1] / 2;
                 }
                 this.redraw();
             };
-            img.onerror = () => {
+            const imgOnerror = () => {
                 this.options.img.success = false;
                 this.options.img.element = null;
             };
-            img.src = this.options.img.url;
-            this.options.img.element = img;
+
+            const cachedImg = imageCache.retrieve(this.options.img.url);
+            if (cachedImg) {
+                this.options.img.element = cachedImg;
+                if (cachedImg.complete) {
+                    if (cachedImg.naturalWidth != 0) {
+                        imgOnload();
+                    } else {
+                        imgOnerror();
+                    }
+                } else {
+                    const oldOnload = cachedImg.onload;
+                    const oldOnError = cachedImg.onerror;
+                    cachedImg.onload = () => {
+                        if (oldOnload) {
+                            (oldOnload as any)();
+                        }
+                        imgOnload();
+                    };
+                    cachedImg.onerror = () => {
+                        if (oldOnError) {
+                            (oldOnError as any)();
+                        }
+                        imgOnerror();
+                    };
+                }
+            } else {
+                const img = new Image();
+                this.options.img.element = img;
+                imageCache.store(this.options.img.url, img);
+                img.onload = imgOnload;
+                img.onerror = imgOnerror;
+                img.src = this.options.img.url;
+            }
         } else if (this.options.img.success) {
             this._updateImg(this._renderer._ctx);
         }
