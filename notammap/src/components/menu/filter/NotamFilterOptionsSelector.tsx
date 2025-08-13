@@ -17,6 +17,8 @@ export interface NotamFilterOptionsSelectorProps {
     options: NotamFilterOptions;
 }
 
+// TODO: include icao locations filter and "include fir notams" checkbox (where location matches fir)
+
 export function NotamFilterOptionsSelector({ onChange, options }: NotamFilterOptionsSelectorProps) {
     function update(updater: (options: NotamFilterOptions) => any) {
         let clone = structuredClone(options);
