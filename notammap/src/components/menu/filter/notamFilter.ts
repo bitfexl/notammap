@@ -64,6 +64,9 @@ export const defaultFilterOptions: NotamFilterOptions = {
     },
 };
 
+const qCodeFirstParts = new Set<string>();
+Object.keys(firstTablesTable).forEach((q) => qCodeFirstParts.add(q));
+
 export function filterNotamData(notamData: NotamData, filterOrOptions: NotamFilterOptions | NotamFilter): NotamData {
     if (typeof filterOrOptions == "object") {
         filterOrOptions = createFilter(filterOrOptions);
@@ -115,13 +118,13 @@ export function createFilter(options: NotamFilterOptions): NotamFilter {
         }
 
         // Q-Code
-        // K... checklist filtered by scope, TODO: better for X use only first letter
+        const qCodeFirstPart = notam.notamCode ? notam.notamCode.substring(1, 3) : null;
         if (
-            notam.notamCode &&
-            !["K", "X"].includes(notam.notamCode[2]) &&
-            !startsWithAny(notam.notamCode.substring(1, 3), options.QCODES)
+            qCodeFirstPart &&
+            qCodeFirstParts.has(qCodeFirstPart) && // check if qcode exists at all, always show unknown qcodes
+            !startsWithAny(qCodeFirstPart, options.QCODES)
         ) {
-            console.log("No match: QCode", notam);
+            console.log("No match: QCode (" + qCodeFirstPart + ")", notam);
             return false;
         }
 
