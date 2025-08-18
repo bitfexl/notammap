@@ -8,7 +8,10 @@ export function toText(qcode: string) {
     // notam is checklist
     if (qcode == "QKKKK" || qcode == "QKKXX") {
         return "Checklist";
+    } else if (qcode == "QXXXX") {
+        return "No NOTAM code";
     }
+    // TODO: notam code where only second letter is given
 
     const code1 = qcode.substring(1, 3);
     const code2 = qcode.substring(3, 5);
