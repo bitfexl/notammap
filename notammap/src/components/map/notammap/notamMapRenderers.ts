@@ -115,6 +115,7 @@ export function renderIcon(color: string, text: string, latlng: L.LatLngTuple, r
     });
 }
 
+// TODO: cache this
 function renderIconSvg(color: string, borderColor: string, textColor: string, textContent: string) {
     return `<svg width="30px" height="30px" viewBox="-4 -1 36 38" version="1.1" xmlns="http://www.w3.org/2000/svg"><style>#text {
 font: 15px sans-serif;
