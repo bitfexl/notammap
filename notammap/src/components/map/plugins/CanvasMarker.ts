@@ -8,8 +8,6 @@ const defaultImgOptions = {
 
 // TODO: flyto sometimes not correctly updates the markers
 
-// TODO: optimize lag (flags)
-
 const imageCache = new MapCache<string, HTMLImageElement>();
 
 const CanvasMarker: any = L.CircleMarker.extend({
@@ -97,7 +95,6 @@ const CanvasMarker: any = L.CircleMarker.extend({
 
     _project() {
         const { img } = this.options;
-        if (!img) return;
         this._point = this._map.latLngToLayerPoint(this._latlng);
         this._point.x += img.offset.x;
         this._point.y += img.offset.y;
