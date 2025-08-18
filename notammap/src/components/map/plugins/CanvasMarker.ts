@@ -14,7 +14,9 @@ const imageCache = new MapCache<string, HTMLImageElement>();
 
 const CanvasMarker: any = L.CircleMarker.extend({
     _updatePath() {
-        if (!this.options.img.element) {
+        if (!this.options.img.triedFetch) {
+            this.options.img.triedFetch = true;
+
             const imgOnload = () => {
                 this.options.img.success = true;
                 // autosize height if negative
