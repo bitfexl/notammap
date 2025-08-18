@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { DetailedNotam } from "../../api/notams/notamextractor";
 import { NotamComponent } from "./NotamComponent";
+import { coordinatesToString } from "../util/coordinates";
 
 export interface NotamListComponentProps {
     /**
@@ -16,6 +17,11 @@ export function NotamListComponent({ detailedNotams }: NotamListComponentProps) 
 
     return (
         <div className="pb-2">
+            <div>
+                {detailedNotams[0].notam.latitude}, {detailedNotams[0].notam.longitude}
+                <br />
+                {coordinatesToString(detailedNotams[0].notam.latitude!, detailedNotams[0].notam.longitude!)}
+            </div>
             <div>
                 <NotamComponent detailedNotam={detailedNotams[notamIndex]}></NotamComponent>
             </div>
