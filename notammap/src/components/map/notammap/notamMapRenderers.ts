@@ -50,6 +50,8 @@ export const renderCoordinates: CoordinatesRenderer = function (
 
     polygon.on("click", onClick);
 
+    polygon.on("contextmenu", console.log);
+
     return polygon;
 };
 
