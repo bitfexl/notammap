@@ -1,0 +1,24 @@
+@base = http://localhost:1234
+
+GET {{base}}/indexes
+
+###
+POST {{base}}/indexes
+Content-Type: application/json
+
+{
+  "uid": "movies",
+  "primaryKey": "id"
+}
+
+###
+POST {{base}}/indexes/movies/documents
+Content-Type: application/json
+
+{
+    "id": 0,
+    "asdf": "asdf"
+}
+
+###
+GET {{base}}/tasks/0
