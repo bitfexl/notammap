@@ -3,7 +3,7 @@
 const bucketUrl = "https://storage.googleapis.com/storage/v1/b/29f98e10-a489-4c82-ae5e-489dbcd4912f/o";
 const bucketUrlWithToken = bucketUrl + "?pageToken=";
 
-(async () => {
+export async function queryAirportData() {
     const jsonExports = await getAirportJsonExports();
     const airports = [];
     for (const jsonExport of jsonExports) {
@@ -12,8 +12,8 @@ const bucketUrlWithToken = bucketUrl + "?pageToken=";
             airports.push(parseAirportJson(airport));
         }
     }
-    console.log(JSON.stringify(airports));
-})();
+    return airports;
+}
 
 async function getAirportJsonExports() {
     let items = [];
