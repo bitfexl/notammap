@@ -1,4 +1,5 @@
-*.json
+*
+!*.template
 !*.template.*
-
-prebuildscript
+!*.md
+!.gitignore
