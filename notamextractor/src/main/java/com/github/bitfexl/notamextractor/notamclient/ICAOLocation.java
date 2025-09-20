@@ -1,4 +1,4 @@
-package com.github.bitfexl.notamextractor.dins;
+package com.github.bitfexl.notamextractor.notamclient;
 
 /**
  * Represents an icao location identifier.

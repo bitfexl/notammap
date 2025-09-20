@@ -4,8 +4,9 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.github.bitfexl.notamextractor.dins.DinsQuery;
-import com.github.bitfexl.notamextractor.dins.ICAOLocation;
+import com.github.bitfexl.notamextractor.notamclient.DODAISClient;
+import com.github.bitfexl.notamextractor.notamclient.NotamClient;
+import com.github.bitfexl.notamextractor.notamclient.ICAOLocation;
 import com.github.bitfexl.notamextractor.notamparser.Notam;
 import com.github.bitfexl.notamextractor.notamparser.NotamParser;
 import com.github.bitfexl.notamextractor.notamparser.detailsparser.DetailedNotamParser;
@@ -19,18 +20,17 @@ import java.util.List;
 // TODO: do not write files with special characters (if country name contains some)
 
 public class Main {
-    private static final DinsQuery dinsQuery = new DinsQuery();
+    private static final NotamClient notamClient = new DODAISClient();
     private static final ObjectMapper objectMapper = new ObjectMapper().setSerializationInclusion(Include.NON_NULL);
 
     @SneakyThrows
     public static void main(String[] args) {
-        // generateLocationJsonIndex();
-
         final List<ICAOLocation> allLocations = loadLocationJsonIndex();
 
-//        final List<String> countries = Arrays.stream(args).map(c -> c.replace("_", " ")).toList();
+        // final List<String> countries = Arrays.stream(args).map(c -> c.replace("_", " ")).toList();
         // ignore united states countries as us notam format currently is not supported
-        final List<String> countries = allLocations.stream().map(ICAOLocation::country).distinct().filter(c -> !c.startsWith("United States")).toList();
+        List<String> countries = allLocations.stream().map(ICAOLocation::country).distinct().filter(c -> !c.startsWith("United States")).toList();
+
         final List<String> successfulCountries = new ArrayList<>();
 
         final ObjectWriter writer = objectMapper.writerWithDefaultPrettyPrinter();
@@ -39,7 +39,7 @@ public class Main {
             final List<ICAOLocation> filteredLocations = allLocations.stream().filter(loc -> loc.country().equalsIgnoreCase(countryName)).toList();
 
             try {
-                final NotamData data = generateNotamsJson(filteredLocations);
+                final NotamData data = generateNotamData(filteredLocations);
                 if (data.notams().isEmpty()) {
                     continue;
                 }
@@ -55,10 +55,10 @@ public class Main {
     }
 
     @SneakyThrows
-    private static NotamData generateNotamsJson(List<ICAOLocation> locations) {
+    private static NotamData generateNotamData(List<ICAOLocation> locations) {
         final NotamParser parser = new NotamParser();
 
-        final List<String> notams = dinsQuery.getNotams(locations);
+        final List<String> notams = notamClient.queryNotmas(locations.stream().map(ICAOLocation::icao).toList());
 
         final List<Notam> parsedNotams = notams.stream().map(notam -> {
             try {
@@ -79,14 +79,5 @@ public class Main {
         try (InputStream inputStream = Main.class.getResourceAsStream("/icaoLocationIndex.json")) {
             return objectMapper.readValue(inputStream, new TypeReference<>(){});
         }
-    }
-
-    @SneakyThrows
-    private static void generateLocationJsonIndex() {
-        final List<ICAOLocation> locations = dinsQuery.getAllIcaoLocations();
-
-        final String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(locations);
-
-        System.out.println(json);
     }
 }
