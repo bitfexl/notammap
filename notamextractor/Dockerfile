@@ -12,7 +12,7 @@ WORKDIR /build
 COPY --from=build-app /app.jar .
 # jdk.crypto.ec module for ssl https://stackoverflow.com/a/55517159/30915739
 RUN $JAVA_HOME/bin/jlink \
-         --add-modules jdk.crypto.ec,$($JAVA_HOME/bin/jdeps --ignore-missing-deps --print-module-deps app.jar) \
+         --add-modules java.net.http,jdk.crypto.ec,$($JAVA_HOME/bin/jdeps --ignore-missing-deps --print-module-deps app.jar) \
          --strip-debug \
          --no-man-pages \
          --no-header-files \
