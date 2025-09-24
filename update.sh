@@ -22,7 +22,7 @@ else
     )
 
     # rebuild and restart
-    podman compose build --pull --no-cache
+    ./prepare-images.sh
     podman compose down
     podman compose up -d
 
