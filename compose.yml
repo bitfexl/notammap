@@ -2,7 +2,7 @@ name: notam-map
 
 services:
   webserver:
-    image: notammap/frontend-webserver
+    image: localhost/notammap/frontend-webserver
     ports:
       - "8080:80"
     volumes:
@@ -16,7 +16,7 @@ services:
       - tmsproxy
 
   extractor:
-    image: notammap/notamextractor
+    image: localhost/notammap/notamextractor
     volumes:
       - notamdata:/data
 
