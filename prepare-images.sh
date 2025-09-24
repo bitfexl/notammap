@@ -1,7 +1,6 @@
 podman build -t notammap/frontend-webserver \
     --build-arg OPENAIP_TILE_LAYER_URL=/tiles/openaip/{z}/{x}/{y} \
     --build-arg SATELLITE_TILE_LAYER_URL=/tiles/satellite/{z}/{x}/{y} \
-    # --build-arg INJECT_HEAD="<script> /* TODO inject analytics script */ </script>"
     ./notammap
 
 podman build -t notammap/notamextractor ./notamextractor
