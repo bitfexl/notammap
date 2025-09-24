@@ -1,4 +1,4 @@
-FROM maven:3-eclipse-temurin-21 AS build-app
+FROM docker.io/maven:3-eclipse-temurin-21 AS build-app
 WORKDIR /build
 COPY pom.xml .
 RUN mvn dependency:go-offline
@@ -7,19 +7,19 @@ RUN mvn package
 RUN mv /build/target/notamextractor.jar /app.jar
 
 # https://github.com/docker-library/docs/blob/master/eclipse-temurin/README.md#creating-a-jre-using-jlink
-FROM eclipse-temurin:21 AS build-jre
+FROM docker.io/eclipse-temurin:21 AS build-jre
 WORKDIR /build
 COPY --from=build-app /app.jar .
 # jdk.crypto.ec module for ssl https://stackoverflow.com/a/55517159/30915739
 RUN $JAVA_HOME/bin/jlink \
-         --add-modules java.net.http,jdk.crypto.ec,$($JAVA_HOME/bin/jdeps --ignore-missing-deps --print-module-deps app.jar) \
-         --strip-debug \
-         --no-man-pages \
-         --no-header-files \
-         --compress=2 \
-         --output /javaruntime
+    --add-modules java.net.http,jdk.crypto.ec,$($JAVA_HOME/bin/jdeps --ignore-missing-deps --print-module-deps app.jar) \
+    --strip-debug \
+    --no-man-pages \
+    --no-header-files \
+    --compress=2 \
+    --output /javaruntime
 
-FROM debian:12-slim
+FROM docker.io/debian:12-slim
 WORKDIR /
 COPY --from=build-jre /javaruntime /javaruntime
 COPY --from=build-app /app.jar .

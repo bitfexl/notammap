@@ -1,4 +1,4 @@
-FROM node as build
+FROM docker.io/node as build
 
 WORKDIR /build
 COPY package*.json .
@@ -19,6 +19,6 @@ ENV VITE_OPENAIP_TILE_LAYER_URL=$OPENAIP_TILE_LAYER_URL \
 
 RUN npm run build && mv dist /dist
 
-FROM caddy
+FROM docker.io/caddy
 COPY Caddyfile /etc/caddy/Caddyfile
 COPY --from=build /dist/ /usr/share/caddy/

@@ -1,11 +1,9 @@
 dnf update -y
 dnf install podman podman-compose git -y
-echo 'unqualified-search-registries = ["docker.io"]' > /etc/containers/registries.conf
 
 git clone https://github.com/bitfexl/notammap.git notammap
-
-# TODO: update cron jobs
-
 cd notammap
+
 chmod +x *.sh
+./prepare-images.sh
 podman compose up -d
