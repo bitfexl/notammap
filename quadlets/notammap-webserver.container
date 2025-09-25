@@ -4,7 +4,7 @@ Description=The entrypoint of the notammap. Handles static assets for the fronte
 [Container]
 Image=localhost/notammap/frontend-webserver
 PublishPort=8080:80
-Volume=notammap-notamdata:/usr/share/caddy/notamdata:readonly,volume-nocopy
+Volume=notammap-notamdata:/usr/share/caddy/notamdata:ro,volume-nocopy
 
 [Install]
 WantedBy=multi-user.target
