@@ -2,6 +2,4 @@
 Description=The notamdata exchange volume between the notamextractor and the webserver.
 
 [Volume]
-
-[Install]
-WantedBy=multi-user.target
+VolumeName=notammap-notamdata
