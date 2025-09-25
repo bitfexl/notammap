@@ -1,0 +1,8 @@
+[Unit]
+Description=The tile map proxy for open aip and satellite tiles.
+
+[Container]
+Image=ghcr.io/bitfexl/tmsproxy:latest
+
+[Install]
+WantedBy=multi-user.target

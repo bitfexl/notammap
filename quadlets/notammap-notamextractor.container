@@ -1,0 +1,9 @@
+[Unit]
+Description=Extracts notamdata for notammap. Runs extraction once, then exits.
+
+[Container]
+Image=localhost/notammap/notamextractor
+Volume=notammap-notamdata:/data
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,8 @@
+[Unit]
+Description=The meilisearch container for airport and city search.
+
+[Container]
+Image=localhost/notammap/meilisearch
+
+[Install]
+WantedBy=multi-user.target
