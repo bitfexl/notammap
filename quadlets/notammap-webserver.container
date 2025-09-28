@@ -1,7 +1,7 @@
 [Unit]
 Description=The entrypoint of the notammap. Handles static assets for the frontend and generated notam data and reverse proxies for the tile map proxy and meilisearch server.
-Requires=notammap-notamdata-volume,notammap-notamextractor
-After=notammap-notamdata-volume
+Requires=notammap-notamdata-volume.service,notammap-notamextractor.service
+After=notammap-notamdata-volume.service
 
 [Container]
 Image=localhost/notammap/frontend-webserver
