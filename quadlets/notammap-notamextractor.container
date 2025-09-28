@@ -1,6 +1,6 @@
 [Unit]
 Description=Extracts notamdata for notammap. Runs extraction once, then exits.
-Requires=notammap-notamdata-volume
+Requires=notammap-notamdata-volume.service
 After=notammap-notamdata-volume.service
 
 [Container]
