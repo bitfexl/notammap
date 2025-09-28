@@ -1,6 +1,6 @@
 [Unit]
 Description=Extracts notamdata for notammap. Runs extraction once, then exits.
-Requires=notammap-notamdata
+Requires=notammap-notamdata-volume
 
 [Container]
 Image=localhost/notammap/notamextractor
