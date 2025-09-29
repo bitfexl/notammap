@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 # update sources
 oldhash=$(git rev-parse HEAD)
 git pull
