@@ -5,5 +5,3 @@ git clone https://github.com/bitfexl/notammap.git notammap
 cd notammap
 
 chmod +x *.sh
-./prepare-images.sh
-podman compose up -d
