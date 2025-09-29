@@ -54,3 +54,9 @@ The following systemd services will be installed:
 - *notammap-tmsproxy.service* the tile map service proxy. Required by the webserver.
 - *notammap-notamdata-volume.service* the notam data exchange volume between the notamextractor and webserver. Required by both.
 - *notammap-network.service* the notammap default network. Required by the webserver and tmsproxy.
+
+TODOS:
+
+TODO: tiles loading slow/not loading at all
+TODO: browser or webserver caches notamdata and available countries (add timestamp)
+TODO: INJECT_HEAD for analytics script, etc.
