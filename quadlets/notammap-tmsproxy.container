@@ -1,6 +1,9 @@
 [Unit]
 Description=The tile map proxy for open aip and satellite tiles.
+Requires=notammap-network.service
+After=notammap-network.service
 
 [Container]
 Image=localhost/notammap/tmsproxy
 ContainerName=notammap-tmsproxy
+Network=notammap-default

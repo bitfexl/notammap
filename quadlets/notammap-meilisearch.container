@@ -1,6 +1,9 @@
 [Unit]
 Description=The meilisearch container for airport and city search.
+Requires=notammap-network.service
+After=notammap-network.service
 
 [Container]
 Image=localhost/notammap/meilisearch
 ContainerName=notammap-meilisearch
+Network=notammap-default
