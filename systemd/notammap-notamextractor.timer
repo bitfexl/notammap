@@ -4,3 +4,6 @@ Description=Run notam extraction daily.
 [Timer]
 Unit=notammap-notamextractor.service
 OnCalendar=daily
+
+[Install]
+WantedBy=multi-user.target
