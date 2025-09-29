@@ -7,4 +7,4 @@ podman build -t notammap/notamextractor ./notamextractor
 
 podman build -t notammap/meilisearch ./meilisearch
 
-podman pull ghcr.io/bitfexl/tmsproxy:latest
+podman build -t notammap/tmsproxy ./tmsproxy

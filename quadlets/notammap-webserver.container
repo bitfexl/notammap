@@ -2,6 +2,8 @@
 Description=The entrypoint of the notammap. Handles static assets for the frontend and generated notam data and reverse proxies for the tile map proxy and meilisearch server.
 Requires=notammap-notamdata-volume.service
 Requires=notammap-notamextractor.service
+Requires=notammap-tmsproxy.service
+Requires=notammap-meilisearch.service
 After=notammap-notamdata-volume.service
 
 [Container]

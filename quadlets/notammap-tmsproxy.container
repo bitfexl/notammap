@@ -2,5 +2,5 @@
 Description=The tile map proxy for open aip and satellite tiles.
 
 [Container]
-Image=ghcr.io/bitfexl/tmsproxy:latest
+Image=localhost/notammap/tmsproxy
 ContainerName=notammap-tmsproxy
