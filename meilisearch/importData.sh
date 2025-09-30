@@ -29,6 +29,14 @@ function main {
 
     waitForCompletion
 
+    response=$(curl -s \
+        -X PUT 'http://localhost:7700/indexes/dataIndex/settings/sortable-attributes' \
+        -H "Authorization: Bearer $adminKey" \
+        -H 'Content-Type: application/json' \
+        -d '["sortKey","_geo","name","icaoCode"]')
+
+    waitForCompletion
+
     echo "Index created."
     echo "Importing data..."
 

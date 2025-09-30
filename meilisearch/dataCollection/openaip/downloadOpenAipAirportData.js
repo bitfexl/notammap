@@ -33,8 +33,9 @@ function parseAirportJson(rawJson) {
         icaoCode: rawJson.icaoCode ?? null,
         iataCode: rawJson.iataCode ?? null,
         _geo: {
-            lat: rawJson.geometry.coordinates[0],
-            lng: rawJson.geometry.coordinates[1],
+            lat: rawJson.geometry.coordinates[1],
+            lng: rawJson.geometry.coordinates[0],
         },
+        sortKey: 100,
     };
 }

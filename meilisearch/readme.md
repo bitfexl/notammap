@@ -10,6 +10,8 @@ Data is not collected at build time. Instead run the command below to update the
 node ./dataCollection/index.js
 ```
 
+The sort key on the places/airports are for sorting the results. 100 for airports, 200 for cities and 300 for towns.
+
 ## Build and run image
 
 WARNING: All the meilisearch keys are always fixed at build time and saved to text files in the image.

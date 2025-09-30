@@ -1,22 +1,18 @@
 const overpassApi = "https://overpass-api.de/api/interpreter";
 
-const overpassQueries = [
-    // cities worldwide
-    `[out:json];
+const cityOSMQuery = `[out:json];
 node["place"="city"];
-out center;`,
-    // towns in europe
-    `[out:json];
+out center;`;
+
+const townsEuropeOSMQuery = `[out:json];
 node["place"="town"](30,-20,70,40);
-out center;`,
-];
+out center;`;
 
 export async function queryLocationsData() {
-    const rawOsmNodes = [];
-    for (const query of overpassQueries) {
-        rawOsmNodes.push(...(await callOverpassApi(query)).elements);
-    }
-    return rawOsmNodes.map(parseOsmJsonElement);
+    const nodes = [];
+    nodes.push(...(await callOverpassApi(cityOSMQuery)).elements.map((r) => parseOsmJsonElement(r, 200)));
+    nodes.push(...(await callOverpassApi(townsEuropeOSMQuery)).elements.map((r) => parseOsmJsonElement(r, 300)));
+    return nodes;
 }
 
 async function callOverpassApi(query) {
@@ -29,7 +25,7 @@ async function callOverpassApi(query) {
     ).json();
 }
 
-function parseOsmJsonElement(rawJson) {
+function parseOsmJsonElement(rawJson, sortKey) {
     return {
         name: rawJson?.tags?.name ?? null,
         nameEn: rawJson?.tags?.["name:en"] ?? null,
@@ -37,5 +33,6 @@ function parseOsmJsonElement(rawJson) {
             lat: rawJson.lat,
             lng: rawJson.lon,
         },
+        sortKey,
     };
 }
