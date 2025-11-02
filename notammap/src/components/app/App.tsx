@@ -8,6 +8,8 @@ import { boxShadowStyle } from "../componentConstants";
 import { MAIN_MAP_ID } from "./appConstants";
 import { AppData, AppDataLayer } from "./AppDataLayer";
 import { AppLayout } from "./AppLayout";
+import { Search } from "../form/Search";
+import { AirportsAndPlacesSearch } from "../form/AirportsAndPlacesSearch";
 // import { NotamPanel } from "../panel/NotamPanel";
 
 export default function App() {
@@ -64,11 +66,19 @@ export default function App() {
                     </div>
                 }
                 header={
-                    <div className="p-4 rounded-md bg-white w-80" style={boxShadowStyle} ref={sideMenuHeaderRef}>
-                        <h2>Notam Map {appData.country}</h2>
-                        <p>
-                            NOTAMS: {appData.displayedNotamData.notams.length} / {appData.loadedNotamData?.notams.length ?? 0}
-                        </p>
+                    <div>
+                        <div className="p-4 rounded-md bg-white w-80" style={boxShadowStyle} ref={sideMenuHeaderRef}>
+                            <h2>Notam Map {appData.country}</h2>
+                            <p>
+                                NOTAMS: {appData.displayedNotamData.notams.length} / {appData.loadedNotamData?.notams.length ?? 0}
+                            </p>
+                        </div>
+                        <div
+                            className="fixed top-4 p-4 bg-white rounded-md left-1/2 -translate-x-1/2 w-96 max-xl:ml-[160px] max-lg:w-80"
+                            style={boxShadowStyle}
+                        >
+                            <AirportsAndPlacesSearch latitude={0} longitude={0}></AirportsAndPlacesSearch>
+                        </div>
                     </div>
                 }
                 menu={

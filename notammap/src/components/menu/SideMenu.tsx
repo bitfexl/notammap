@@ -216,7 +216,7 @@ function CountryMenu({
                     <SVGIcon svg={searchIcon} inline></SVGIcon>
                     <input
                         type="text"
-                        placeholder="Search..."
+                        placeholder="Search country..."
                         className="ml-2 w-full border-b-2 border-gray-400 outline-none focus:border-gray-700"
                         value={searchContent}
                         onChange={(e) => setSearchContent(e.target.value)}
