@@ -6,6 +6,7 @@ import com.github.bitfexl.notammap.notam.extraction.NOTAMClient;
 import io.quarkus.arc.Arc;
 import io.quarkus.arc.InstanceHandle;
 import io.quarkus.logging.Log;
+import jakarta.json.Json;
 import lombok.SneakyThrows;
 
 import java.io.IOException;
@@ -18,9 +19,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 public class FAANotamExtractor implements NOTAMClient {
-    private static final int MAX_PER_QUERY = 50;
+    private static final int MAX_PER_QUERY = 9999; // there seems to be no limit
+
+    private static final String INVALID_LOCATIONS_STRING = "Invalid location(s):";
 
     private final URI uri = URI.create("https://notams.aim.faa.gov/notamSearch/search");
 
@@ -28,8 +33,7 @@ public class FAANotamExtractor implements NOTAMClient {
 
     @Override
     public List<String> queryADNotams(List<String> icaoIds) {
-        final String s = queryNotams(icaoIds);
-        return List.of(s);
+        return queryNotams(icaoIds);
     }
 
     @Override
@@ -39,7 +43,7 @@ public class FAANotamExtractor implements NOTAMClient {
 
     @Override
     public List<String> queryFIRNotams(List<String> icaoIds) {
-        return List.of();
+        return queryNotams(icaoIds);
     }
 
     @Override
@@ -47,9 +51,9 @@ public class FAANotamExtractor implements NOTAMClient {
         return MAX_PER_QUERY;
     }
 
-    private String queryNotams(List<String> icaoIds) {
-        if (icaoIds.size() > 99999) {
-            throw new IllegalArgumentException("Can handle ... icao ids at max.");
+    private List<String> queryNotams(List<String> icaoIds) {
+        if (icaoIds.size() > MAX_PER_QUERY) {
+            throw new IllegalArgumentException("Can only query " + MAX_PER_QUERY + " icao ids at once.");
         }
 
         final String icaoIdsString = String.join(",", icaoIds);
@@ -74,18 +78,41 @@ public class FAANotamExtractor implements NOTAMClient {
             nextQuery = query + "&offset=" + endRecord + "&notamsOnly=false";
         } while (notams.size() < notamsCount);
 
-        return notams.toString();
+        return notams.stream().map(n -> n.get("icaoMessage").asText()).toList();
     }
 
     private JsonNode queryNotamsHandled(String query) {
+        final JsonNode response;
         try {
-            return queryNotams(query);
+            response = queryNotams(query);
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
             throw new RuntimeException("Interrupted while querying notams.");
         } catch (Exception ex) {
             throw new RuntimeException("Exception while querying notams.", ex);
         }
+
+        errorHandling: if (response.has("error")) {
+            final String errorString = response.get("error").asText();
+            if (errorString.isEmpty()) {
+                break errorHandling;
+            }
+
+            if (errorString.startsWith(INVALID_LOCATIONS_STRING)) {
+                final String[] invalidLocations = errorString.substring(INVALID_LOCATIONS_STRING.length()).split(",");
+                // list of single quoted strings
+                final List<String> invalidIcaoIds = Stream.of(invalidLocations)
+                        .map(id -> {
+                            id = id.trim();
+                            return id.substring(1, id.length() - 1);
+                        }).toList();
+                throw new InvalidIcaoIdsException(invalidIcaoIds);
+            } else {
+                throw new RuntimeException("FAA NOTAMS api returned an error: " + errorString);
+            }
+        }
+
+        return response;
     }
 
     private JsonNode queryNotams(String query) throws IOException, InterruptedException {
@@ -109,12 +136,10 @@ public class FAANotamExtractor implements NOTAMClient {
                     throw new RuntimeException("ObjectMapper not available.");
                 }
 
+//                final String s = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+//                Log.info(s);
                 return mapper.get().readTree(in);
             }
         }
-    }
-
-    private void extractNotams(JsonNode json) {
-
     }
 }
