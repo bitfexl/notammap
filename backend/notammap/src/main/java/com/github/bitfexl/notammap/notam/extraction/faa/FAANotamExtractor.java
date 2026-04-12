@@ -2,6 +2,8 @@ package com.github.bitfexl.notammap.notam.extraction.faa;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.bitfexl.notammap.notam.extraction.ExtractedNotamData;
+import com.github.bitfexl.notammap.notam.extraction.ExtractedNotamDataString;
 import com.github.bitfexl.notammap.notam.extraction.NOTAMClient;
 import io.quarkus.arc.Arc;
 import io.quarkus.arc.InstanceHandle;
@@ -32,8 +34,8 @@ public class FAANotamExtractor implements NOTAMClient {
     private final HttpClient httpClient = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.ALWAYS).build();
 
     @Override
-    public List<String> queryADNotams(List<String> icaoIds) {
-        return queryNotams(icaoIds);
+    public List<ExtractedNotamData> queryADNotams(List<String> icaoIds) {
+        return queryNotams(icaoIds).stream().map(s -> (ExtractedNotamData) new ExtractedNotamDataString(s)).toList();
     }
 
     @Override
@@ -42,8 +44,8 @@ public class FAANotamExtractor implements NOTAMClient {
     }
 
     @Override
-    public List<String> queryFIRNotams(List<String> icaoIds) {
-        return queryNotams(icaoIds);
+    public List<ExtractedNotamData> queryFIRNotams(List<String> icaoIds) {
+        return queryNotams(icaoIds).stream().map(s -> (ExtractedNotamData) new ExtractedNotamDataString(s)).toList();
     }
 
     @Override
