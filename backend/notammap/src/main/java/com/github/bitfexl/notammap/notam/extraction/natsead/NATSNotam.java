@@ -7,4 +7,10 @@ public record NATSNotam(Type type, String notamId, String notam, String heading)
         AERODROME,
         FIR
     }
+
+    @Override
+    public String toString() {
+        // TODO: check this for correctness
+        return notamId + "\n" + notam;
+    }
 }

@@ -2,6 +2,7 @@ package com.github.bitfexl.notammap.notam.extraction.natsead;
 
 import com.github.bitfexl.notammap.notam.extraction.ExtractedNotamData;
 import com.github.bitfexl.notammap.notam.extraction.NOTAMClient;
+import io.smallrye.mutiny.Uni;
 import org.openqa.selenium.WebDriver;
 
 import java.time.Instant;
@@ -38,15 +39,8 @@ public class NATSExtractor implements NOTAMClient {
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<ExtractedNotamData> queryADNotams(List<String> icaoIds) {
-        try {
-            return (List<ExtractedNotamData>) (Object) extractNotamsForAerodromes(icaoIds).get();
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(ex);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
+    public Uni<List<ExtractedNotamData>> queryADNotams(List<String> icaoIds) {
+        return (Uni<List<ExtractedNotamData>>) (Object) extractNotamsForAerodromes(icaoIds);
     }
 
     @Override
@@ -56,15 +50,8 @@ public class NATSExtractor implements NOTAMClient {
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<ExtractedNotamData> queryFIRNotams(List<String> icaoIds) {
-        try {
-            return (List<ExtractedNotamData>) (Object) extractNotamsForFIRs(icaoIds).get();
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(ex);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
+    public Uni<List<ExtractedNotamData>> queryFIRNotams(List<String> icaoIds) {
+        return (Uni<List<ExtractedNotamData>>) (Object) extractNotamsForFIRs(icaoIds);
     }
 
     @Override
@@ -74,7 +61,7 @@ public class NATSExtractor implements NOTAMClient {
 
     // end notam client api
 
-    public Future<List<AerodromeSearchResult>> searchAerodromes(String search) {
+    public Uni<List<AerodromeSearchResult>> searchAerodromes(String search) {
         return runTask(() -> {
             natsInteractor.selectAerodromeBriefing();
             natsInteractor.openAdSearch();
@@ -85,7 +72,7 @@ public class NATSExtractor implements NOTAMClient {
         });
     }
 
-    public Future<List<FIRSearchResult>> searchFIRs(String search) {
+    public Uni<List<FIRSearchResult>> searchFIRs(String search) {
         return runTask(() -> {
             natsInteractor.selectAreaBriefing();
             natsInteractor.openFirSearch();
@@ -98,16 +85,16 @@ public class NATSExtractor implements NOTAMClient {
 
     // end notam client serach api
 
-    public Future<List<NATSNotam>> extractNotamsForFIRs(List<String> firs) {
+    public Uni<List<NATSNotam>> extractNotamsForFIRs(List<String> firs) {
         if (firs.size() > 40) {
-            return CompletableFuture.failedFuture(new IllegalArgumentException("A maximum of 40 FIRs can be extracted at once."));
+            return Uni.createFrom().failure(new IllegalArgumentException("A maximum of 40 FIRs can be extracted at once."));
         }
         return runTask(() -> extract(firs, true));
     }
 
-    public Future<List<NATSNotam>> extractNotamsForAerodromes(List<String> aerodromes) {
+    public Uni<List<NATSNotam>> extractNotamsForAerodromes(List<String> aerodromes) {
         if (aerodromes.size() > 200) {
-            return CompletableFuture.failedFuture(new IllegalArgumentException("A maximum of 200 airports can be extracted at once."));
+            return Uni.createFrom().failure(new IllegalArgumentException("A maximum of 200 airports can be extracted at once."));
         }
         return runTask(() -> extract(aerodromes, false));
     }
@@ -168,19 +155,26 @@ public class NATSExtractor implements NOTAMClient {
         stopWebDriver();
     }
 
-    private <T> Future<T> runTask(Callable<T> task) {
-        return executorService.submit(() -> {
-            // force reinit every 20 min of inactivity (30 min is logout)
-            if (lastTaskExecuted == null || Instant.now().minus(20, ChronoUnit.MINUTES).isAfter(lastTaskExecuted)) {
-                initNatsInteractor(true);
-            } else {
-                initNatsInteractor();
-            }
-            lastTaskExecuted = Instant.now();
+    private <T> Uni<T> runTask(Callable<T> task) {
+        return Uni.createFrom().emitter((emitter) -> {
+            executorService.submit(() -> {
+                // force reinit every 20 min of inactivity (30 min is logout)
+                if (lastTaskExecuted == null || Instant.now().minus(20, ChronoUnit.MINUTES).isAfter(lastTaskExecuted)) {
+                    initNatsInteractor(true);
+                } else {
+                    initNatsInteractor();
+                }
+                lastTaskExecuted = Instant.now();
 
-            final T t = task.call();
-            scheduleCleanup();
-            return t;
+                try {
+                    final T t = task.call();
+                    emitter.complete(t);
+                } catch (Exception ex) {
+                    emitter.fail(ex);
+                } finally {
+                    scheduleCleanup();
+                }
+            });
         });
     }
 

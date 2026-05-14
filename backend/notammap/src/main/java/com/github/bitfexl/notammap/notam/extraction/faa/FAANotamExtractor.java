@@ -8,6 +8,8 @@ import com.github.bitfexl.notammap.notam.extraction.NOTAMClient;
 import io.quarkus.arc.Arc;
 import io.quarkus.arc.InstanceHandle;
 import io.quarkus.logging.Log;
+import io.smallrye.mutiny.Uni;
+import io.smallrye.mutiny.infrastructure.Infrastructure;
 import jakarta.json.Json;
 import lombok.SneakyThrows;
 
@@ -34,8 +36,10 @@ public class FAANotamExtractor implements NOTAMClient {
     private final HttpClient httpClient = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.ALWAYS).build();
 
     @Override
-    public List<ExtractedNotamData> queryADNotams(List<String> icaoIds) {
-        return queryNotams(icaoIds).stream().map(s -> (ExtractedNotamData) new ExtractedNotamDataString(s)).toList();
+    public Uni<List<ExtractedNotamData>> queryADNotams(List<String> icaoIds) {
+        // TODO: update this class to use a reactive http client
+        return Uni.createFrom().item(queryNotams(icaoIds).stream().map(s -> (ExtractedNotamData) new ExtractedNotamDataString(s)).toList())
+                .runSubscriptionOn(Infrastructure.getDefaultWorkerPool());
     }
 
     @Override
@@ -44,8 +48,10 @@ public class FAANotamExtractor implements NOTAMClient {
     }
 
     @Override
-    public List<ExtractedNotamData> queryFIRNotams(List<String> icaoIds) {
-        return queryNotams(icaoIds).stream().map(s -> (ExtractedNotamData) new ExtractedNotamDataString(s)).toList();
+    public Uni<List<ExtractedNotamData>> queryFIRNotams(List<String> icaoIds) {
+        // TODO: update this class to use a reactive http client
+        return Uni.createFrom().item(queryNotams(icaoIds).stream().map(s -> (ExtractedNotamData) new ExtractedNotamDataString(s)).toList())
+                .runSubscriptionOn(Infrastructure.getDefaultWorkerPool());
     }
 
     @Override
