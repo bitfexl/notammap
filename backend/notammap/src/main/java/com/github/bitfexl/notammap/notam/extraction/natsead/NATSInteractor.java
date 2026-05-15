@@ -160,11 +160,11 @@ public class NATSInteractor {
 
         for (WebElement row : table.findElements(By.tagName("tr"))) {
             final List<WebElement> tds = row.findElements(By.tagName("td"));
-            final String icao = tds.get(0).getText().trim();
-            final String iata = tds.get(1).getText().trim();
-            final String fir = tds.get(2).getText().trim();
-            final String name = tds.get(3).getText().trim();
-            final String type = tds.get(4).getText().trim();
+            final String icao = nullIfEmpty(tds.get(0).getText().trim());
+            final String iata = nullIfEmpty(tds.get(1).getText().trim());
+            final String fir = nullIfEmpty(tds.get(2).getText().trim());
+            final String name = nullIfEmpty(tds.get(3).getText().trim());
+            final String type = nullIfEmpty(tds.get(4).getText().trim());
             aerodromeSearchResults.add(new AerodromeSearchResult(icao, iata, fir, name, type));
         }
 
@@ -178,8 +178,8 @@ public class NATSInteractor {
 
         for (WebElement row : table.findElements(By.tagName("tr"))) {
             final List<WebElement> tds = row.findElements(By.tagName("td"));
-            final String icao = tds.get(0).getText().trim();
-            final String name = tds.get(1).getText().trim();
+            final String icao = nullIfEmpty(tds.get(0).getText().trim());
+            final String name = nullIfEmpty(tds.get(1).getText().trim());
             firSearchResults.add(new FIRSearchResult(icao, name));
         }
 
@@ -342,5 +342,13 @@ public class NATSInteractor {
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    // helper method
+    private String nullIfEmpty(String s) {
+        if (s.isEmpty()) {
+            return null;
+        }
+        return s;
     }
 }

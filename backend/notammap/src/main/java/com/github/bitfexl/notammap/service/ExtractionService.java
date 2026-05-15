@@ -91,7 +91,7 @@ public class ExtractionService {
 
             identifier.setType(IdentifierType.AERODROME);
             identifier.setAerodromeType(result.type());
-            identifier.setIataCode(result.icao());
+            identifier.setIataCode(result.iata());
             identifier.setFir(result.fir());
             identifier.setName(result.name());
             identifier.setLastSearch(icaoIdentifierSearch);
