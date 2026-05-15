@@ -1,3 +1,24 @@
+# Notammap
+
+## Dev database
+
+**Run database**
+
+```shell
+podman run -d -p 5432:5432 --name notammap-dev-db -e POSTGRES_USER=notammap -e POSTGRES_PASSWORD=pammaton docker.io/library/postgres:latest
+```
+**Port:** 5432
+
+**User/Database:** notammap
+
+**Password:** pammaton
+
+---
+
+# Quarkus readme below
+
+---
+
 # notammap
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.

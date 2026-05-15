@@ -4,13 +4,21 @@ import com.github.bitfexl.notammap.event.SearchCompletedEvent;
 import com.github.bitfexl.notammap.notam.extraction.ExtractedNotamData;
 import com.github.bitfexl.notammap.notam.extraction.NOTAMClient;
 import com.github.bitfexl.notammap.notam.extraction.faa.FAANotamExtractor;
+import com.github.bitfexl.notammap.notam.extraction.natsead.AerodromeSearchResult;
 import com.github.bitfexl.notammap.notam.extraction.natsead.FIRSearchResult;
 import com.github.bitfexl.notammap.notam.extraction.natsead.NATSExtractor;
+import com.github.bitfexl.notammap.repository.ICAOIdentifierRepository;
+import com.github.bitfexl.notammap.repository.ICAOIdentifierSearchRepository;
+import com.github.bitfexl.notammap.repository.entities.ICAOIdentifier;
+import com.github.bitfexl.notammap.repository.entities.ICAOIdentifierSearch;
+import com.github.bitfexl.notammap.repository.entities.types.IdentifierType;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Event;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,12 +38,72 @@ public class ExtractionService {
     @Inject
     NATSExtractor natsExtractor;
 
-    public void searchAerodromes(String query) {
+    @Inject
+    ICAOIdentifierRepository icaoIdentifierRepository;
 
+    @Inject
+    ICAOIdentifierSearchRepository icaoIdentifierSearchRepository;
+
+    public record SearchResult(String searchString, Instant startTimestamp, Instant insertStartTimestamp, Instant endTimestamp, int totalRecords, int newRecords) { }
+
+    /**
+     * Searches for icao aerodrome ids and returns the number of new ids inserted.
+     * @param search The search string.
+     * @return The result of the search
+     */
+    public Uni<SearchResult> searchAerodromes(String search) {
+        final Instant startTimestamp = Instant.now();
+        return natsExtractor.searchAerodromes(search).onItem().transform(
+                (result) -> {
+                    final Instant insertStartTimestamp = Instant.now();
+                    final int newRecords = insertSearchResults(search, result, "NATS");
+                    final Instant endTimestamp = Instant.now();
+                    return new SearchResult(search, startTimestamp, insertStartTimestamp, endTimestamp, result.size(), newRecords);
+                }
+        );
     }
 
     public Uni<List<FIRSearchResult>> searchFIRs(String search) {
         return faaNotamExtractor.searchFIRs(search);
+    }
+
+    @Transactional
+    int insertSearchResults(String searchString, List<AerodromeSearchResult> searchResults, String source) {
+        final ICAOIdentifierSearch icaoIdentifierSearch = new ICAOIdentifierSearch();
+        icaoIdentifierSearch.setSearchString(searchString);
+        icaoIdentifierSearch.setSearchType(IdentifierType.AERODROME);
+        icaoIdentifierSearch.setSource(source);
+        icaoIdentifierSearch.setFoundIdentifiers(searchResults.size());
+
+        icaoIdentifierSearchRepository.persist(icaoIdentifierSearch);
+
+        int newIdentifiers = 0;
+
+        for (AerodromeSearchResult result : searchResults) {
+            ICAOIdentifier identifier = icaoIdentifierRepository.findById(result.icao());
+
+            if (identifier == null) {
+                identifier = new ICAOIdentifier();
+                identifier.setId(result.icao());
+                identifier.setFirstSearch(icaoIdentifierSearch);
+                newIdentifiers++;
+            }
+
+            identifier.setType(IdentifierType.AERODROME);
+            identifier.setAerodromeType(result.type());
+            identifier.setIataCode(result.icao());
+            identifier.setFir(result.fir());
+            identifier.setName(result.name());
+            identifier.setLastSearch(icaoIdentifierSearch);
+
+            icaoIdentifierRepository.persist(identifier);
+        }
+
+        icaoIdentifierSearch.setNewIdentifiers(newIdentifiers);
+
+        icaoIdentifierSearchRepository.persist(icaoIdentifierSearch);
+
+        return newIdentifiers;
     }
 
     // TODO: methods to extract known fir, ad notams (skip icao id check)
