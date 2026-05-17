@@ -62,6 +62,17 @@
             <artifactId>quarkus-hibernate-orm-panache</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-spatial</artifactId>
+        </dependency>
+        <!-- Source: https://mvnrepository.com/artifact/org.geolatte/geolatte-geom -->
+        <dependency>
+            <groupId>org.geolatte</groupId>
+            <artifactId>geolatte-geom</artifactId>
+            <version>1.12</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-hibernate-validator</artifactId>
         </dependency>

@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
+import java.time.Instant;
 import java.util.List;
 
 @Entity
@@ -17,6 +18,8 @@ import java.util.List;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Notam extends BaseEntity {
+    //region fields added by application/raw fields
+
     /**
      * Primary key.
      */
@@ -34,6 +37,10 @@ public class Notam extends BaseEntity {
      * The source of the notam (extraction source).
      */
     String source;
+
+    //endregion
+
+    //region series/header fields
 
     /**
      * The notam series, the letter in front of the notam number.
@@ -63,7 +70,27 @@ public class Notam extends BaseEntity {
     /**
      * The notam type.
      */
+    // TOOD: enum column type string
     NotamType type;
+
+    /**
+     * The series of the previous notam if type is NOTAMC see {@link #series}
+     */
+    Character previousNotamSeries;
+
+    /**
+     * The number of the previous notam if type is NOTAMC see {@link #number}
+     */
+    Character previousNotamNumber;
+
+    /**
+     * The year of the previous notam if type is NOTAMC see {@link #year}
+     */
+    Integer previousNotamYear;
+
+    //endregion
+
+    //region q line fields
 
     /**
      * The flight information region as provided in item Q.
@@ -72,120 +99,153 @@ public class Notam extends BaseEntity {
      */
     String fir;
 
-//    /**
-//     * The 5 letter notam code as provided in item Q.
-//     * See: https://www.faa.gov/air_traffic/publications/atpubs/notam_html/appendix_b.html
-//     */
-//    String notamCode;
-//
-//    /**
-//     * The affected traffic as provided in item Q.
-//     */
-//    List<Traffic> traffic;
-//
-//    /**
-//     * The notam purpose as provided in item Q.
-//     */
-//    List<NotamPurpose> purposes;
-//
-//    /**
-//     * The notam scopes as provided in item Q.
-//     */
-//    List<NotamScope> scopes;
-//
-//    /**
-//     * The lower limit in FL or in thousands of feet below the transition level as provided in item Q.
-//     * Item F and G should be the same.
-//     * If no specific height information is provided
-//     * 0 and 999 are assumed for lower and upper limit.
-//     */
-//    Integer qLower;
-//
-//    /**
-//     * The lower limit in FL or in thousands of feet below the transition level as provided in item Q.
-//     * Item F and G should be the same.
-//     * If no specific height information is provided
-//     * 0 and 999 are assumed for lower and upper limit.
-//     */
-//    Integer qUpper;
-//
-//    /**
-//     * The latitude of the coordinates and radius provided in item Q. (ISO 6709 format)
-//     */
-//    Double latitude;
-//
-//    /**
-//     *  The longitude of the coordinates and radius provided in item Q. (ISO 6709 format)
-//     */
-//    Double longitude;
-//
-//    /**
-//     * The radius of the coordinates and radius provided in item Q in nautical miles.
-//     */
-//    Integer radius;
-//
-//    /**
-//     * ICAO location indicators as provided in item A.
-//     * Is set to the nationality letters + "XX" in the case of a not
-//     * ICAO location. Then details are provided in item E.
-//     */
-//    List<String> locationIndicators;
-//
-//    /**
-//     * The date and time as provided in item B (UTC).
-//     * In the ISO 8601 (https://en.wikipedia.org/wiki/ISO_8601) format.
-//     */
-//    // TODO: REAL DATES
-//    String from;
-//
-//    /**
-//     * The date and time as provided in item C (UTC).
-//     * In the ISO 8601 (https://en.wikipedia.org/wiki/ISO_8601) format.
-//     * Might be null, in which case isPermanent should be true.
-//     * Might be an estimation in which case isEstimation should be true.
-//     */
-//    String to;
-//
-//    /**
-//     * If item C (to) is "PERM".
-//     * If true, item C should be null.
-//     */
-//    Boolean isPermanent;
-//
-//    /**
-//     * If true item C (to) is just an estimation.
-//     */
-//    Boolean isEstimation;
-//
-//    /**
-//     * The schedule as provided in item D.
-//     * Might be null.
-//     */
-//    String schedule;
-//
-//    /**
-//     * The plain text provided in item E.
-//     */
-//    String notamText;
-//
-//    /**
-//     * The lower limit as provided in item F.
-//     * Should be the same as aLower if provided.
-//     * Unit of measurement is clearly indicated.
-//     * The abbreviations "GND" (ground) and "SFC" (surface) may be used.
-//     */
-//    String lowerLimit;
-//
-//    /**
-//     * The upper limit as provided in item G.
-//     * Should be the same as aUpper if provided.
-//     * Unit of measurement is clearly indicated.
-//     * The abbreviation "UNL" (unlimited) may be used.
-//     */
-//    String upperLimit;
-//
-//    /**
-//     * The created line at the end of each notam returned by DINS.
-//     */
-//    String created;
+    /**
+     * The 4 letters of the 5 letter notam code as provided in item Q after the Q.
+     * See: https://www.faa.gov/air_traffic/publications/atpubs/notam_html/appendix_b.html
+     */
+    String notamCode;
+
+    /**
+     * The affected traffic as provided in item Q contains I for IFR.
+     */
+    boolean trafficIsIfr;
+
+    /**
+     * The affected traffic as provided in item Q contains V for VFR.
+     */
+    boolean trafficIsVrf;
+
+    /**
+     * The affected traffic as provided in item Q contains K for a checklist.
+     * This should only be true if the other two traffics are false.
+     */
+    boolean trafficIsChecklist;
+
+    /**
+     * If the notam purpose contains N.
+     * Valid combinations should only be NBO, BO which appear in PIB,
+     * M or K.
+     */
+    boolean purposeIsImmediateAttention;
+
+    /**
+     * If the notam purpose contains B.
+     * Valid combinations should only be NBO, BO which appear in PIB,
+     * M or K.
+     */
+    boolean purposeIsOperationallySignificant;
+
+    /**
+     * If the notam purpose contains O.
+     * Valid combinations should only be NBO, BO which appear in PIB,
+     * M or K.
+     */
+    boolean purposeIsFlightOperations;
+
+    /**
+     * If the notam purpose contains/is M.
+     * Valid combinations should only be NBO, BO which appear in PIB,
+     * M or K.
+     */
+    boolean purposeIsMiscellaneous;
+
+    /**
+     * If the notam purpose contains/is K.
+     * Valid combinations should only be NBO, BO which appear in PIB,
+     * M or K.
+     */
+    boolean purposeIsChecklist;
+
+    /**
+     * The notam affects aerodromes.
+     */
+    boolean scopeIsAerordrome;
+
+    /**
+     * The notam affects enroute information.
+     */
+    boolean scopeIsEnroute;
+
+    /**
+     * The notam effects a nav warning.
+     */
+    boolean scopeIsNavWarning;
+
+    /**
+     * The notam is a checklist, other scope types should be false.
+     */
+    boolean scopeIsChecklist;
+
+    /**
+     * The lower limit in FL or in hundreds of feet below the transition level as provided in item Q.
+     * Item F and G should be the same.
+     * If no specific height information is provided
+     * 0 and 999 are assumed for lower and upper limit.
+     */
+    Integer QLowerLimit;
+
+    /**
+     * The lower limit in FL or in hundreds of feet below the transition level as provided in item Q.
+     * Item F and G should be the same.
+     * If no specific height information is provided
+     * 0 and 999 are assumed for lower and upper limit.
+     */
+    Integer QUpperLimit;
+
+    // TODO: q line coordinates and radius (as postgis object)
+
+    //endregion
+
+    // other items (A-G)
+
+    /**
+     * Item A
+     * ICAO location indicators as provided in item A.
+     * Is set to the nationality letters + "XX" in the case of a not
+     * ICAO location. Then details are provided in item E.
+     */
+    // TODO: this needs to be a list
+    String locationIndicators;
+
+    /**
+     * Item B
+     * Notam validity start.
+     */
+    Instant startOfValidity;
+
+    /**
+     * Item C
+     * Notam validity end, might be null if PERM. Or end in EST.
+     */
+    Instant endOfValidity;
+
+    /**
+     * If item C is an estimation (EST).
+     */
+    boolean endOfValidityIsEstimate;
+
+    /**
+     * true if item C is PERM (permanent notam).
+     */
+    boolean validityIsPermanent;
+
+    // TODO: item D time schedule
+
+    /**
+     * Item E
+     * The raw text provided.
+     */
+    String notamText;
+
+    /**
+     * Item E
+     * The lower limit as provided.
+     */
+    String lowerLimit;
+
+    /**
+     * Item G
+     * The upper limit as provided.
+     */
+    String upperLimit;
 }
