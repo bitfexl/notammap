@@ -7,7 +7,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -17,6 +16,19 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 public class NATSInteractor {
+    public static class ExtractionFailedPartialResultException extends RuntimeException {
+        private final Object partialResult;
+
+        public ExtractionFailedPartialResultException(Throwable cause, Object partialResult) {
+            super("Extraction did not complete, but a partial result is still available.", cause);
+            this.partialResult = partialResult;
+        }
+
+        public Object getPartialResult() {
+            return partialResult;
+        }
+    }
+
     private static final DateTimeFormatter natsDateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     private final long actionPause = 200;
@@ -126,28 +138,36 @@ public class NATSInteractor {
 
         final List<T> extractedData = new ArrayList<>();
 
-        while (true) {
-            // extract
-            extractedData.addAll(extractor.get());
+        try {
+            while (true) {
+                // extract
+                extractedData.addAll(extractor.get());
 
-            // next
-            if (!Objects.requireNonNull(next.getAttribute("class")).contains("ui-state-disabled")) {
-                next.click();
+                // next
+                if (!Objects.requireNonNull(next.getAttribute("class")).contains("ui-state-disabled")) {
+                    next.click();
 
-                String newPageSelectorText;
-                do {
-                    try {
-                        newPageSelectorText = driver.findElement(pageSelector).getText();
-                    } catch (StaleElementReferenceException ex) {
-                        // try again
-                        newPageSelectorText = pageSelectorText;
-                    }
-                    actionPause();
-                } while (pageSelectorText.equals(newPageSelectorText));
-                pageSelectorText = newPageSelectorText;
-            } else {
-                break;
+                    String newPageSelectorText;
+                    do {
+                        try {
+                            newPageSelectorText = driver.findElement(pageSelector).getText();
+                        } catch (StaleElementReferenceException ex) {
+                            // try again
+                            newPageSelectorText = pageSelectorText;
+                        }
+                        actionPause();
+                    } while (pageSelectorText.equals(newPageSelectorText));
+                    pageSelectorText = newPageSelectorText;
+                } else {
+                    break;
+                }
             }
+        } catch (Exception ex) {
+            if (extractedData.isEmpty()) {
+                throw ex;
+            }
+
+            throw new ExtractionFailedPartialResultException(ex, extractedData);
         }
 
         return extractedData;

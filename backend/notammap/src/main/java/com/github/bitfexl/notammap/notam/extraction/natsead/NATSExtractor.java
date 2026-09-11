@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.concurrent.*;
 import java.util.function.Supplier;
 
+// TODO: add an error detection for FIR / AD id switched up
+
 public class NATSExtractor implements NOTAMClient {
     private final Supplier<WebDriver> webDriverFactory;
 
@@ -61,25 +63,47 @@ public class NATSExtractor implements NOTAMClient {
 
     // end notam client api
 
-    public Uni<List<AerodromeSearchResult>> searchAerodromes(String search) {
+    /**
+     * The result of a search.
+     * @param completed true if the search completed fully, false if only partially;
+     * @param results The results.
+     * @param cause The error because of which the search could not complete if any.
+     */
+    public record SearchResult<T>(boolean completed, List<T> results, Throwable cause) { }
+
+    @SuppressWarnings("unchecked")
+    public Uni<SearchResult<AerodromeSearchResult>> searchAerodromes(String search) {
         return runTask(() -> {
-            natsInteractor.selectAerodromeBriefing();
-            natsInteractor.openAdSearch();
-            natsInteractor.searchByAdName(search);
-            final List<AerodromeSearchResult> results = natsInteractor.extractAdSearchData();
-            stopWebDriver(); // webdriver unusable after search
-            return results;
+            try {
+                natsInteractor.selectAerodromeBriefing();
+                natsInteractor.openAdSearch();
+                natsInteractor.searchByAdName(search);
+                try {
+                    return new SearchResult<>(true, natsInteractor.extractAdSearchData(), null);
+                } catch (NATSInteractor.ExtractionFailedPartialResultException ex) {
+                    return new SearchResult<>(false, (List<AerodromeSearchResult>) ex.getPartialResult(), ex.getCause());
+                }
+            } finally {
+                stopWebDriver(); // webdriver unusable after search
+            }
         });
     }
 
-    public Uni<List<FIRSearchResult>> searchFIRs(String search) {
+    @SuppressWarnings("unchecked")
+    public Uni<SearchResult<FIRSearchResult>> searchFIRs(String search) {
         return runTask(() -> {
-            natsInteractor.selectAreaBriefing();
-            natsInteractor.openFirSearch();
-            natsInteractor.searchByFirName(search);
-            final List<FIRSearchResult> results = natsInteractor.extractFirSearchData();
-            stopWebDriver(); // webdriver unusable after search
-            return results;
+            try {
+                natsInteractor.selectAreaBriefing();
+                natsInteractor.openFirSearch();
+                natsInteractor.searchByFirName(search);
+                try {
+                    return new SearchResult<>(true, natsInteractor.extractFirSearchData(), null);
+                } catch (NATSInteractor.ExtractionFailedPartialResultException ex) {
+                    return new SearchResult<>(false, (List<FIRSearchResult>) ex.getPartialResult(), ex.getCause());
+                }
+            } finally {
+                stopWebDriver(); // webdriver unusable after search
+            }
         });
     }
 

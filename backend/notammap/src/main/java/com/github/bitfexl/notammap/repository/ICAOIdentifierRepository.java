@@ -17,4 +17,14 @@ public class ICAOIdentifierRepository implements PanacheRepositoryBase<ICAOIdent
                 .setParameter("identifiers", identifiers)
                 .getResultList();
     }
+
+    @SuppressWarnings("unchecked")
+    public List<String> getNonExistentIdentifiers(List<String> identifiers) {
+        final List<String> existing = getEntityManager()
+                .createQuery("SELECT id FROM ICAOIdentifier WHERE id IN :identifiers")
+                .setParameter("identifiers", identifiers)
+                .getResultList();
+
+        return identifiers.stream().filter(i -> !existing.contains(i)).toList();
+    }
 }

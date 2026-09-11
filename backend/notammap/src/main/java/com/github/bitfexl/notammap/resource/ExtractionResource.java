@@ -1,33 +1,41 @@
 package com.github.bitfexl.notammap.resource;
 
 import com.github.bitfexl.notammap.service.ExtractionService;
-import io.smallrye.mutiny.Uni;
+import com.github.bitfexl.notammap.service.NotamProcessingService;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
 import java.util.List;
-import java.util.Objects;
 
 @Path("/extract")
 public class ExtractionResource {
     @Inject
     ExtractionService extractionService;
 
-    @GET
-    @Path("/{icaoIds}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<?> extract(String icaoIds) {
-        final String[] icaoIdArray = icaoIds.split(",");
-        return extractionService.extractNotams(ExtractionService.NotamSource.FAA, List.of(icaoIdArray));
-    }
+    @Inject
+    NotamProcessingService notamProcessingService;
 
     @GET
-    @Path("/search/aerodromes/{search}")
+    @Path("/{source}/{icaoIds}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Uni<ExtractionService.SearchResult> search(String search) {
-        return extractionService.searchAerodromes(search);
+    public List<?> extract(String source, String icaoIds) {
+        ExtractionService.NotamSource notamSource;
+
+        if (source.equalsIgnoreCase("FAA")) {
+            notamSource = ExtractionService.NotamSource.FAA;
+        } else if (source.equalsIgnoreCase("NATS")) {
+            notamSource = ExtractionService.NotamSource.NATS;
+        } else {
+            throw new BadRequestException("Unknown source: " + source);
+        }
+
+        final String[] icaoIdArray = icaoIds.split(",");
+
+        return extractionService.extractNotams(notamSource, List.of(icaoIdArray)).stream()
+                .map(notam -> notamProcessingService.recreateRawNotam(notamSource, notam)).toList();
     }
 }

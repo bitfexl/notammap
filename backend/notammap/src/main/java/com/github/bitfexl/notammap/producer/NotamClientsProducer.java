@@ -21,8 +21,12 @@ public class NotamClientsProducer {
 
     @Produces
     public NATSExtractor produceNATSExtractor() {
-        final NATSExtractor natsExtractor = new NATSExtractor(() -> new ChromeDriver(new ChromeOptions().addArguments("--headless")), natsEadConfig.username(), natsEadConfig.password());
+        final boolean debug = true;
 
-        return natsExtractor;
+        if (debug) {
+            return new NATSExtractor(() -> new ChromeDriver(new ChromeOptions()), natsEadConfig.username(), natsEadConfig.password());
+        }
+
+        return new NATSExtractor(() -> new ChromeDriver(new ChromeOptions().addArguments("--headless")), natsEadConfig.username(), natsEadConfig.password());
     }
 }

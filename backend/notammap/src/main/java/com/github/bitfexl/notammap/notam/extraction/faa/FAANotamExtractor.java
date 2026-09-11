@@ -7,11 +7,8 @@ import com.github.bitfexl.notammap.notam.extraction.ExtractedNotamDataString;
 import com.github.bitfexl.notammap.notam.extraction.NOTAMClient;
 import io.quarkus.arc.Arc;
 import io.quarkus.arc.InstanceHandle;
-import io.quarkus.logging.Log;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.infrastructure.Infrastructure;
-import jakarta.json.Json;
-import lombok.SneakyThrows;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,9 +18,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public class FAANotamExtractor implements NOTAMClient {
@@ -129,6 +124,9 @@ public class FAANotamExtractor implements NOTAMClient {
                 .header("Accept", "application/json")
                 .header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
                 .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36")
+                .header("Cookie", "fnsDisclaimer=agreed; DR_SITE_PM=https://notams.aim.faa.gov/dnotam/; akamai_pilotweb_access=true;")
+                .header("Referer", "https://notams.aim.faa.gov/notamSearch/nsapp.html")
+                .header("Origin", "https://notams.aim.faa.gov")
                 .POST(HttpRequest.BodyPublishers.ofString(query, StandardCharsets.UTF_8))
                 .build();
 

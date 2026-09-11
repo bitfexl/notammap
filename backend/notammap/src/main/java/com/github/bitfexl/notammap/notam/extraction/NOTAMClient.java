@@ -2,10 +2,10 @@ package com.github.bitfexl.notammap.notam.extraction;
 
 import com.github.bitfexl.notammap.notam.extraction.natsead.AerodromeSearchResult;
 import com.github.bitfexl.notammap.notam.extraction.natsead.FIRSearchResult;
+import com.github.bitfexl.notammap.notam.extraction.natsead.NATSExtractor;
 import io.smallrye.mutiny.Uni;
 
 import java.util.List;
-import java.util.concurrent.Future;
 
 public interface NOTAMClient {
     /**
@@ -39,7 +39,7 @@ public interface NOTAMClient {
      * @param search The search string.
      * @return A list of found aerodromes for the specified search string or an empty list.
      */
-    default Uni<List<AerodromeSearchResult>> searchAerodromes(String search) {
+    default Uni<NATSExtractor.SearchResult<AerodromeSearchResult>> searchAerodromes(String search) {
         throw new UnsupportedOperationException("Searching aerodromes is not supported by " + this.getClass().getName() + ".");
     }
 
@@ -48,7 +48,7 @@ public interface NOTAMClient {
      * @param search The search string.
      * @return A list of found FIRs for the specified search string or an empty list.
      */
-    default Uni<List<FIRSearchResult>> searchFIRs(String search) {
+    default Uni<NATSExtractor.SearchResult<FIRSearchResult>> searchFIRs(String search) {
         throw new UnsupportedOperationException("Searching FIRs is not supported by " + this.getClass().getName() + ".");
     }
 }
